@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+
+<HBox fx:controller="com.example.vendingmachine.VendingMachineController" xmlns:fx="http://javafx.com/fxml" stylesheets="@style.css" spacing="20">
+    <HBox styleClass="vending-machine" >
+        <VBox >
+            <GridPane fx:id="productGrid" hgap="10" vgap="10">
+            </GridPane>
+            <VBox styleClass="purchased-box">
+                <Label text="출고된 상품:"/>
+                <VBox fx:id="productList"/>
+            </VBox>
+        </VBox>
+
+        <VBox spacing="10">
+            <VBox styleClass="money-wrapper">
+                <Label text="금액 입력"/>
+                <GridPane fx:id="moneyGrid"  hgap="5" vgap="3"/>
+            </VBox>
+            <VBox styleClass="balance-box">
+                <Label text="넣은 금액"/>
+                <Label fx:id="balanceLabel"/>
+            </VBox>
+            <Button styleClass="refund-button" text="잔돈 반환" onAction="#refund" />
+        </VBox>
+    </HBox>
+    <VBox styleClass="refund-box">
+        <Label text="반환된 금액"/>
+        <VBox fx:id="refundedList"/>
+    </VBox>
+</HBox>
