@@ -1,44 +1,37 @@
 package com.example.vendingmachine;
 
 public enum Money {
-    // 한화
-    WON_100(100, "100원"),
-    WON_500(500, "500원"),
-    WON_1000(1000, "1000원"),
-    WON_5000(5000, "5000원"),
-    WON_10000(10000, "10000원"),
-    WON_50000(50000, "50000원"),
+    WON_100(100, Currency.WON),
+    WON_500(500, Currency.WON),
+    WON_1000(1000, Currency.WON),
+    WON_5000(5000, Currency.WON),
+    WON_10000(10000, Currency.WON),
+    WON_50000(50000, Currency.WON),
 
-    // 엔화 (1엔 = 10원)
-    YEN_10(100, "10¥"),
-    YEN_50(500, "50¥"),
-    YEN_100(1000, "100¥"),
-    YEN_500(5000, "500¥"),
-    YEN_1000(10000, "1000¥"),
-    YEN_5000(50000, "5000¥"),
-    YEN_10000(100000, "10000¥"),
+    YEN_10(10, Currency.YEN),
+    YEN_50(50, Currency.YEN),
+    YEN_100(100, Currency.YEN),
+    YEN_500(500, Currency.YEN),
+    YEN_1000(1000, Currency.YEN),
+    YEN_5000(5000, Currency.YEN),
+    YEN_10000(10000, Currency.YEN),
 
-    // 달러 (1달러 = 1000원)
-    DOLLAR_1(1000, "$1"),
-    DOLLAR_5(5000, "$5"),
-    DOLLAR_10(10000, "$10"),
-    DOLLAR_20(20000, "$20"),
-    DOLLAR_50(50000, "$50"),
-    DOLLAR_100(100000, "$100");
+    DOLLAR_1(1, Currency.DOLLAR),
+    DOLLAR_5(5, Currency.DOLLAR),
+    DOLLAR_10(10, Currency.DOLLAR),
+    DOLLAR_20(20, Currency.DOLLAR),
+    DOLLAR_50(50, Currency.DOLLAR),
+    DOLLAR_100(100, Currency.DOLLAR);
 
-    private final int wonValue;
-    private final String displayName;
+    private final int value;
+    private final Currency currency;
 
-    Money(int wonValue, String displayName) {
-        this.wonValue = wonValue;
-        this.displayName = displayName;
+    Money(int value, Currency currency) {
+        this.value = value;
+        this.currency = currency;
     }
 
-    public int value() {
-        return wonValue;
-    }
+    public int getWonValue() { return currency.toWon(value); }
 
-    public String displayName() {
-        return displayName;
-    }
+    public String displayName() { return currency.format(value); }
 }

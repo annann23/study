@@ -36,7 +36,7 @@ public class VendingMachine {
     }
 
     public void insertCoin(Money money) {
-        this.balance += money.value();
+        this.balance += money.getWonValue();
     }
 
     public ProductItem pressButton(int buttonId) {
@@ -59,8 +59,8 @@ public class VendingMachine {
                 Money.WON_1000, Money.WON_500, Money.WON_100};
 
         for(Money money : monies) {
-            int count = balance/ money.value();
-            balance %= money.value();
+            int count = balance/ money.getWonValue();
+            balance %= money.getWonValue();
             if(count > 0) refundAmount.put(money, count);
         }
 

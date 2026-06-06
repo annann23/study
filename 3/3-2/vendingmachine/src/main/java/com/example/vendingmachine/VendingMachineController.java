@@ -19,16 +19,16 @@ public class VendingMachineController {
     private final Map<Button, javafx.scene.control.Button> priceButtons = new HashMap<>();
 
     @FXML private GridPane productGrid;
-    @FXML private ComboBox<String> currencyComboBox;
+    @FXML private ComboBox<Currency> currencyComboBox;
     @FXML private ComboBox<Money> denominationComboBox;
     @FXML private Label balanceLabel;
     @FXML private VBox productList;
     @FXML private VBox refundedList;
 
-    private static final Map<String, Money[]> CURRENCY_MAP = Map.of(
-            "원", new Money[]{Money.WON_100, Money.WON_500, Money.WON_1000, Money.WON_5000, Money.WON_10000, Money.WON_50000},
-            "엔", new Money[]{Money.YEN_10, Money.YEN_50, Money.YEN_100, Money.YEN_500, Money.YEN_1000, Money.YEN_5000, Money.YEN_10000},
-            "달러", new Money[]{Money.DOLLAR_1, Money.DOLLAR_5, Money.DOLLAR_10, Money.DOLLAR_20, Money.DOLLAR_50, Money.DOLLAR_100}
+    private static final Map<Currency, Money[]> CURRENCY_MAP = Map.of(
+            Currency.WON, new Money[]{Money.WON_100, Money.WON_500, Money.WON_1000, Money.WON_5000, Money.WON_10000, Money.WON_50000},
+            Currency.YEN, new Money[]{Money.YEN_10, Money.YEN_50, Money.YEN_100, Money.YEN_500, Money.YEN_1000, Money.YEN_5000, Money.YEN_10000},
+            Currency.DOLLAR, new Money[]{Money.DOLLAR_1, Money.DOLLAR_5, Money.DOLLAR_10, Money.DOLLAR_20, Money.DOLLAR_50, Money.DOLLAR_100}
     );
 
     @FXML
@@ -71,14 +71,14 @@ public class VendingMachineController {
         };
         denominationComboBox.setConverter(converter);
 
-        currencyComboBox.getItems().addAll("원", "엔", "달러");
+        currencyComboBox.getItems().addAll(Currency.values());
         currencyComboBox.getSelectionModel().selectFirst();
         onCurrencySelected();
     }
 
     @FXML
     public void onCurrencySelected() {
-        String currency = currencyComboBox.getValue();
+        Currency currency = currencyComboBox.getValue();
         denominationComboBox.getItems().setAll(CURRENCY_MAP.get(currency));
         denominationComboBox.getSelectionModel().selectFirst();
     }
@@ -137,7 +137,7 @@ public class VendingMachineController {
 
             refundedList.getChildren().clear();
             refundMap.forEach((money, count) ->
-                    refundedList.getChildren().add(new Label(money.value() + "원: " + count + "개")));
+                    refundedList.getChildren().add(new Label(money.getWonValue() + "원: " + count + "개")));
 
             balanceLabel.setText(vendingMachine.getBalance() + "원");
             updateButtonStates();
