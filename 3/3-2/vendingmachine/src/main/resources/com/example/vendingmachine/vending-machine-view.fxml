@@ -5,6 +5,7 @@
 <?import javafx.scene.layout.HBox?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 
 <HBox fx:controller="com.example.vendingmachine.VendingMachineController" xmlns:fx="http://javafx.com/fxml" stylesheets="@style.css" spacing="20">
@@ -19,9 +20,12 @@
         </VBox>
 
         <VBox spacing="10">
-            <VBox styleClass="money-wrapper">
-                <Label text="금액 입력"/>
-                <GridPane fx:id="moneyGrid"  hgap="5" vgap="3"/>
+            <VBox styleClass="money-wrapper" spacing="5">
+                <Label text="통화 선택"/>
+                <ComboBox fx:id="currencyComboBox" onAction="#onCurrencySelected" maxWidth="Infinity"/>
+                <Label text="금액 선택"/>
+                <ComboBox fx:id="denominationComboBox" maxWidth="Infinity"/>
+                <Button text="투입" onAction="#onInsert" maxWidth="Infinity"/>
             </VBox>
             <VBox styleClass="balance-box">
                 <Label text="넣은 금액"/>

@@ -3,12 +3,15 @@ package com.example.vendingmachine;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.Map;
 
 public class VendingMachineController {
     private VendingMachine vendingMachine;
@@ -16,16 +19,23 @@ public class VendingMachineController {
     private final Map<Button, javafx.scene.control.Button> priceButtons = new HashMap<>();
 
     @FXML private GridPane productGrid;
-    @FXML private GridPane moneyGrid;
+    @FXML private ComboBox<String> currencyComboBox;
+    @FXML private ComboBox<Money> denominationComboBox;
     @FXML private Label balanceLabel;
     @FXML private VBox productList;
     @FXML private VBox refundedList;
+
+    private static final Map<String, Money[]> CURRENCY_MAP = Map.of(
+            "원", new Money[]{Money.WON_100, Money.WON_500, Money.WON_1000, Money.WON_5000, Money.WON_10000, Money.WON_50000},
+            "엔", new Money[]{Money.YEN_10, Money.YEN_50, Money.YEN_100, Money.YEN_500, Money.YEN_1000, Money.YEN_5000, Money.YEN_10000},
+            "달러", new Money[]{Money.DOLLAR_1, Money.DOLLAR_5, Money.DOLLAR_10, Money.DOLLAR_20, Money.DOLLAR_50, Money.DOLLAR_100}
+    );
 
     @FXML
     private void initialize() {
         vendingMachine = new VendingMachine();
         initializeProducts();
-        initializeMoneyButtons();
+        initializeCurrencyDropdown();
     }
 
     private void initializeProducts() {
@@ -54,17 +64,30 @@ public class VendingMachineController {
         }
     }
 
-    private void initializeMoneyButtons() {
-        Money[] monies = {Money.WON_50000, Money.WON_10000, Money.WON_5000,
-                Money.WON_1000, Money.WON_500, Money.WON_100};
+    private void initializeCurrencyDropdown() {
+        StringConverter<Money> converter = new StringConverter<>() {
+            @Override public String toString(Money money) { return money == null ? "" : money.displayName(); }
+            @Override public Money fromString(String s) { return null; }
+        };
+        denominationComboBox.setConverter(converter);
 
-        for (int i = 0; i < monies.length; i++) {
-            javafx.scene.control.Button moneyButton = new javafx.scene.control.Button(monies[i].value() + "₩");
-            moneyButton.getStyleClass().add("money-button");
+        currencyComboBox.getItems().addAll("원", "엔", "달러");
+        currencyComboBox.getSelectionModel().selectFirst();
+        onCurrencySelected();
+    }
 
-            Money money = monies[i];
-            moneyButton.setOnAction(e -> insertCoin(money));
-            moneyGrid.add(moneyButton, i % 2, i / 2);
+    @FXML
+    public void onCurrencySelected() {
+        String currency = currencyComboBox.getValue();
+        denominationComboBox.getItems().setAll(CURRENCY_MAP.get(currency));
+        denominationComboBox.getSelectionModel().selectFirst();
+    }
+
+    @FXML
+    public void onInsert(ActionEvent actionEvent) {
+        Money money = denominationComboBox.getValue();
+        if (money != null) {
+            insertCoin(money);
         }
     }
 
