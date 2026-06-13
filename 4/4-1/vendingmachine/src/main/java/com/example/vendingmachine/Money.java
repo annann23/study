@@ -31,7 +31,13 @@ public enum Money {
         this.currency = currency;
     }
 
-    public int getWonValue() { return currency.toWon(value); }
+    public org.joda.money.Money getAmount() {
+        return currency.of(value);
+    }
+
+    public int getWonValue() {
+        return currency.toWon(value).getAmountMajorInt();
+    }
 
     public String displayName() { return currency.format(value); }
 }
