@@ -13,7 +13,7 @@ public class DiscountEvent extends Event{
 
     @Override
     public int getPrice(int price) {
-        return price * (100 - discountRate) / 100;
+        return (int) Math.floor((double) (price * (100 - discountRate)) / 100);
     }
 
     @Override

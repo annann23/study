@@ -1,6 +1,7 @@
 module com.example.vendingmachine {
     requires javafx.controls;
     requires javafx.fxml;
+    requires org.joda.money;
 
 
     opens com.example.vendingmachine to javafx.fxml;
