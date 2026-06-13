@@ -5,7 +5,7 @@ import java.util.*;
 public class VendingMachine {
     private int balance;
     private final List<Button> buttons = new ArrayList<>();
-    private final List<Event> events = new ArrayList<>();  // 추가
+    private final EventManager eventManager = new EventManager();
 
     public VendingMachine() {
         balance = 0;
@@ -29,41 +29,25 @@ public class VendingMachine {
                 .orElseThrow(() -> new IllegalArgumentException("버튼이 없습니다: " + buttonId));
     }
 
+    public void registerEvent(Event event) {
+        eventManager.register(event);
+    }
+
+    public int getDisplayPrice(ProductType productType) {
+        return eventManager.getDisplayPrice(productType);
+    }
+
+    public int getQuantity(ProductType productType) {
+        return eventManager.getQuantity(productType);
+    }
+
     public boolean isPurchasable(Button button) {
         Rail rail = button.getRail();
 
         if (rail.isSoldOut()) return false;
 
         ProductType type = rail.peek().getType();
-        int requiredQuantity = findEvent(type)
-                .filter(e -> e instanceof OnePlusOneEvent)
-                .map(Event::getQuantity)
-                .orElse(1);
-
-        return rail.getQuantity() >= requiredQuantity;
-    }
-
-    public void registerEvent(Event event) {
-        events.add(event);
-    }
-
-    private Optional<Event> findEvent(ProductType productType) {
-        return events.stream()
-                .filter(e -> e.getTarget() == productType && e.isActive())
-                .findFirst();
-    }
-
-    public int getDisplayPrice(ProductType productType) {
-        return findEvent(productType)
-                .map(e -> e.getPrice(productType.price()))
-                .orElse(productType.price());
-    }
-
-    public int getQuantity(ProductType productType) {
-        return findEvent(productType)
-                .filter(e -> e instanceof OnePlusOneEvent)
-                .map(Event::getQuantity)
-                .orElse(1);
+        return rail.getQuantity() >= eventManager.getQuantity(type);
     }
 
     public void insertCoin(Money money) {
@@ -78,10 +62,13 @@ public class VendingMachine {
         if(!isPurchasable(button))
             throw new IllegalArgumentException("상품이 품절되었습니다.");
 
-        if (balance < getDisplayPrice(type))
+        ProductType type = button.getRail().peek().getType();
+        int finalPrice = getDisplayPrice(type);
+
+        if (balance < finalPrice)
             throw new IllegalArgumentException("금액이 부족합니다.");
 
-        balance -= getDisplayPrice(type);
+        balance -= finalPrice;
 
         List<ProductItem> result = new ArrayList<>();
 
@@ -93,7 +80,7 @@ public class VendingMachine {
     }
 
     public Map<Money, Integer> refund() {
-        if(balance <= 0) throw new IllegalArgumentException("반환할 금액이 없습니다.");;
+        if(balance <= 0) throw new IllegalArgumentException("반환할 금액이 없습니다.");
 
         Map<Money, Integer> refundAmount = new LinkedHashMap<>();
 

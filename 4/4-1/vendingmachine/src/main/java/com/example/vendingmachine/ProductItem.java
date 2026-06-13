@@ -1,7 +1,6 @@
 package com.example.vendingmachine;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 public class ProductItem {
     private final ProductType type;
