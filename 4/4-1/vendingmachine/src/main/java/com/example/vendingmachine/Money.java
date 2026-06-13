@@ -1,6 +1,8 @@
 package com.example.vendingmachine;
 
 public enum Money {
+    WON_10(10, Currency.WON),
+    WON_50(50, Currency.WON),
     WON_100(100, Currency.WON),
     WON_500(500, Currency.WON),
     WON_1000(1000, Currency.WON),
