@@ -34,8 +34,14 @@
             <Button styleClass="refund-button" text="잔돈 반환" onAction="#refund" />
         </VBox>
     </HBox>
-    <VBox styleClass="refund-box">
-        <Label text="반환된 금액"/>
-        <VBox fx:id="refundedList"/>
+    <VBox spacing="10">
+        <VBox styleClass="refund-box">
+            <Label text="진행 중인 이벤트"/>
+            <VBox fx:id="eventList"/>
+        </VBox>
+        <VBox styleClass="refund-box">
+            <Label text="반환된 금액"/>
+            <VBox fx:id="refundedList"/>
+        </VBox>
     </VBox>
 </HBox>

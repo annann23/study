@@ -168,6 +168,33 @@
     -fx-font-size: 13px;
 }
 
+/* ===== 가격 표시 텍스트 ===== */
+.normal-price {
+    -fx-font-size: 11px;
+    -fx-fill: black;
+}
+
+.original-price {
+    -fx-font-size: 10px;
+    -fx-fill: #999;
+    -fx-strikethrough: true;
+}
+
+.discounted-price {
+    -fx-font-size: 12px;
+    -fx-fill: #e74c3c;
+    -fx-font-weight: bold;
+}
+
+.event-badge {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-padding: 1 4 1 4;
+    -fx-background-radius: 3;
+}
+
 /* ===== 섹션 타이틀 라벨 ===== */
 .section-title {
     -fx-text-fill: white;
