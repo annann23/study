@@ -1,13 +1,11 @@
 package com.example.vendingmachine;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class VendingMachine {
     private int balance;
     private final List<Button> buttons = new ArrayList<>();
+    private final List<Event> events = new ArrayList<>();  // 추가
 
     public VendingMachine() {
         balance = 0;
@@ -33,6 +31,14 @@ public class VendingMachine {
 
     public List<Button> getButtons() {
         return buttons;
+    public void registerEvent(Event event) {
+        events.add(event);
+    }
+
+    private Optional<Event> findEvent(ProductType productType) {
+        return events.stream()
+                .filter(e -> e.getTarget() == productType && e.isActive())
+                .findFirst();
     }
 
     public void insertCoin(Money money) {

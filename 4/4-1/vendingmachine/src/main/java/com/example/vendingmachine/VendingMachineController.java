@@ -10,6 +10,8 @@ import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.Map;
 
@@ -34,8 +36,22 @@ public class VendingMachineController {
     @FXML
     private void initialize() {
         vendingMachine = new VendingMachine();
+        initializeEvents();
         initializeProducts();
         initializeCurrencyDropdown();
+    }
+
+    private void initializeEvents() {
+        ZonedDateTime start = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+        ZonedDateTime end = start.plusDays(7);
+
+        vendingMachine.registerEvent(
+                new DiscountEvent(ProductType.ZERO_COKE, start, end, 10)
+        );
+
+        vendingMachine.registerEvent(
+                new OnePlusOneEvent(ProductType.GREEN_TEA, start, end)
+        );
     }
 
     private void initializeProducts() {
