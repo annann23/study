@@ -127,9 +127,8 @@ public class VendingMachineController {
 
     private void purchase(Button domainButton) {
         try {
-            ProductItem purchased;
-            purchased = vendingMachine.pressButton(domainButton.getId());
-            purchasedMap.merge(purchased.getName(), 1, Integer::sum);
+            List<ProductItem> purchased = vendingMachine.pressButton(domainButton.getId());
+            purchased.forEach(item -> purchasedMap.merge(item.getName(), 1, Integer::sum));
 
             productList.getChildren().clear();
             purchasedMap.forEach((name, count) ->

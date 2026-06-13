@@ -59,19 +59,37 @@ public class VendingMachine {
                 .orElse(productType.price());
     }
 
+    public int getQuantity(ProductType productType) {
+        return findEvent(productType)
+                .filter(e -> e instanceof OnePlusOneEvent)
+                .map(Event::getQuantity)
+                .orElse(1);
+    }
+
     public void insertCoin(Money money) {
         this.balance += money.getWonValue();
     }
 
-    public ProductItem pressButton(int buttonId) {
+    public List<ProductItem> pressButton(int buttonId) {
         Button button = getButton(buttonId);
         ProductItem product = button.getRail().peek();
+        ProductType type = product.getType();
 
-        if (balance < product.getPrice())
+        if(!isPurchasable(button))
+            throw new IllegalArgumentException("상품이 품절되었습니다.");
+
+        if (balance < getDisplayPrice(type))
             throw new IllegalArgumentException("금액이 부족합니다.");
 
-        balance -= product.getPrice();
-        return button.getRail().dispense();
+        balance -= getDisplayPrice(type);
+
+        List<ProductItem> result = new ArrayList<>();
+
+        for (int i = 0; i < getQuantity(type); i++) {
+            result.add(button.getRail().dispense());
+        }
+
+        return result;
     }
 
     public Map<Money, Integer> refund() {
