@@ -17,4 +17,9 @@ public class OnePlusOneEvent extends Event{
     public int getQuantity() {
         return 2;
     }
+
+    @Override
+    public String getDescription() {
+        return getTarget().name() + " 1+1";
+    }
 }

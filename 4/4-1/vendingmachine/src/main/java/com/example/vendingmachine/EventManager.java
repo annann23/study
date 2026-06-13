@@ -3,6 +3,7 @@ package com.example.vendingmachine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class EventManager {
     private final List<Event> events = new ArrayList<>();
@@ -27,5 +28,11 @@ public class EventManager {
         return findActive(productType)
                 .map(Event::getQuantity)
                 .orElse(1);
+    }
+
+    public List<Event> getActiveEvents() {
+        return events.stream()
+                .filter(Event::isActive)
+                .collect(Collectors.toList());
     }
 }

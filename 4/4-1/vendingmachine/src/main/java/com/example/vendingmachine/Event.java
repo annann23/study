@@ -16,6 +16,7 @@ public abstract class Event {
 
     public abstract int getPrice(int price);
     public abstract int getQuantity();
+    public abstract String getDescription();
 
     public ProductType getTarget() { return target; }
     public boolean isActive() {

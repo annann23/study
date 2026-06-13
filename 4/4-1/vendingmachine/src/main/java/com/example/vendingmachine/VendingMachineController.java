@@ -2,11 +2,14 @@ package com.example.vendingmachine;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 
 import java.time.LocalDate;
@@ -26,6 +29,7 @@ public class VendingMachineController {
     @FXML private Label balanceLabel;
     @FXML private VBox productList;
     @FXML private VBox refundedList;
+    @FXML private VBox eventList;
 
     private static final Map<Currency, Money[]> CURRENCY_MAP = Map.of(
             Currency.WON, new Money[]{Money.WON_100, Money.WON_500, Money.WON_1000, Money.WON_5000, Money.WON_10000, Money.WON_50000},
@@ -39,6 +43,7 @@ public class VendingMachineController {
         initializeEvents();
         initializeProducts();
         initializeCurrencyDropdown();
+        updateEventList();
     }
 
     private void initializeEvents() {
@@ -54,6 +59,16 @@ public class VendingMachineController {
         );
     }
 
+    private void updateEventList() {
+        eventList.getChildren().clear();
+        List<Event> activeEvents = vendingMachine.getActiveEvents();
+        if (activeEvents.isEmpty()) {
+            eventList.getChildren().add(new Label("진행 중인 이벤트가 없습니다."));
+        } else {
+            activeEvents.forEach(e -> eventList.getChildren().add(new Label(e.getDescription())));
+        }
+    }
+
     private void initializeProducts() {
         for (int i = 0; i < ProductType.ALL.length; i++) {
             ProductType type = ProductType.ALL[i];
@@ -66,7 +81,8 @@ public class VendingMachineController {
             productImage.getStyleClass().add("product-image");
             productImage.getChildren().add(new Label(type.name()));
 
-            javafx.scene.control.Button priceButton = new javafx.scene.control.Button(vendingMachine.getDisplayPrice(type) + "원");
+            javafx.scene.control.Button priceButton = new javafx.scene.control.Button();
+            priceButton.setGraphic(buildPriceNode(type));
             priceButton.setDisable(true);
             priceButton.getStyleClass().add("price-button");
             priceButton.setOnAction(e -> purchase(domainButton));
@@ -107,13 +123,50 @@ public class VendingMachineController {
         }
     }
 
+    private Node buildPriceNode(ProductType type) {
+        int originalPrice = type.price();
+        int displayPrice = vendingMachine.getDisplayPrice(type);
+        int quantity = vendingMachine.getQuantity(type);
+
+        VBox box = new VBox(2);
+        box.setAlignment(Pos.CENTER);
+
+        if (displayPrice < originalPrice) {
+            Text original = new Text(originalPrice + "원");
+            original.setStrikethrough(true);
+            original.getStyleClass().add("original-price");
+
+            Text discounted = new Text(displayPrice + "원");
+            discounted.getStyleClass().add("discounted-price");
+
+            box.getChildren().addAll(original, discounted);
+        } else if (quantity > 1) {
+            Text price = new Text(displayPrice + "원");
+            price.getStyleClass().add("normal-price");
+
+            Label badge = new Label("1+1");
+            badge.getStyleClass().add("event-badge");
+
+            box.getChildren().addAll(price, badge);
+        } else {
+            Text price = new Text(originalPrice + "원");
+            price.getStyleClass().add("normal-price");
+            box.getChildren().add(price);
+        }
+
+        return box;
+    }
+
     private void updateButtonStates() {
         priceButtons.forEach((domainBtn, priceBtn) -> {
             if (!vendingMachine.isPurchasable(domainBtn)) {
+                priceBtn.setGraphic(null);
                 priceBtn.setText("품절");
                 priceBtn.setDisable(true);
             } else {
                 ProductType type = domainBtn.getRail().peek().getType();
+                priceBtn.setText("");
+                priceBtn.setGraphic(buildPriceNode(type));
                 priceBtn.setDisable(vendingMachine.getBalance() < vendingMachine.getDisplayPrice(type));
             }
         });

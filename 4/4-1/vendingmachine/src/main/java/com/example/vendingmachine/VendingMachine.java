@@ -33,6 +33,10 @@ public class VendingMachine {
         eventManager.register(event);
     }
 
+    public List<Event> getActiveEvents() {
+        return eventManager.getActiveEvents();
+    }
+
     public int getDisplayPrice(ProductType productType) {
         return eventManager.getDisplayPrice(productType);
     }

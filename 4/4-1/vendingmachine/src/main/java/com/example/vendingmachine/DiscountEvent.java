@@ -20,4 +20,9 @@ public class DiscountEvent extends Event{
     public int getQuantity() {
         return 1;
     }
+
+    @Override
+    public String getDescription() {
+        return getTarget().name() + " " + discountRate + "% 할인";
+    }
 }
