@@ -1,5 +1,7 @@
 package com.example.vendingmachine;
 
+import com.example.vendingmachine.product.ProductItem;
+
 import java.util.*;
 
 class Rail {

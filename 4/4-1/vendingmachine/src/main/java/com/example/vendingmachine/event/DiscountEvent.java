@@ -1,4 +1,6 @@
-package com.example.vendingmachine;
+package com.example.vendingmachine.event;
+
+import com.example.vendingmachine.product.ProductType;
 
 import java.time.ZonedDateTime;
 

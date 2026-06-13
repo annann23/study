@@ -1,8 +1,10 @@
-package com.example.vendingmachine;
+package com.example.vendingmachine.event;
+
+import com.example.vendingmachine.product.ProductType;
 
 import java.time.ZonedDateTime;
 
-public class OnePlusOneEvent extends Event{
+public class OnePlusOneEvent extends Event {
 
     public OnePlusOneEvent(ProductType target, ZonedDateTime startDate, ZonedDateTime endDate) {
         super(target, startDate, endDate);

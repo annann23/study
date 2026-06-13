@@ -1,5 +1,12 @@
 package com.example.vendingmachine;
 
+import com.example.vendingmachine.event.DiscountEvent;
+import com.example.vendingmachine.event.Event;
+import com.example.vendingmachine.event.OnePlusOneEvent;
+import com.example.vendingmachine.money.Currency;
+import com.example.vendingmachine.money.Money;
+import com.example.vendingmachine.product.ProductItem;
+import com.example.vendingmachine.product.ProductType;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -24,17 +31,17 @@ public class VendingMachineController {
     private final Map<Button, javafx.scene.control.Button> priceButtons = new HashMap<>();
 
     @FXML private GridPane productGrid;
-    @FXML private ComboBox<Currency> currencyComboBox;
+    @FXML private ComboBox<com.example.vendingmachine.money.Currency> currencyComboBox;
     @FXML private ComboBox<Money> denominationComboBox;
     @FXML private Label balanceLabel;
     @FXML private VBox productList;
     @FXML private VBox refundedList;
     @FXML private VBox eventList;
 
-    private static final Map<Currency, Money[]> CURRENCY_MAP = Map.of(
-            Currency.WON, new Money[]{Money.WON_100, Money.WON_500, Money.WON_1000, Money.WON_5000, Money.WON_10000, Money.WON_50000},
-            Currency.YEN, new Money[]{Money.YEN_10, Money.YEN_50, Money.YEN_100, Money.YEN_500, Money.YEN_1000, Money.YEN_5000, Money.YEN_10000},
-            Currency.DOLLAR, new Money[]{Money.DOLLAR_1, Money.DOLLAR_5, Money.DOLLAR_10, Money.DOLLAR_20, Money.DOLLAR_50, Money.DOLLAR_100}
+    private static final Map<com.example.vendingmachine.money.Currency, Money[]> CURRENCY_MAP = Map.of(
+            com.example.vendingmachine.money.Currency.WON, new Money[]{Money.WON_100, Money.WON_500, Money.WON_1000, Money.WON_5000, Money.WON_10000, Money.WON_50000},
+            com.example.vendingmachine.money.Currency.YEN, new Money[]{Money.YEN_10, Money.YEN_50, Money.YEN_100, Money.YEN_500, Money.YEN_1000, Money.YEN_5000, Money.YEN_10000},
+            com.example.vendingmachine.money.Currency.DOLLAR, new Money[]{Money.DOLLAR_1, Money.DOLLAR_5, Money.DOLLAR_10, Money.DOLLAR_20, Money.DOLLAR_50, Money.DOLLAR_100}
     );
 
     @FXML
@@ -103,7 +110,7 @@ public class VendingMachineController {
         };
         denominationComboBox.setConverter(converter);
 
-        currencyComboBox.getItems().addAll(Currency.values());
+        currencyComboBox.getItems().addAll(com.example.vendingmachine.money.Currency.values());
         currencyComboBox.getSelectionModel().selectFirst();
         onCurrencySelected();
     }

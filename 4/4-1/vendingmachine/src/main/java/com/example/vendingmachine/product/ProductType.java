@@ -1,4 +1,4 @@
-package com.example.vendingmachine;
+package com.example.vendingmachine.product;
 
 public record ProductType (
     String name,

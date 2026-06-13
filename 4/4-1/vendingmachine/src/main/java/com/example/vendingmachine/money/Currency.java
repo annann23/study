@@ -1,4 +1,4 @@
-package com.example.vendingmachine;
+package com.example.vendingmachine.money;
 
 import org.joda.money.CurrencyUnit;
 import java.math.BigDecimal;

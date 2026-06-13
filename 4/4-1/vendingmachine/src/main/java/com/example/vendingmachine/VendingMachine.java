@@ -1,6 +1,15 @@
 package com.example.vendingmachine;
 
-import java.util.*;
+import com.example.vendingmachine.event.Event;
+import com.example.vendingmachine.event.EventManager;
+import com.example.vendingmachine.money.Money;
+import com.example.vendingmachine.product.ProductItem;
+import com.example.vendingmachine.product.ProductType;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class VendingMachine {
     private int balance;
@@ -60,8 +69,6 @@ public class VendingMachine {
 
     public List<ProductItem> pressButton(int buttonId) {
         Button button = getButton(buttonId);
-        ProductItem product = button.getRail().peek();
-        ProductType type = product.getType();
 
         if(!isPurchasable(button))
             throw new IllegalArgumentException("상품이 품절되었습니다.");
@@ -89,7 +96,7 @@ public class VendingMachine {
         Map<Money, Integer> refundAmount = new LinkedHashMap<>();
 
         Money[] monies = {Money.WON_50000, Money.WON_10000, Money.WON_5000,
-                Money.WON_1000, Money.WON_500, Money.WON_100};
+                Money.WON_1000, Money.WON_500, Money.WON_100, Money.WON_50, Money.WON_10};
 
         for(Money money : monies) {
             int count = balance/ money.getWonValue();

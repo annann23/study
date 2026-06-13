@@ -1,4 +1,4 @@
-package com.example.vendingmachine;
+package com.example.vendingmachine.money;
 
 public enum Money {
     WON_10(10, Currency.WON),

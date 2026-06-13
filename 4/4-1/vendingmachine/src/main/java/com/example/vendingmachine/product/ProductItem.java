@@ -1,4 +1,4 @@
-package com.example.vendingmachine;
+package com.example.vendingmachine.product;
 
 import java.time.LocalDate;
 
