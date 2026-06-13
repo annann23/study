@@ -18,6 +18,10 @@ class Rail {
         return products.poll();
     }
 
+    public int getQuantity() {
+        return products.size();
+    }
+
     public boolean isSoldOut() { return products.isEmpty(); }
 
     public ProductItem peek() {

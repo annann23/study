@@ -66,7 +66,7 @@ public class VendingMachineController {
             productImage.getStyleClass().add("product-image");
             productImage.getChildren().add(new Label(type.name()));
 
-            javafx.scene.control.Button priceButton = new javafx.scene.control.Button(type.price() + "원");
+            javafx.scene.control.Button priceButton = new javafx.scene.control.Button(vendingMachine.getDisplayPrice(type) + "원");
             priceButton.setDisable(true);
             priceButton.getStyleClass().add("price-button");
             priceButton.setOnAction(e -> purchase(domainButton));
@@ -109,12 +109,12 @@ public class VendingMachineController {
 
     private void updateButtonStates() {
         priceButtons.forEach((domainBtn, priceBtn) -> {
-            Rail rail = domainBtn.getRail();
-            if (rail.isSoldOut()) {
+            if (!vendingMachine.isPurchasable(domainBtn)) {
                 priceBtn.setText("품절");
                 priceBtn.setDisable(true);
             } else {
-                priceBtn.setDisable(vendingMachine.getBalance() < rail.peek().getPrice());
+                ProductType type = domainBtn.getRail().peek().getType();
+                priceBtn.setDisable(vendingMachine.getBalance() < vendingMachine.getDisplayPrice(type));
             }
         });
     }

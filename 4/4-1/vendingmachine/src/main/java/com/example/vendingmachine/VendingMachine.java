@@ -29,8 +29,20 @@ public class VendingMachine {
                 .orElseThrow(() -> new IllegalArgumentException("버튼이 없습니다: " + buttonId));
     }
 
-    public List<Button> getButtons() {
-        return buttons;
+    public boolean isPurchasable(Button button) {
+        Rail rail = button.getRail();
+
+        if (rail.isSoldOut()) return false;
+
+        ProductType type = rail.peek().getType();
+        int requiredQuantity = findEvent(type)
+                .filter(e -> e instanceof OnePlusOneEvent)
+                .map(Event::getQuantity)
+                .orElse(1);
+
+        return rail.getQuantity() >= requiredQuantity;
+    }
+
     public void registerEvent(Event event) {
         events.add(event);
     }
@@ -39,6 +51,12 @@ public class VendingMachine {
         return events.stream()
                 .filter(e -> e.getTarget() == productType && e.isActive())
                 .findFirst();
+    }
+
+    public int getDisplayPrice(ProductType productType) {
+        return findEvent(productType)
+                .map(e -> e.getPrice(productType.price()))
+                .orElse(productType.price());
     }
 
     public void insertCoin(Money money) {
@@ -57,7 +75,7 @@ public class VendingMachine {
     }
 
     public Map<Money, Integer> refund() {
-        if(balance == 0) throw new IllegalArgumentException("반환할 금액이 없습니다.");;
+        if(balance <= 0) throw new IllegalArgumentException("반환할 금액이 없습니다.");;
 
         Map<Money, Integer> refundAmount = new LinkedHashMap<>();
 
