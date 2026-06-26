@@ -1,2 +1,16 @@
 # misc
 .DS_Store
+
+# IDE
+.idea/
+
+# Gradle
+.gradle/
+build/
+
+# Maven
+target/
+
+# Compiled
+out/
+*.class

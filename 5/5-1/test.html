@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>댓글 입력</title>
+  </head>
+  <body>
+    <div class="input-wrapper flex flex-col gap-2">
+      <input type="text" placeholder="댓글을 입력하세요" />
+      <input type="text" placeholder="작성자 이름을 입력하세요" />
+      <button>댓글 등록</button>
+    </div>
+    <div>
+      <p>등록된 댓글</p>
+      <div id="comment-list"></div>
+    </div>
+  </body>
+  <script>
+    const commentList = document.getElementById("comment-list");
+
+    window.addEventListener("load", () => {
+      fetch("http://localhost:8090/comments")
+        .then((response) => response.json())
+        .then((data) => {
+          data.forEach((comment) => {
+            const commentElement = document.createElement("div");
+            commentElement.textContent = `${comment.nickname}: ${comment.content} (${new Date(comment.createdAt).toLocaleString()})`;
+            commentList.appendChild(commentElement);
+          });
+        })
+        .catch((error) => {
+          console.error("댓글을 가져오는 중 오류가 발생했습니다:", error);
+        });
+    });
+
+    const inputWrapper = document.querySelector(".input-wrapper");
+    const [commentInput, nameInput] = inputWrapper.children;
+    const button = document.querySelector("button");
+
+    button.addEventListener("click", () => {
+      const content = commentInput.value;
+      const nickname = nameInput.value;
+
+      if (content && nickname) {
+        fetch("http://localhost:8090/comments", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ content, nickname }),
+        })
+          .then((response) => {})
+          .then((data) => {
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("댓글 등록 중 오류가 발생했습니다:", error);
+          });
+        commentInput.value = "";
+        nameInput.value = "";
+      } else {
+        alert("댓글과 작성자 이름을 모두 입력해주세요.");
+      }
+    });
+  </script>
+</html>
