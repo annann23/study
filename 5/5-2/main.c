@@ -13,6 +13,10 @@ typedef enum {
     WHILE,
     RETURN,
 
+    // 변수명
+    IDENTIFIER, 
+    // 숫자
+    NUMBER, 
     //연산자
     ASSIGN, // =
     PLUS, // +
@@ -34,11 +38,53 @@ typedef enum {
     SEMICOLON  // ;
 } TokenType;
 
+const char* tokenName(TokenType type)
+{
+    switch(type)
+    {
+        case INT: return "INT";
+        case IF: return "IF";
+        case ELSE: return "ELSE";
+        case WHILE: return "WHILE";
+        case RETURN: return "RETURN";
+
+        case IDENTIFIER: return "IDENTIFIER";
+        case NUMBER: return "NUMBER";
+
+        case ASSIGN: return "ASSIGN";
+        case PLUS: return "PLUS";
+        case MINUS: return "MINUS";
+
+        case EQUAL: return "EQUAL";
+        case NEQUAL: return "NEQUAL";
+        case LT: return "LT";
+        case LTE: return "LTE";
+        case GT: return "GT";
+        case GTE: return "GTE";
+
+        case LPAREN: return "LPAREN";
+        case RPAREN: return "RPAREN";
+        case LBRACE: return "LBRACE";
+        case RBRACE: return "RBRACE";
+        case SEMICOLON: return "SEMICOLON";
+
+        default: return "ILLEGAL";
+    }
+}
+
 typedef struct Token {
     TokenType type;
     char value[64];
     struct Token* next;
 } Token;
+
+Token* readIdentifierOrKeyword(char* input, int* pos);
+Token* readNumber(char* input, int* pos);
+Token* readOperator(char* input, int* pos);
+Token* createToken(TokenType type, const char* value);
+void connectToken(Token** head, Token** tail, Token* newToken);
+void appendToken(Token** head, Token** tail, TokenType type, const char* value);
+TokenType getSingleTokenType(char ch);
 
 Token* tokenize(char* input) {
     Token* head = NULL;
@@ -50,31 +96,27 @@ Token* tokenize(char* input) {
             pos++;
             continue;
         }else if(isalpha(input[pos]) || input[pos] == '_') {
-            // letter면 identifier/keyword 읽는 함수 호출
+            connectToken(&head, &tail, readIdentifierOrKeyword(input, &pos));
         } else if(isdigit(input[pos])) {
-            // digit이면 number 읽는 함수 호출
+            connectToken(&head, &tail, readNumber(input, &pos));
         } else if(input[pos] == '=' || input[pos] == '!' || input[pos] == '<' || input[pos] == '>') {
-            // =, !, <, > 이면 lookahead 필요한 연산자 함수 호출
+            connectToken(&head, &tail, readOperator(input, &pos));
         } else if(input[pos] == '+' || input[pos] == '-' ||
                   input[pos] == '(' || input[pos] == ')' || 
                   input[pos] == '{' || input[pos] == '}' || 
                   input[pos] == ';') {
-            // +, -, /, (, ), {, }, ; 면 즉시 토큰 생성
-        } else {
-            // 그 외의 문자는 ILLEGAL 토큰으로 처리
-            Token* newToken = (Token*)malloc(sizeof(Token));
-            newToken->type = ILLEGAL;
-            newToken->value[0] = input[pos];
-            newToken->value[1] = '\0';
-            newToken->next = NULL;
 
-            if (head == NULL) {
-                head = newToken;
-                tail = newToken;
-            } else {
-                tail->next = newToken;
-                tail = newToken;
-            }
+            char value[2];
+            value[0]=input[pos];
+            value[1]='\0';
+            appendToken(&head, &tail, getSingleTokenType(input[pos]), value);
+            pos++;
+        } else {
+            char value[2];
+            value[0] = input[pos];
+            value[1] = '\0';
+            appendToken(&head, &tail, ILLEGAL, value);
+            pos++;
         }
     }
 
@@ -82,10 +124,167 @@ Token* tokenize(char* input) {
 }
 
 Token* readIdentifierOrKeyword(char* input, int* pos) {
-    // 1. 시작 위치 저장
-    // 2. letter나 digit인 동안 pos 전진 (q1 → q1 루프)
-    // 3. 멈춘 지점까지 문자열 잘라내기 (strncpy 등 고려)
-    // 4. 잘라낸 문자열이 keyword 목록에 있는지 비교
-    //    (keyword 목록: "int", "if", "else", "while", "return")
-    // 5. 있으면 KEYWORD, 없으면 IDENTIFIER 토큰 생성
+    int start = *pos;
+
+    while(isalnum(input[*pos]) || input[*pos] == '_') {
+        (*pos)++;
+    }
+
+    int length = *pos - start;
+    char buffer[64];
+    strncpy(buffer, input + start, length);
+    buffer[length] = '\0';
+
+    if(strcmp(buffer, "int") == 0) {
+        return createToken(INT, buffer);
+    } else if(strcmp(buffer, "if") == 0) {
+        return createToken(IF, buffer);
+    } else if(strcmp(buffer, "else") == 0) {
+        return createToken(ELSE, buffer);
+    } else if(strcmp(buffer, "while") == 0) {
+        return createToken(WHILE, buffer);
+    } else if(strcmp(buffer, "return") == 0) {
+        return createToken(RETURN, buffer);
+    } else {
+        return createToken(IDENTIFIER, buffer);
+    }
+}
+
+Token* readNumber(char* input, int* pos) {
+    int start = *pos;
+
+    while(isdigit(input[*pos])) {
+        (*pos)++;
+    }
+
+    int length = *pos - start;
+    char buffer[64];
+    strncpy(buffer, input + start, length);
+    buffer[length] = '\0';
+
+    return createToken(NUMBER, buffer);
+}
+
+Token* readOperator(char* input, int* pos) {
+    char current = input[*pos];
+
+    if (current == '=') {
+        if (input[*pos + 1] == '=') {
+            *pos += 2;
+            return createToken(EQUAL, "==");
+        } else {
+            *pos += 1;
+            return createToken(ASSIGN, "=");
+        }
+    }
+
+    if (current == '!') {
+        if (input[*pos + 1] == '=') {
+            *pos += 2;
+            return createToken(NEQUAL, "!=");
+        } else {
+            *pos += 1;
+            return createToken(ILLEGAL, "");
+        }
+    }
+
+    if (current == '<') {
+        if (input[*pos + 1] == '=') {
+            *pos += 2;
+            return createToken(LTE, "<=");
+        } else {
+            *pos += 1;
+            return createToken(LT, "<");
+        }
+    }
+
+    if (current == '>') {
+        if (input[*pos + 1] == '=') {
+            *pos += 2;
+            return createToken(GTE, ">=");
+        } else {
+            *pos += 1;
+            return createToken(GT, ">");
+        }
+    }
+
+    return createToken(ILLEGAL, "");
+}
+
+Token* createToken(TokenType type, const char* value) {
+    Token* newToken = (Token*)malloc(sizeof(Token));
+    newToken->type = type;
+    strncpy(newToken->value, value, sizeof(newToken->value) - 1);
+    newToken->next = NULL;
+    return newToken;
+}
+
+void connectToken(Token** head, Token** tail, Token* newToken) {
+    if (*head == NULL) {
+        *head = newToken;
+        *tail = newToken;
+    } else {
+        (*tail)->next = newToken;
+        *tail = newToken;
+    }
+}
+
+void appendToken(Token** head, Token** tail, TokenType type, const char* value) {
+    Token* newToken = createToken(type, value);
+    connectToken(head, tail, newToken);
+}
+
+TokenType getSingleTokenType(char ch) {
+    switch (ch) {
+        case '+': return PLUS;
+        case '-': return MINUS;
+        case '(': return LPAREN;
+        case ')': return RPAREN;
+        case '{': return LBRACE;
+        case '}': return RBRACE;
+        case ';': return SEMICOLON;
+        default:  return ILLEGAL;
+    }
+}
+
+int main() {
+
+    char input[] =
+        "int main() {\n"
+        "    int x;\n"
+        "    int y;\n"
+        "    int z;\n"
+        "\n"
+        "    x = 10;\n"
+        "    y = 20;\n"
+        "\n"
+        "    if (z == 60) {\n"
+        "        z = z - 1;\n"
+        "    } else {\n"
+        "        z = z + 1;\n"
+        "    }\n"
+        "\n"
+        "    while (z != 0) {\n"
+        "        z = z - 1;\n"
+        "    }\n"
+        "\n"
+        "    return z;\n"
+        "}";
+
+    Token* head = tokenize(input);
+
+    Token* current = head;
+    while (current != NULL) {
+        printf("%s : %s\n", tokenName(current->type), current->value);
+        current = current->next;
+    }
+
+    current = head;
+    while (current != NULL) {
+        Token* temp = current;
+        current = current->next;
+        free(temp);
+    }
+
+    return 0;
 }
