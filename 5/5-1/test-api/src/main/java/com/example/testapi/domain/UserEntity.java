@@ -42,7 +42,7 @@ public class UserEntity {
     public Long getId() { return id; }
 
     public UserLevelEntity getUserLevel() { return userLevel; }
-
+    public Long getUserLevelId() {return userLevel.getId(); }
     public String getLoginId() { return loginId; }
     public String getPassword() { return password; }
 
