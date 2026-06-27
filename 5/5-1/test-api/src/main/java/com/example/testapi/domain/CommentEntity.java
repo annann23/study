@@ -49,6 +49,7 @@ public class CommentEntity {
     public Long getId() { return id; }
     public PostEntity getPost() { return post; }
     public UserEntity getUser() { return user; }
+    public String getUserId() {return user.getLoginId();}
     public CommentEntity getParent() { return parent; }
 
     public String getContent() { return content; }

@@ -63,7 +63,7 @@ public class CommentService {
             throw new IllegalArgumentException("content는 비어있을 수 없습니다.");
         }
 
-        CommentEntity comment = getActiveCommentOrThrow(id);   // private 헬퍼로
+        CommentEntity comment = getActiveCommentOrThrow(id);
         comment.setContent(newContent);
         comment.setIsEdited(true);
 
