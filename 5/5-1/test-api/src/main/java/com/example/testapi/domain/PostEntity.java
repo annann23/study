@@ -45,7 +45,9 @@ public class PostEntity {
 
     public Long getId() { return id; }
     public BoardEntity getBoard() { return board; }
+    public Long getBoardId() { return board.getId(); }
     public UserEntity getUser() { return user; }
+    public Long getUserId() { return user.getId(); }
     public String getTitle() { return title; }
     public String getContent() { return content; }
 
