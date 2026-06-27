@@ -4,6 +4,7 @@ import com.example.testapi.controller.request.PostDeleteRequest;
 import com.example.testapi.controller.request.PostEditRequest;
 import com.example.testapi.controller.request.PostSaveRequest;
 import com.example.testapi.controller.response.PostResponse;
+import com.example.testapi.service.LikedService;
 import com.example.testapi.service.PostService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +17,11 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
+    private final LikedService likedService;
 
-    public PostController(PostService postService) {
+    public PostController(PostService postService, LikedService likedService) {
         this.postService = postService;
+        this.likedService = likedService;
     }
 
     @PostMapping
@@ -64,5 +67,10 @@ public class PostController {
     public ResponseEntity<Void> delete(@RequestBody PostDeleteRequest request) {
         postService.delete(request.postId());
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<Boolean> toggleLike(@PathVariable Long postId, @RequestParam Long userId) {
+        return ResponseEntity.ok(likedService.toggleLike(userId, postId));
     }
 }

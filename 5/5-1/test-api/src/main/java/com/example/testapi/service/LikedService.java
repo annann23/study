@@ -22,23 +22,16 @@ public class LikedService {
         this.postService = postService;
     }
 
-    public LikedEntity like(Long userId, Long postId) {
+    @Transactional
+    public boolean toggleLike(Long userId, Long postId) {
         if (likedRepository.existsByUserIdAndPostId(userId, postId)) {
-            throw new IllegalArgumentException("이미 좋아요한 게시글입니다.");
+            likedRepository.deleteByUserIdAndPostId(userId, postId);
+            return false;
         }
-
         UserEntity user = userService.findById(userId);
         PostEntity post = postService.findById(postId);
-
-        return likedRepository.save(new LikedEntity(user, post));
-    }
-
-    @Transactional
-    public void unlike(Long userId, Long postId) {
-        if (!likedRepository.existsByUserIdAndPostId(userId, postId)) {
-            throw new IllegalArgumentException("좋아요하지 않은 게시글입니다.");
-        }
-        likedRepository.deleteByUserIdAndPostId(userId, postId);
+        likedRepository.save(new LikedEntity(user, post));
+        return true;
     }
 
     public List<LikedEntity> findAllByPost(Long postId) {
