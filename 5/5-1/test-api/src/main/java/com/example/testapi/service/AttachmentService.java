@@ -30,6 +30,11 @@ public class AttachmentService {
         }
 
         PostEntity post = postService.findById(postId);
+
+        if (!"갤러리".equals(post.getBoard().getBoardType().getName())) {
+            throw new IllegalArgumentException("갤러리 게시판만 파일 업로드가 가능합니다.");
+        }
+
         return attachmentRepository.save(new AttachmentEntity(post, name, type, fileUrl));
     }
 
