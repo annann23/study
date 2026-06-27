@@ -35,6 +35,7 @@ public class BoardEntity {
     }
 
     public BoardTypeEntity getBoardType() { return boardType; }
+    public Long getBoardTypeId() { return boardType.getId(); }
     public String getName() { return name; }
 
     public Long getId() { return id; }
