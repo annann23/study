@@ -44,6 +44,10 @@ public class PostService {
     }
 
     //r
+    public PostEntity findById(Long id) {
+        return getActivePostOrThrow(id);
+    }
+
     public List<PostEntity> findAllByBoard(Long boardId) {
         return postRepository.findAllByBoardIdAndDeletedAtIsNull(boardId);
     }
