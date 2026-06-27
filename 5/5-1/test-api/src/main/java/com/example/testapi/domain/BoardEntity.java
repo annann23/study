@@ -37,5 +37,8 @@ public class BoardEntity {
     public BoardTypeEntity getBoardType() { return boardType; }
     public String getName() { return name; }
 
+    public Long getId() { return id; }
+
     public void setName(String name) { this.name = name; }
+    public void setBoardType(BoardTypeEntity boardType) { this.boardType = boardType; }
 }

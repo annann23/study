@@ -7,7 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name="posts")
+@Table(name="post")
 public class PostEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +21,9 @@ public class PostEntity {
     @JoinColumn(name = "user", nullable = false)
     private UserEntity user;
 
+    @Column(nullable = false, length=20)
     private String title;
+
     private String content;
 
     @CreationTimestamp
@@ -29,6 +31,8 @@ public class PostEntity {
 
     @UpdateTimestamp
     private ZonedDateTime updatedAt;
+
+    private ZonedDateTime deletedAt;
 
     public PostEntity() {};
 
@@ -47,7 +51,10 @@ public class PostEntity {
 
     public ZonedDateTime getCreatedAt() { return createdAt; }
     public ZonedDateTime getUpdatedAt() { return updatedAt; }
+    public ZonedDateTime getDeletedAt() { return deletedAt; }
 
     public void setTitle(String title) { this.title = title; }
     public void setContent(String content) { this.content = content; }
+    public void setDeletedAt(ZonedDateTime deletedAt) { this.deletedAt = deletedAt; }
+
 }
