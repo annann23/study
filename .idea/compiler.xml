@@ -13,6 +13,9 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="5-1.test-api" options="-parameters" />
+      <module name="5-1.test-api.main" options="-parameters" />
+      <module name="5-1.test-api.test" options="-parameters" />
       <module name="com.example.test-api" options="-parameters" />
       <module name="com.example.test-api.main" options="-parameters" />
       <module name="com.example.test-api.test" options="-parameters" />
