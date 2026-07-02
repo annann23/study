@@ -19,16 +19,9 @@ public class UserController {
         this.userService = userService;
     }
 
-
-    @PostMapping
-    public ResponseEntity<UserResponse> save(@RequestBody UserRegisterRequest request) {
-        UserEntity user = userService.register(request.loginId(), request.password(), request.userLevelId());
-        return ResponseEntity.ok(UserResponse.from(user));
-    }
-
     @PutMapping("/password")
     public ResponseEntity<UserResponse> updatePassword(@RequestBody UserPasswordEditRequest request) {
-        UserEntity user = userService.updatePassword(request.userId(), request.password());
+        UserEntity user = userService.updatePassword(request.loginDto());
         return ResponseEntity.ok(UserResponse.from(user));
     }
 

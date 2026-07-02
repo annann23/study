@@ -20,23 +20,6 @@ public class UserService {
         this.userLevelService = userLevelService;
     }
 
-    // c
-    public UserEntity register(String loginId, String password, Long userLevelId) {
-        if (loginId == null || loginId.isBlank()) {
-            throw new IllegalArgumentException("loginId는 비어있을 수 없습니다.");
-        }
-        if (password == null || password.isBlank()) {
-            throw new IllegalArgumentException("password는 비어있을 수 없습니다.");
-        }
-        if (userRepository.existsByLoginId(loginId)) {
-            throw new IllegalArgumentException("이미 사용중인 loginId입니다.");
-        }
-
-        UserLevelEntity userLevel = userLevelService.findById(userLevelId);
-
-        return userRepository.save(new UserEntity(loginId, password, userLevel));
-    }
-
     // r
     public UserEntity findById(Long id) {
         return getActiveUserOrThrow(id);
@@ -45,6 +28,16 @@ public class UserService {
     public UserEntity findByLoginId(String loginId) {
         return userRepository.findByLoginIdAndDeletedAtIsNull(loginId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+    }
+
+    private UserEntity getActiveUserOrThrow(Long id) {
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        if (user.getDeletedAt() != null) {
+            throw new IllegalArgumentException("삭제된 사용자입니다.");
+        }
+        return user;
     }
 
     public List<UserEntity> findAll() {
@@ -80,13 +73,4 @@ public class UserService {
         userRepository.save(user);
     }
 
-    private UserEntity getActiveUserOrThrow(Long id) {
-        UserEntity user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
-        if (user.getDeletedAt() != null) {
-            throw new IllegalArgumentException("삭제된 사용자입니다.");
-        }
-        return user;
-    }
 }
