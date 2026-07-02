@@ -1,3 +1,3 @@
 package com.example.testapi.controller.request;
 
-public record UserRegisterRequest(String loginId, String password, Long userLevelId) {}
+public record UserRegisterRequest(UserLoginDto loginDto, Long userLevelId) {}

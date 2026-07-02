@@ -1,5 +1,6 @@
 package com.example.testapi.domain;
 
+import com.example.testapi.controller.request.UserLoginDto;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -33,10 +34,10 @@ public class UserEntity {
 
     public UserEntity() {}
 
-    public UserEntity(String loginId, String password, UserLevelEntity userLevel) {
+    public UserEntity(UserLoginDto loginDto, UserLevelEntity userLevel) {
         this.userLevel = userLevel;
-        this.loginId = loginId;
-        this.password = password;
+        this.loginId = loginDto.loginId();
+        this.password = loginDto.password();
     }
 
     public Long getId() { return id; }

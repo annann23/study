@@ -1,5 +1,6 @@
 package com.example.testapi.service;
 
+import com.example.testapi.controller.request.UserLoginDto;
 import com.example.testapi.domain.UserEntity;
 import com.example.testapi.domain.UserLevelEntity;
 import com.example.testapi.repository.UserRepository;
@@ -51,13 +52,16 @@ public class UserService {
     }
 
     // u
-    public UserEntity updatePassword(Long id, String newPassword) {
-        if (newPassword == null || newPassword.isBlank()) {
-            throw new IllegalArgumentException("password는 비어있을 수 없습니다.");
+    public UserEntity updatePassword(UserLoginDto loginDto) {
+        if (loginDto.loginId() == null || loginDto.loginId().isBlank()) {
+            throw new IllegalArgumentException("loginId는 비어있을 수 없습니다.");
         }
+        if (loginDto.password() == null || loginDto.password().isBlank()) {
+            throw new IllegalArgumentException("password는 비어있을 수 없습니다.");
+        } 
 
-        UserEntity user = getActiveUserOrThrow(id);
-        user.setPassword(newPassword);
+        UserEntity user = findByLoginId(loginDto.loginId());
+        user.setPassword(loginDto.password());
         return userRepository.save(user);
     }
 
