@@ -1,5 +1,6 @@
 package com.example.testapi.domain;
 
+import com.example.testapi.controller.request.PostContentDto;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -36,11 +37,11 @@ public class PostEntity {
 
     public PostEntity() {};
 
-    public PostEntity(BoardEntity board, UserEntity user, String title, String content) {
+    public PostEntity(BoardEntity board, UserEntity user, PostContentDto post) {
         this.board = board;
         this.user =  user;
-        this.title = title;
-        this.content = content;
+        this.title = post.title();
+        this.content = post.content();
     };
 
     public Long getId() { return id; }

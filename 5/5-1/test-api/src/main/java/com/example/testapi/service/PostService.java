@@ -1,5 +1,6 @@
 package com.example.testapi.service;
 
+import com.example.testapi.controller.request.PostContentDto;
 import com.example.testapi.domain.BoardEntity;
 import com.example.testapi.domain.PostEntity;
 import com.example.testapi.domain.UserEntity;
@@ -28,8 +29,8 @@ public class PostService {
     }
 
     //c
-    public PostEntity save(String title, String content, Long boardId, Long userId) {
-        if (title == null || title.isBlank()) {
+    public PostEntity save(PostContentDto post, Long boardId, Long userId) {
+        if (post.title() == null || post.title().isBlank()) {
             throw new IllegalArgumentException("title은 비어있을 수 없습니다.");
         }
 
@@ -40,7 +41,7 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
 
-        return postRepository.save(new PostEntity(board, user, title, content));
+        return postRepository.save(new PostEntity(board, user, post));
     }
 
     //r
@@ -58,14 +59,14 @@ public class PostService {
 
 
     //u
-    public PostEntity edit(Long id, String newTitle, String newContent) {
-        if (newTitle == null || newTitle.isBlank()) {
+    public PostEntity edit(Long id, PostContentDto updatedPost ) {
+        if (updatedPost.title() == null || updatedPost.title().isBlank()) {
             throw new IllegalArgumentException("제목은 비어있을 수 없습니다.");
         }
 
         PostEntity post = getActivePostOrThrow(id);
-        post.setTitle(newTitle);
-        post.setContent(newContent);
+        post.setTitle(updatedPost.title());
+        post.setContent(updatedPost.content());
 
         return postRepository.save(post);
     }

@@ -27,7 +27,7 @@ public class PostController {
     @PostMapping
     public ResponseEntity<PostResponse> save(@RequestBody PostSaveRequest request) {
         PostResponse response = PostResponse.from(
-                postService.save(request.title(), request.content(), request.boardId(), request.userId())
+                postService.save(request.post(), request.boardId(), request.userId())
         );
         return ResponseEntity.ok(response);
     }
@@ -58,7 +58,7 @@ public class PostController {
     @PutMapping
     public ResponseEntity<PostResponse> edit(@RequestBody PostEditRequest request) {
         PostResponse response = PostResponse.from(
-                postService.edit(request.postId(), request.title(), request.content())
+                postService.edit(request.postId(), request.post())
         );
         return ResponseEntity.ok(response);
     }
