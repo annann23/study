@@ -18,7 +18,7 @@ public class AuthService {
     }
 
     // c
-    public UserEntity register(UserLoginDto loginDto, Long userLevelId) {
+    public UserEntity register(UserLoginDto loginDto) {
         if (loginDto.loginId() == null || loginDto.loginId().isBlank()) {
             throw new IllegalArgumentException("loginId는 비어있을 수 없습니다.");
         }
@@ -28,8 +28,9 @@ public class AuthService {
         if (userRepository.existsByLoginId(loginDto.loginId())) {
             throw new IllegalArgumentException("이미 사용중인 loginId입니다.");
         }
+        Long defaultUserLevel = 1L;
 
-        UserLevelEntity userLevel = userLevelService.findById(userLevelId);
+        UserLevelEntity userLevel = userLevelService.findById(defaultUserLevel);
 
         return userRepository.save(new UserEntity(loginDto, userLevel));
     }
