@@ -33,6 +33,18 @@ public class UserController {
         return ResponseEntity.ok(UserResponse.from(user));
     }
 
+    @PutMapping("/user")
+    public ResponseEntity<UserResponse> updateUserData(@RequestBody UserDataEditRequest request, HttpServletRequest httpRequest) {
+        HttpSession session = httpRequest.getSession(false);
+        if (session == null) return ResponseEntity.status(401).build();
+
+        Long userId = (Long) session.getAttribute("id");
+        if (userId == null) return ResponseEntity.status(401).build();
+
+        UserEntity user = userService.updateNickname(userId, request.nickname());
+        return ResponseEntity.ok(UserResponse.from(user));
+    }
+
     @PutMapping("/user-level")
     public ResponseEntity<UserResponse> updateLevel(@RequestBody UserLevelEditRequest request) {
         UserEntity user = userService.updateLevel(request.userId(), request.userLevelId());

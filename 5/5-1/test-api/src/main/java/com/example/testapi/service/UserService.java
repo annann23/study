@@ -1,6 +1,5 @@
 package com.example.testapi.service;
 
-import com.example.testapi.controller.request.UserLoginDto;
 import com.example.testapi.domain.UserEntity;
 import com.example.testapi.domain.UserLevelEntity;
 import com.example.testapi.repository.UserRepository;
@@ -52,6 +51,16 @@ public class UserService {
 
         UserEntity user = getActiveUserOrThrow(id);
         user.setPassword(newPassword);
+        return userRepository.save(user);
+    }
+
+    public UserEntity updateNickname(Long id, String nickname) {
+        if (nickname== null || nickname.isBlank()) {
+            throw new IllegalArgumentException("닉네임은 비어있을 수 없습니다.");
+        }
+
+        UserEntity user = getActiveUserOrThrow(id);
+        user.setNickname(nickname);
         return userRepository.save(user);
     }
 
