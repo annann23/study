@@ -1,6 +1,6 @@
 package com.example.testapi.controller;
 
-import com.example.testapi.controller.request.UserLoginDto;
+import com.example.testapi.controller.request.UserLoginRequest;
 import com.example.testapi.controller.request.UserRegisterRequest;
 import com.example.testapi.controller.response.UserResponse;
 import com.example.testapi.domain.UserEntity;
@@ -37,12 +37,12 @@ public class AuthController {
 
     @PostMapping("/sign-up")
     public ResponseEntity<UserResponse> signup(@RequestBody UserRegisterRequest request) {
-        UserEntity user = authService.register(request.loginDto(), request.nickname());
+        UserEntity user = authService.register(request.toLoginDto(), request.nickname());
         return ResponseEntity.ok(UserResponse.from(user));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@RequestBody UserLoginDto request, HttpServletRequest httpRequest) {
+    public ResponseEntity<UserResponse> login(@RequestBody UserLoginRequest request, HttpServletRequest httpRequest) {
         HttpSession session = httpRequest.getSession(false);
         if(session != null && Objects.requireNonNull(session).getAttribute("id") != null) {
             Long userId = (Long) session.getAttribute("id");

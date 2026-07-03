@@ -1,11 +1,9 @@
 package com.example.testapi.service;
-import com.example.testapi.controller.request.UserLoginDto;
+import com.example.testapi.controller.request.UserLoginRequest;
 import com.example.testapi.domain.UserEntity;
 import com.example.testapi.domain.UserLevelEntity;
 import com.example.testapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class AuthService {
@@ -18,17 +16,17 @@ public class AuthService {
     }
 
     // c
-    public UserEntity register(UserLoginDto loginDto, String nickname) {
-        if (loginDto.loginId() == null || loginDto.loginId().isBlank()) {
+    public UserEntity register(UserLoginRequest loginRequest, String nickname) {
+        if (loginRequest.loginId() == null || loginRequest.loginId().isBlank()) {
             throw new IllegalArgumentException("loginId는 비어있을 수 없습니다.");
         }
-        if (loginDto.password() == null || loginDto.password().isBlank()) {
+        if (loginRequest.password() == null || loginRequest.password().isBlank()) {
             throw new IllegalArgumentException("password는 비어있을 수 없습니다.");
         }
         if (nickname == null || nickname.isBlank()) {
             throw new IllegalArgumentException("닉네임은 비어있을 수 없습니다.");
         }
-        if (userRepository.existsByLoginId(loginDto.loginId())) {
+        if (userRepository.existsByLoginId(loginRequest.loginId())) {
             throw new IllegalArgumentException("이미 사용중인 loginId입니다.");
         }
         if (userRepository.existsByNickname(nickname)) {
@@ -39,21 +37,21 @@ public class AuthService {
 
         UserLevelEntity userLevel = userLevelService.findById(defaultUserLevel);
 
-        return userRepository.save(new UserEntity(loginDto, userLevel));
+        return userRepository.save(new UserEntity(loginRequest, userLevel));
     }
 
-    public UserEntity login(UserLoginDto loginDto) {
-        if (loginDto.loginId() == null || loginDto.loginId().isBlank()) {
+    public UserEntity login(UserLoginRequest loginRequest) {
+        if (loginRequest.loginId() == null || loginRequest.loginId().isBlank()) {
             throw new IllegalArgumentException("loginId는 비어있을 수 없습니다.");
         }
-        if (loginDto.password() == null || loginDto.password().isBlank()) {
+        if (loginRequest.password() == null || loginRequest.password().isBlank()) {
             throw new IllegalArgumentException("password는 비어있을 수 없습니다.");
         }
 
-        UserEntity user = userRepository.findByLoginIdAndDeletedAtIsNull(loginDto.loginId())
+        UserEntity user = userRepository.findByLoginIdAndDeletedAtIsNull(loginRequest.loginId())
                 .orElseThrow(() -> new IllegalArgumentException("아이디나 패스워드가 틀렸습니다."));
 
-        if(!user.getPassword().equals(loginDto.password())) {throw new IllegalArgumentException("아이디나 패스워드가 틀렸습니다.");}
+        if(!user.getPassword().equals(loginRequest.password())) {throw new IllegalArgumentException("아이디나 패스워드가 틀렸습니다.");}
         return user;
     }
 }
