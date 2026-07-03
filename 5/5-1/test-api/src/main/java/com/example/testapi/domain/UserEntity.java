@@ -24,6 +24,9 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false, unique = true)
+    private String nickname;
+
     @CreationTimestamp
     private ZonedDateTime createdAt;
 
@@ -46,6 +49,7 @@ public class UserEntity {
     public Long getUserLevelId() {return userLevel.getId(); }
     public String getLoginId() { return loginId; }
     public String getPassword() { return password; }
+    public String getNickname() {return nickname; }
 
     public ZonedDateTime getCreatedAt() { return createdAt; }
     public ZonedDateTime getUpdatedAt() { return updatedAt; }
@@ -53,6 +57,7 @@ public class UserEntity {
 
     public void setUserLevel(UserLevelEntity userLevel) { this.userLevel = userLevel; }
     public void setLoginId(String loginId) { this.loginId = loginId; }
+    public void setNickname(String nickname) { this.nickname = nickname; }
     public void setPassword(String password) { this.password = password; }
     public void setDeletedAt(ZonedDateTime deletedAt) { this.deletedAt = deletedAt; }
 }

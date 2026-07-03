@@ -18,16 +18,23 @@ public class AuthService {
     }
 
     // c
-    public UserEntity register(UserLoginDto loginDto) {
+    public UserEntity register(UserLoginDto loginDto, String nickname) {
         if (loginDto.loginId() == null || loginDto.loginId().isBlank()) {
             throw new IllegalArgumentException("loginId는 비어있을 수 없습니다.");
         }
         if (loginDto.password() == null || loginDto.password().isBlank()) {
             throw new IllegalArgumentException("password는 비어있을 수 없습니다.");
         }
+        if (nickname == null || nickname.isBlank()) {
+            throw new IllegalArgumentException("닉네임은 비어있을 수 없습니다.");
+        }
         if (userRepository.existsByLoginId(loginDto.loginId())) {
             throw new IllegalArgumentException("이미 사용중인 loginId입니다.");
         }
+        if (userRepository.existsByNickname(nickname)) {
+            throw new IllegalArgumentException("이미 사용중인 닉네임입니다.");
+        }
+
         Long defaultUserLevel = 1L;
 
         UserLevelEntity userLevel = userLevelService.findById(defaultUserLevel);
