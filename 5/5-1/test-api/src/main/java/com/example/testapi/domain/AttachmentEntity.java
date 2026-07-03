@@ -20,10 +20,10 @@ public class AttachmentEntity {
     @Column(nullable = false, length = 255)
     private String name;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String type;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String fileUrl;
 
     @CreationTimestamp

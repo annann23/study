@@ -34,7 +34,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<UserResponse> login(@RequestBody UserLoginDto request, HttpServletRequest httpRequest) {
         HttpSession session = httpRequest.getSession(false);
-        if(session != null & Objects.requireNonNull(session).getAttribute("id") != null) {
+        if(session != null && Objects.requireNonNull(session).getAttribute("id") != null) {
             Long userId = (Long) session.getAttribute("id");
             return ResponseEntity.ok(UserResponse.from(userService.findById(userId)));
         }
