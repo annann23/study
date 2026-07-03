@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/user-level")
-@CrossOrigin(origins = "*")
 public class UserLevelController {
 
     private final UserLevelService userLevelService;

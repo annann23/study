@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/attachment")
-@CrossOrigin(origins = "*")
 public class AttachmentController {
 
     private final AttachmentService attachmentService;

@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/board-types")
-@CrossOrigin(origins = "*")
 public class BoardTypeController {
 
     private final BoardTypeService boardTypeService;
