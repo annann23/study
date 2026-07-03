@@ -45,16 +45,13 @@ public class UserService {
     }
 
     // u
-    public UserEntity updatePassword(UserLoginDto loginDto) {
-        if (loginDto.loginId() == null || loginDto.loginId().isBlank()) {
-            throw new IllegalArgumentException("loginId는 비어있을 수 없습니다.");
-        }
-        if (loginDto.password() == null || loginDto.password().isBlank()) {
+    public UserEntity updatePassword(Long id, String newPassword) {
+        if (newPassword == null || newPassword.isBlank()) {
             throw new IllegalArgumentException("password는 비어있을 수 없습니다.");
-        } 
+        }
 
-        UserEntity user = findByLoginId(loginDto.loginId());
-        user.setPassword(loginDto.password());
+        UserEntity user = getActiveUserOrThrow(id);
+        user.setPassword(newPassword);
         return userRepository.save(user);
     }
 

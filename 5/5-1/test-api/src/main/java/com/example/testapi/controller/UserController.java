@@ -4,6 +4,9 @@ import com.example.testapi.controller.request.*;
 import com.example.testapi.controller.response.UserResponse;
 import com.example.testapi.domain.UserEntity;
 import com.example.testapi.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,8 +22,14 @@ public class UserController {
     }
 
     @PutMapping("/password")
-    public ResponseEntity<UserResponse> updatePassword(@RequestBody UserPasswordEditRequest request) {
-        UserEntity user = userService.updatePassword(request.loginDto());
+    public ResponseEntity<UserResponse> updatePassword(@RequestBody UserPasswordEditRequest request, HttpServletRequest httpRequest) {
+        HttpSession session = httpRequest.getSession(false);
+        if (session == null) return ResponseEntity.status(401).build();
+
+        Long userId = (Long) session.getAttribute("id");
+        if (userId == null) return ResponseEntity.status(401).build();
+
+        UserEntity user = userService.updatePassword(userId, request.password());
         return ResponseEntity.ok(UserResponse.from(user));
     }
 
