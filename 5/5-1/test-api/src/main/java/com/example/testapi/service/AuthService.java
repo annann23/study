@@ -37,7 +37,7 @@ public class AuthService {
 
         UserLevelEntity userLevel = userLevelService.findById(defaultUserLevel);
 
-        return userRepository.save(new UserEntity(loginRequest, userLevel));
+        return userRepository.save(new UserEntity(loginRequest, nickname, userLevel));
     }
 
     public UserEntity login(UserLoginRequest loginRequest) {

@@ -37,10 +37,11 @@ public class UserEntity {
 
     public UserEntity() {}
 
-    public UserEntity(UserLoginRequest loginRequest, UserLevelEntity userLevel) {
+    public UserEntity(UserLoginRequest loginRequest, String nickname, UserLevelEntity userLevel) {
         this.userLevel = userLevel;
         this.loginId = loginRequest.loginId();
         this.password = loginRequest.password();
+        this.nickname = nickname;
     }
 
     public Long getId() { return id; }
