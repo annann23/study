@@ -15,7 +15,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:63342", allowCredentials = "true")
 public class AuthController {
     private final AuthService authService;
     private final UserService userService;
@@ -23,6 +23,17 @@ public class AuthController {
     public AuthController(AuthService authService, UserService userService) {
         this.authService = authService;
         this.userService = userService;
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> me(HttpServletRequest httpRequest) {
+        HttpSession session = httpRequest.getSession(false);
+        if (session == null) return ResponseEntity.status(401).build();
+
+        Long userId = (Long) session.getAttribute("id");
+        if (userId == null) return ResponseEntity.status(401).build();
+
+        return ResponseEntity.ok(UserResponse.from(userService.findById(userId)));
     }
 
     @PostMapping("/sign-up")
