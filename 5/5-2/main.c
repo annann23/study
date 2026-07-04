@@ -2,42 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-
-typedef enum
-{
-    ILLEGAL, // illegal token
-
-    // 예약어
-    INT,
-    IF,
-    ELSE,
-    WHILE,
-    RETURN,
-
-    // 변수명
-    IDENTIFIER,
-    // 숫자
-    NUMBER,
-    // 연산자
-    ASSIGN, // =
-    PLUS,   // +
-    MINUS,  // -
-
-    // 관계연산자
-    EQUAL,  // ==
-    NEQUAL, // !=
-    LT,     // <
-    LTE,    // <=
-    GT,     // >
-    GTE,    // >=
-
-    // 구분자
-    LPAREN,   // (
-    RPAREN,   // )
-    LBRACE,   // {
-    RBRACE,   // }
-    SEMICOLON // ;
-} TokenType;
+#include "lexer.h"
+#include "parse.h"
 
 typedef enum
 {
@@ -122,13 +88,6 @@ const char *tokenName(TokenType type)
         return "ILLEGAL";
     }
 }
-
-typedef struct Token
-{
-    TokenType type;
-    char value[64];
-    struct Token *next;
-} Token;
 
 Token *readIdentifierOrKeyword(const char *word);
 Token *createToken(TokenType type, const char *value);
@@ -476,6 +435,12 @@ int main()
         current = current->next;
     }
 
+    Parser parser = { head };
+    Node *ast = parseFunction(&parser);
+    printAST(ast, 0);
+
+
+    //메모리 해제
     current = head;
     while (current != NULL)
     {
