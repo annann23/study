@@ -95,8 +95,7 @@ void connectToken(Token **head, Token **tail, Token *newToken);
 void appendToken(Token **head, Token **tail, TokenType type, const char *value);
 TokenType getSingleTokenType(char ch);
 
-Token *tokenize(char *input)
-{
+Token *tokenize(char *input) {
     Token *head = NULL;
     Token *tail = NULL;
     int pos = 0;
@@ -105,8 +104,7 @@ Token *tokenize(char *input)
 
     State state = q0;
 
-    while (input[pos] != '\0')
-    {
+    while (input[pos] != '\0') {
         char currentChar = input[pos];
 
         switch (state) {
@@ -114,68 +112,53 @@ Token *tokenize(char *input)
                 bufLen = 0;
                 memset(buffer, 0, sizeof(buffer));
 
-                if (isspace(currentChar))
-                {
+                if (isspace(currentChar)) {
                     pos++;
                 }
-                else if (isalpha(currentChar) || currentChar == '_')
-                {
+                else if (isalpha(currentChar) || currentChar == '_') {
                     state = q1;
                 }
-                else if (isdigit(currentChar))
-                {
+                else if (isdigit(currentChar)) {
                     state = q3;
                 }
-                else if (currentChar == '=')
-                {
+                else if (currentChar == '=') {
                     pos++;
                     state = q5;
                 }
-                else if (currentChar == '!')
-                {
+                else if (currentChar == '!') {
                     pos++;
                     state = q8;
                 }
-                else if (currentChar == '>')
-                {
+                else if (currentChar == '>') {
                     pos++;
                     state = q10;
                 }
-                else if (currentChar == '<')
-                {
+                else if (currentChar == '<') {
                     pos++;
                     state = q13;
                 }
-                else if (currentChar == '+')
-                {
+                else if (currentChar == '+') {
                     state = q16;
                 }
-                else if (currentChar == '-')
-                {
+                else if (currentChar == '-') {
                     state = q17;
                 }
-                else if (currentChar == '{')
-                {
+                else if (currentChar == '{') {
                     state = q18;
                 }
-                else if (currentChar == '}')
-                {
+                else if (currentChar == '}') {
                     state = q19;
                 }
-                else if (currentChar == '(')
-                {
+                else if (currentChar == '(') {
                     state = q20;
                 }
-                else if (currentChar == ')')
-                {
+                else if (currentChar == ')') {
                     state = q21;
                 }
-                else if (currentChar == ';')
-                {
+                else if (currentChar == ';') {
                     state = q22;
                 }
-                else
-                {
+                else {
                     char value[2];
                     value[0] = currentChar;
                     value[1] = '\0';
@@ -321,36 +304,28 @@ Token *tokenize(char *input)
     return head;
 }
 
-Token *readIdentifierOrKeyword(const char *word)
-{
-    if (strcmp(word, "int") == 0)
-    {
+Token *readIdentifierOrKeyword(const char *word) {
+    if (strcmp(word, "int") == 0) {
         return createToken(INT, word);
     }
-    else if (strcmp(word, "if") == 0)
-    {
+    else if (strcmp(word, "if") == 0) {
         return createToken(IF, word);
     }
-    else if (strcmp(word, "else") == 0)
-    {
+    else if (strcmp(word, "else") == 0){
         return createToken(ELSE, word);
     }
-    else if (strcmp(word, "while") == 0)
-    {
+    else if (strcmp(word, "while") == 0) {
         return createToken(WHILE, word);
     }
-    else if (strcmp(word, "return") == 0)
-    {
+    else if (strcmp(word, "return") == 0) {
         return createToken(RETURN, word);
     }
-    else
-    {
+    else {
         return createToken(IDENTIFIER, word);
     }
 }
 
-Token *createToken(TokenType type, const char *value)
-{
+Token *createToken(TokenType type, const char *value) {
     Token *newToken = (Token *)malloc(sizeof(Token));
     newToken->type = type;
     strncpy(newToken->value, value, sizeof(newToken->value) - 1);
@@ -358,8 +333,7 @@ Token *createToken(TokenType type, const char *value)
     return newToken;
 }
 
-void connectToken(Token **head, Token **tail, Token *newToken)
-{
+void connectToken(Token **head, Token **tail, Token *newToken) {
     if (*head == NULL)
     {
         *head = newToken;
@@ -372,14 +346,12 @@ void connectToken(Token **head, Token **tail, Token *newToken)
     }
 }
 
-void appendToken(Token **head, Token **tail, TokenType type, const char *value)
-{
+void appendToken(Token **head, Token **tail, TokenType type, const char *value) {
     Token *newToken = createToken(type, value);
     connectToken(head, tail, newToken);
 }
 
-TokenType getSingleTokenType(char ch)
-{
+TokenType getSingleTokenType(char ch) {
     switch (ch)
     {
     case '+':
@@ -401,9 +373,7 @@ TokenType getSingleTokenType(char ch)
     }
 }
 
-int main()
-{
-
+int main() {
     char input[] =
         "int main() {\n"
         "    int x;\n"
@@ -429,8 +399,7 @@ int main()
     Token *head = tokenize(input);
 
     Token *current = head;
-    while (current != NULL)
-    {
+    while (current != NULL) {
         printf("%s : %s\n", tokenName(current->type), current->value);
         current = current->next;
     }
@@ -442,8 +411,7 @@ int main()
 
     //메모리 해제
     current = head;
-    while (current != NULL)
-    {
+    while (current != NULL) {
         Token *temp = current;
         current = current->next;
         free(temp);

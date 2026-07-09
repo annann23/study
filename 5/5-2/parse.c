@@ -41,13 +41,11 @@ Token *peek(Parser *p)
     return p->current;
 }
 
-bool checkType(Parser *p, TokenType type)
-{
+bool checkType(Parser *p, TokenType type) {
     return p->current != NULL && p->current->type == type;
 }
 
-Token *advance(Parser *p)
-{
+Token *advance(Parser *p) {
     Token *token = p->current;
     if (p->current != NULL)
     {
@@ -56,8 +54,7 @@ Token *advance(Parser *p)
     return token;
 }
 
-Token *expect(Parser *p, TokenType type)
-{
+Token *expect(Parser *p, TokenType type) {
     if (!checkType(p, type))
     {
         fprintf(stderr, "Parse error: expected %s but got %s\n",
@@ -68,8 +65,7 @@ Token *expect(Parser *p, TokenType type)
     return advance(p);
 }
 
-Node *parsePrimary(Parser *p)
-{
+Node *parsePrimary(Parser *p) {
     if (checkType(p, IDENTIFIER))
     {
         Token *token = advance(p);
@@ -120,8 +116,7 @@ Node *parseAdditive(Parser *p)
 }
 
 // condition = identifier rel_op (number | identifier) ;
-Node *parseCondition(Parser *p)
-{
+Node *parseCondition(Parser *p) {
     Node *left = parsePrimary(p);
 
     TokenType op = peek(p) != NULL ? peek(p)->type : ILLEGAL;
@@ -144,8 +139,7 @@ Node *parseCondition(Parser *p)
 }
 
 // block_statement = "{" { statement } "}"
-Node *parseBlock(Parser *p)
-{
+Node *parseBlock(Parser *p) {
     expect(p, LBRACE);
 
     Node *head = NULL;
@@ -173,8 +167,7 @@ Node *parseBlock(Parser *p)
 
 
 //statement = assign | declare | if | while | return
-Node *parseStatement(Parser *p)
-{
+Node *parseStatement(Parser *p) {
     if (peek(p) == NULL)
     {
         return NULL;
@@ -199,9 +192,8 @@ Node *parseStatement(Parser *p)
     }
 }
 
-// declare := INT IDENTIFIER [ ASSIGN Expression ] SEMICOLON
-Node *parseDeclare(Parser *p)
-{
+// declare = "int" identifier [ assgin_op  ((identifier arith_op number) | number )]";"
+Node *parseDeclare(Parser *p) {
     expect(p, INT);
 
     Token *nameToken = expect(p, IDENTIFIER);
@@ -222,9 +214,8 @@ Node *parseDeclare(Parser *p)
     return node;
 }
 
-//assign = identifier assgin_op {(identifier arith_op number) | number } ";"
-Node *parseAssign(Parser *p)
-{
+//assign = identifier assgin_op ((identifier arith_op number) | number ) ";"
+Node *parseAssign(Parser *p) {
     Token *nameToken = expect(p, IDENTIFIER);
     Node *target = newNode(NODE_IDENTIFIER);
     strncpy(target->value, nameToken->value, sizeof(target->value) - 1);
@@ -242,8 +233,7 @@ Node *parseAssign(Parser *p)
 }
 
 // if = "if" func_statement ["else" "{" { statement } "}" ] ;
-Node *parseIf(Parser *p)
-{
+Node *parseIf(Parser *p) {
     expect(p, IF);
     expect(p, LPAREN);
     Node *condition = parseCondition(p);
@@ -267,8 +257,7 @@ Node *parseIf(Parser *p)
 }
 
 // while = "while" func_statement ;
-Node *parseWhile(Parser *p)
-{
+Node *parseWhile(Parser *p) {
     expect(p, WHILE);
     expect(p, LPAREN);
     Node *condition = parseCondition(p);
@@ -283,8 +272,7 @@ Node *parseWhile(Parser *p)
 }
 
 //return = "return" { number | identifier } ";"
-Node *parseReturn(Parser *p)
-{
+Node *parseReturn(Parser *p) {
     expect(p, RETURN);
     Node *value = parsePrimary(p);
     expect(p, SEMICOLON);
@@ -295,9 +283,8 @@ Node *parseReturn(Parser *p)
     return node;
 }
 
-// func_statement = "int" identifier "(" ")" "{" { statement } "}" ;
-Node *parseFunction(Parser *p)
-{
+// func_statement = "int" identifier "(" ")" block ;
+Node *parseFunction(Parser *p) {
     expect(p, INT);
     Token *nameToken = expect(p, IDENTIFIER);
 
@@ -313,8 +300,7 @@ Node *parseFunction(Parser *p)
     return node;
 }
 
-static const char *nodeTypeName(NodeType type)
-{
+static const char *nodeTypeName(NodeType type) {
     switch (type)
     {
     case NODE_FUNCTION: return "Function";
