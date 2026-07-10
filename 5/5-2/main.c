@@ -406,7 +406,7 @@ int main() {
 
     Parser parser = { head };
     Node *ast = parseFunction(&parser);
-    printAST(ast, 0);
+    printAST(ast, 0, "", 0);
 
 
     //메모리 해제

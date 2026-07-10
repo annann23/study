@@ -13,6 +13,7 @@ Token *expect(Parser *p, TokenType type);
 Node *parseAdditive(Parser *p);
 Node *parsePrimary(Parser *p);
 Node *parseCondition(Parser *p);
+Token *expectRelop(Parser *p);
 Node *parseBlock(Parser *p);
 
 Node *parseStatement(Parser *p);
@@ -105,7 +106,7 @@ Node *parsePrimary(Parser *p) {
 Node *parseAdditive(Parser *p)
 {
     Node *left = parsePrimary(p);
-
+ 
     while (checkType(p, PLUS) || checkType(p, MINUS))
     {
         TokenType op = advance(p)->type;
@@ -125,16 +126,7 @@ Node *parseAdditive(Parser *p)
 // condition = identifier rel_op (number | identifier) ;
 Node *parseCondition(Parser *p) {
     Node *left = parsePrimary(p);
-
-    TokenType op = peek(p) != NULL ? peek(p)->type : ILLEGAL;
-    if (op != EQUAL && op != NEQUAL && op != LT && op != LTE && op != GT && op != GTE)
-    {
-        fprintf(stderr, "Parse error: expected relational operator but got %s\n",
-                peek(p) != NULL ? tokenName(peek(p)->type) : "EOF");
-        exit(1);
-    }
-    advance(p);
-
+    Token *relopToken = expectRelop(p);
     Node *right = parsePrimary(p);
 
     Node *node = newNode(NODE_BINARY_EXPR);
@@ -143,6 +135,18 @@ Node *parseCondition(Parser *p) {
     addChild(node, right);
 
     return node;
+}
+
+Token *expectRelop(Parser *p) {
+    TokenType type = peek(p) != NULL ? peek(p)->type : ILLEGAL;
+    if (type == EQUAL || type == NEQUAL ||
+        type == LT    || type == LTE    ||
+        type == GT    || type == GTE) {
+        return advance(p);
+    }
+    fprintf(stderr, "Parse error: expected relational operator but got %s\n",
+        peek(p) != NULL ? tokenName(peek(p)->type) : "EOF");
+    exit(1);
 }
 
 // block_statement = "{" { statement } "}"
@@ -324,7 +328,6 @@ static const char *nodeTypeName(NodeType type) {
     case NODE_DECLARE: return "Declare";
     case NODE_ASSIGN: return "Assign";
     case NODE_IF: return "If";
-    case NODE_IF_BODY: return "IfBody";
     case NODE_WHILE: return "While";
     case NODE_RETURN: return "Return";
     case NODE_BLOCK: return "Block";
@@ -335,29 +338,31 @@ static const char *nodeTypeName(NodeType type) {
     return "?";
 }
 
-void printAST(Node *node, int depth)
-{
-    for (; node != NULL; node = node->next)
-    {
-        for (int i = 0; i < depth; i++)
-        {
-            printf("  ");
+void printAST(Node *node, int depth, const char *prefix, int isLast) {
+    for (; node != NULL; node = node->next) {
+        int currentIsLast = (node->next == NULL);
+
+        if (strlen(prefix) != 0 || node->next != NULL) {
+            printf("%s", prefix);
+            printf("%s", currentIsLast ? "└── " : "├── ");
         }
 
-        if (node->nodeType == NODE_BINARY_EXPR || node->nodeType == NODE_ASSIGN)
-        {
+        if (node->nodeType == NODE_BINARY_EXPR || node->nodeType == NODE_ASSIGN) {
             printf("%s(%s)\n", nodeTypeName(node->nodeType), tokenName(node->tokenType));
-        }
-        else if (node->nodeType == NODE_IDENTIFIER || node->nodeType == NODE_NUMBER || node->nodeType == NODE_FUNCTION)
-        {
+        } else if (node->nodeType == NODE_IDENTIFIER || node->nodeType == NODE_NUMBER || node->nodeType == NODE_FUNCTION) {
             printf("%s(%s)\n", nodeTypeName(node->nodeType), node->value);
-        }
-        else
-        {
+        } else {
             printf("%s\n", nodeTypeName(node->nodeType));
         }
 
-        printAST(node->left, depth + 1);
-        printAST(node->right, depth + 1);
+        char newPrefix[256];
+        snprintf(newPrefix, sizeof(newPrefix), "%s%s",
+                 prefix,
+                 currentIsLast ? "    " : "│   ");
+
+        for (int i = 0; i < node->childCount; i++) {
+            int childIsLast = (i == node->childCount - 1);
+            printAST(node->children[i], depth + 1, newPrefix, childIsLast);
+        }
     }
 }
