@@ -3,13 +3,11 @@
 
 #include "lexer.h"
 
-typedef enum
-{
+typedef enum {
     NODE_FUNCTION, // type identifier "(" ")" 블록
     NODE_DECLARE,
     NODE_ASSIGN,
     NODE_IF,
-    NODE_IF_BODY, // if/else 부모
     NODE_WHILE,
     NODE_RETURN,
     NODE_BLOCK,
@@ -18,18 +16,17 @@ typedef enum
     NODE_NUMBER
 } NodeType;
 
-typedef struct Node
-{
+typedef struct Node {
     NodeType nodeType;
     TokenType tokenType;
     char value[64];
-    struct Node *left;
-    struct Node *right;
-    struct Node *next;
+    struct Node **children; 
+    int childCount; 
+    int childCapacity;
+    struct Node *next; 
 } Node;
 
-typedef struct
-{
+typedef struct {
     Token *current;
 } Parser;
 

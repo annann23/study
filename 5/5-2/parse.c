@@ -30,14 +30,21 @@ Node *newNode(NodeType type)
     node->nodeType = type;
     node->tokenType = ILLEGAL;
     node->value[0] = '\0';
-    node->left = NULL;
-    node->right = NULL;
-    node->next = NULL;
+    node->children = NULL; 
+    node->childCount = 0;
+    node->childCapacity = 0;
     return node;
 }
 
-Token *peek(Parser *p)
-{
+void addChild(Node* parent, Node* child) {
+    if (parent->childCount == parent->childCapacity) {
+        parent->childCapacity = parent->childCapacity == 0 ? 2 : parent->childCapacity * 2;
+        parent->children = realloc(parent->children, sizeof(Node*) * parent->childCapacity);
+    }
+    parent->children[parent->childCount++] = child;
+}
+
+Token *peek(Parser *p) {
     return p->current;
 }
 
@@ -106,8 +113,8 @@ Node *parseAdditive(Parser *p)
 
         Node *binary = newNode(NODE_BINARY_EXPR);
         binary->tokenType = op;
-        binary->left = left;
-        binary->right = right;
+        addChild(binary, left);
+        addChild(binary, right);
 
         left = binary;
     }
@@ -131,9 +138,9 @@ Node *parseCondition(Parser *p) {
     Node *right = parsePrimary(p);
 
     Node *node = newNode(NODE_BINARY_EXPR);
-    node->tokenType = op;
-    node->left = left;
-    node->right = right;
+    node->tokenType = relopToken->type;
+    addChild(node, left);
+    addChild(node, right);
 
     return node;
 }
@@ -201,12 +208,12 @@ Node *parseDeclare(Parser *p) {
     strncpy(target->value, nameToken->value, sizeof(target->value) - 1);
 
     Node *node = newNode(NODE_DECLARE);
-    node->left = target;
+    addChild(node, target);
 
     if (checkType(p, ASSIGN))
     {
         advance(p);
-        node->right = parseAdditive(p); // 초기화 없으면 NULL로 남음
+        addChild(node, parseAdditive(p));
     }
 
     expect(p, SEMICOLON);
@@ -226,8 +233,8 @@ Node *parseAssign(Parser *p) {
 
     Node *node = newNode(NODE_ASSIGN);
     node->tokenType = ASSIGN;
-    node->left = target;
-    node->right = value;
+    addChild(node, target);
+    addChild(node, value);
 
     return node;
 }
@@ -240,18 +247,28 @@ Node *parseIf(Parser *p) {
     expect(p, RPAREN);
     Node *thenBlock = parseBlock(p);
 
-    Node *body = newNode(NODE_IF_BODY);
-    body->left = thenBlock;
-
-    if (checkType(p, ELSE))
-    {
-        advance(p);
-        body->right = parseBlock(p); // else 없으면 NULL로 남음
-    }
-
     Node *node = newNode(NODE_IF);
-    node->left = condition;
-    node->right = body;
+    addChild(node, condition); 
+    addChild(node, thenBlock); 
+
+   while (checkType(p, ELSE)) {
+        advance(p); 
+
+        if (checkType(p, IF)) {
+            advance(p);
+            expect(p, LPAREN);
+            Node *elseIfCondition = parseCondition(p);
+            expect(p, RPAREN);
+            Node *elseIfBlock = parseBlock(p);
+
+            addChild(node, elseIfCondition);  
+            addChild(node, elseIfBlock);
+        } else {
+            Node *elseBlock = parseBlock(p);
+            addChild(node, elseBlock); 
+            break; 
+        }
+    }
 
     return node;
 }
@@ -265,8 +282,8 @@ Node *parseWhile(Parser *p) {
     Node *body = parseBlock(p);
 
     Node *node = newNode(NODE_WHILE);
-    node->left = condition;
-    node->right = body;
+    addChild(node, condition);
+    addChild(node, body);
 
     return node;
 }
@@ -278,7 +295,7 @@ Node *parseReturn(Parser *p) {
     expect(p, SEMICOLON);
 
     Node *node = newNode(NODE_RETURN);
-    node->right = value;
+    addChild(node, value);
 
     return node;
 }
@@ -295,7 +312,7 @@ Node *parseFunction(Parser *p) {
 
     Node *node = newNode(NODE_FUNCTION);
     strncpy(node->value, nameToken->value, sizeof(node->value) - 1);
-    node->right = body;
+    addChild(node, body);
 
     return node;
 }
