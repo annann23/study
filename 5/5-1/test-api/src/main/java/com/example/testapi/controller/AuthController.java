@@ -1,8 +1,8 @@
 package com.example.testapi.controller;
 
-import com.example.testapi.controller.request.UserLoginRequest;
-import com.example.testapi.controller.request.UserRegisterRequest;
-import com.example.testapi.controller.response.UserResponse;
+import com.example.testapi.dtos.request.UserLoginRequest;
+import com.example.testapi.dtos.request.UserRegisterRequest;
+import com.example.testapi.dtos.response.UserResponse;
 import com.example.testapi.domain.UserEntity;
 import com.example.testapi.service.AuthService;
 import com.example.testapi.service.UserService;

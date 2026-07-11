@@ -1,9 +1,9 @@
 package com.example.testapi.controller;
 
-import com.example.testapi.controller.request.PostDeleteRequest;
-import com.example.testapi.controller.request.PostEditRequest;
-import com.example.testapi.controller.request.PostSaveRequest;
-import com.example.testapi.controller.response.PostResponse;
+import com.example.testapi.dtos.request.PostDeleteRequest;
+import com.example.testapi.dtos.request.PostEditRequest;
+import com.example.testapi.dtos.request.PostSaveRequest;
+import com.example.testapi.dtos.response.PostResponse;
 import com.example.testapi.service.LikedService;
 import com.example.testapi.service.PostService;
 import org.springframework.http.ResponseEntity;

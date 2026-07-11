@@ -1,8 +1,8 @@
 package com.example.testapi.controller;
 
-import com.example.testapi.controller.request.UserLevelSaveRequest;
-import com.example.testapi.controller.request.UserLevelUpdateRequest;
-import com.example.testapi.controller.response.UserLevelResponse;
+import com.example.testapi.dtos.request.UserLevelSaveRequest;
+import com.example.testapi.dtos.request.UserLevelUpdateRequest;
+import com.example.testapi.dtos.response.UserLevelResponse;
 import com.example.testapi.service.UserLevelService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

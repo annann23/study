@@ -1,4 +1,4 @@
-package com.example.testapi.controller.response;
+package com.example.testapi.dtos.response;
 import com.example.testapi.domain.UserLevelEntity;
 
 public record UserLevelResponse(

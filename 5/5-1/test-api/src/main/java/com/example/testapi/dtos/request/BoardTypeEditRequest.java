@@ -1,3 +1,3 @@
-package com.example.testapi.controller.request;
+package com.example.testapi.dtos.request;
 
 public record BoardTypeEditRequest(Long boardTypeId, String name) {}

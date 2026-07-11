@@ -1,6 +1,6 @@
 package com.example.testapi.domain;
 
-import com.example.testapi.controller.request.UserLoginRequest;
+import com.example.testapi.dtos.request.UserLoginRequest;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
