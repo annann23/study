@@ -25,6 +25,10 @@ Node *parseReturn(Parser *p);
 
 static const char *nodeTypeName(NodeType type);
 
+void addVariables(Scope* scope, const char* name);
+int lookupVariable(Scope* scope, const char* name); 
+int isVariableDeclared(Scope* scope, const char* name);
+
 Node *newNode(NodeType type)
 {
     Node *node = (Node *)malloc(sizeof(Node));
@@ -153,27 +157,16 @@ Token *expectRelop(Parser *p) {
 Node *parseBlock(Parser *p) {
     expect(p, LBRACE);
 
-    Node *head = NULL;
-    Node *tail = NULL;
+    Node *block = newNode(NODE_BLOCK);  
 
     while (!checkType(p, RBRACE) && peek(p) != NULL)
     {
         Node *stmt = parseStatement(p);
-        if (head == NULL)
-        {
-            head = stmt;
-            tail = stmt;
-        }
-        else
-        {
-            tail->next = stmt;
-            tail = stmt;
-        }
+        addChild(block, stmt); 
     }
 
     expect(p, RBRACE);
-
-    return head;
+    return block;
 }
 
 
@@ -336,6 +329,105 @@ static const char *nodeTypeName(NodeType type) {
     case NODE_NUMBER: return "Number";
     }
     return "?";
+}
+
+Scope* pushScope(Scope* current) {
+    Scope* newScope = (Scope*)malloc(sizeof(Scope));
+    newScope->variables = NULL;
+    newScope->parent = current;
+    
+    return newScope;
+}
+
+void addVariables(Scope* scope, const char* name) {
+    Variable* newVar = (Variable*)malloc(sizeof(Variable));
+
+    strncpy(newVar->name, name, sizeof(newVar->name) - 1);
+    newVar->name[sizeof(newVar->name) - 1] = '\0';
+
+    newVar->next = scope->variables;
+    scope->variables = newVar;
+}
+
+Scope* popScope(Scope* current) {
+    Variable* var = current->variables;
+
+    while (var != NULL) {
+        Variable* tmp = var;
+        var = var->next;
+        free(tmp);
+    }
+
+    Scope* parent = current->parent;
+
+    free(current);
+    return parent;
+}
+
+int lookupVariable(Scope* scope, const char* name) {
+    while (scope != NULL) {
+        Variable* var = scope->variables;
+        while (var != NULL) {
+            if (strcmp(var->name, name) == 0) {
+                return 1; 
+            }
+            var = var->next;
+        }
+        scope = scope->parent;
+    }
+    return 0; 
+}
+
+int isVariableDeclared(Scope* scope, const char* name) {
+    Variable* var = scope->variables;
+    while (var != NULL) {
+        if (strcmp(var->name, name) == 0) {
+            return 1; 
+        }
+        var = var->next;
+    }
+    return 0; 
+}
+
+void analyze(Node* node, Scope* currentScope, int* errorCount) {
+    for (; node != NULL; node = node->next) {
+        switch (node->nodeType) {
+
+            case NODE_BLOCK: {
+                Scope* blockScope = pushScope(currentScope);
+                for (int i = 0; i < node->childCount; i++) {
+                    analyze(node->children[i], blockScope, errorCount);
+                }
+                popScope(blockScope);
+                break;
+            }
+
+            case NODE_DECLARE: {
+                char* name = node->children[0]->value;
+                if (isVariableDeclared(currentScope, name)) {
+                    fprintf(stderr, "중복 선언된 변수입니다: '%s'\n", name);
+                    (*errorCount)++;
+                }
+                addVariables(currentScope, name);
+                break;
+            }
+
+            case NODE_IDENTIFIER: {
+                if (!lookupVariable(currentScope, node->value)) {
+                    fprintf(stderr, "선언되지 않은 변수입니다: '%s'\n", node->value);
+                    (*errorCount)++;
+                }
+                break;
+            }
+
+            default: {
+                for (int i = 0; i < node->childCount; i++) {
+                    analyze(node->children[i], currentScope, errorCount);
+                }
+                break;
+            }
+        }
+    }
 }
 
 void printAST(Node *node, int depth, const char *prefix, int isLast) {

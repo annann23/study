@@ -382,6 +382,8 @@ int main() {
         "\n"
         "    x = 10;\n"
         "    y = 20;\n"
+        "    l = 20;\n"
+        "    int z = 3;\n"
         "\n"
         "    if (z == 60) {\n"
         "        z = z - 1;\n"
@@ -398,15 +400,29 @@ int main() {
 
     Token *head = tokenize(input);
 
+    // lexer 결과 출력
     Token *current = head;
     while (current != NULL) {
         printf("%s : %s\n", tokenName(current->type), current->value);
         current = current->next;
     }
 
+    //파서 결과 출력
     Parser parser = { head };
     Node *ast = parseFunction(&parser);
     printAST(ast, 0, "", 0);
+
+    //의미 분석
+    int errorCount = 0;
+    Scope* globalScope = pushScope(NULL);
+    analyze(ast, globalScope, &errorCount);
+    popScope(globalScope);
+
+    if(errorCount > 0) {
+        printf("의미 분석 중 %d개의 오류가 발견되었습니다.\n", errorCount);
+    } else {
+        printf("의미 분석이 오류 없이 완료되었습니다.\n");
+    }
 
 
     //메모리 해제

@@ -30,7 +30,21 @@ typedef struct {
     Token *current;
 } Parser;
 
+typedef struct Variable {
+    char name[64];
+    struct Variable* next;
+} Variable;
+
+typedef struct Scope {
+    Variable* variables; 
+    struct Scope* parent;
+} Scope;
+
 Node *parseFunction(Parser *p);
-void printAST(Node *node, int depth);
+void printAST(Node *node, int depth, const char *prefix, int isLast);
+
+Scope* pushScope(Scope* current);
+Scope* popScope(Scope* current);
+void analyze(Node* node, Scope* currentScope, int* errorCount);
 
 #endif
