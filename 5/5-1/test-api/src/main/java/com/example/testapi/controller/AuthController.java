@@ -6,11 +6,13 @@ import com.example.testapi.dtos.response.UserResponse;
 import com.example.testapi.domain.UserEntity;
 import com.example.testapi.service.AuthService;
 import com.example.testapi.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -25,12 +27,8 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> me(HttpServletRequest httpRequest) {
-        HttpSession session = httpRequest.getSession(false);
-        if (session == null) return ResponseEntity.status(401).build();
-
-        Long userId = (Long) session.getAttribute("id");
-        if (userId == null) return ResponseEntity.status(401).build();
+    public ResponseEntity<UserResponse> me() {
+        Long userId = (Long) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
 
         return ResponseEntity.ok(UserResponse.from(userService.findById(userId)));
     }
@@ -42,16 +40,13 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@RequestBody UserLoginRequest request, HttpServletRequest httpRequest) {
-        HttpSession session = httpRequest.getSession(false);
-        if(session != null && Objects.requireNonNull(session).getAttribute("id") != null) {
-            Long userId = (Long) session.getAttribute("id");
-            return ResponseEntity.ok(UserResponse.from(userService.findById(userId)));
-        }
-
+    public ResponseEntity<UserResponse> login(@RequestBody UserLoginRequest request) {
         UserEntity user = authService.login(request);
-        HttpSession newSession = httpRequest.getSession(true);
-        newSession.setAttribute("id", user.getId());
+
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(user.getId(), null, List.of());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
         return ResponseEntity.ok(UserResponse.from(user));
     }
 
