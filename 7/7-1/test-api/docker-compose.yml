@@ -1,0 +1,15 @@
+version: "0.1"
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: testdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1234"
+    ports:
+      - "5433:5432"
+  redis:
+    image: redis:7
+    ports:
+      - "6223:6379"

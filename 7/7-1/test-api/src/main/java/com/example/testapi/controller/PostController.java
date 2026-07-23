@@ -1,0 +1,75 @@
+package com.example.testapi.controller;
+
+import com.example.testapi.dtos.request.PostDeleteRequest;
+import com.example.testapi.dtos.request.PostEditRequest;
+import com.example.testapi.dtos.request.PostSaveRequest;
+import com.example.testapi.dtos.response.PostResponse;
+import com.example.testapi.service.LikedService;
+import com.example.testapi.service.PostService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/posts")
+public class PostController {
+
+    private final PostService postService;
+    private final LikedService likedService;
+
+    public PostController(PostService postService, LikedService likedService) {
+        this.postService = postService;
+        this.likedService = likedService;
+    }
+
+    @PostMapping
+    public ResponseEntity<PostResponse> save(@RequestBody PostSaveRequest request) {
+        PostResponse response = PostResponse.from(
+                postService.save(request.post(), request.boardId(), request.userId())
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PostResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(PostResponse.from(postService.findById(id)));
+    }
+
+    @GetMapping("/board/{boardId}")
+    public ResponseEntity<List<PostResponse>> findAllByBoard(@PathVariable Long boardId) {
+        List<PostResponse> responses = postService.findAllByBoard(boardId)
+                .stream()
+                .map(PostResponse::from)
+                .toList();
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<PostResponse>> findAllByUser(@PathVariable Long userId) {
+        List<PostResponse> responses = postService.findAllByUser(userId)
+                .stream()
+                .map(PostResponse::from)
+                .toList();
+        return ResponseEntity.ok(responses);
+    }
+
+    @PutMapping
+    public ResponseEntity<PostResponse> edit(@RequestBody PostEditRequest request) {
+        PostResponse response = PostResponse.from(
+                postService.edit(request.postId(), request.post())
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> delete(@RequestBody PostDeleteRequest request) {
+        postService.delete(request.postId());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<Boolean> toggleLike(@PathVariable Long postId, @RequestParam Long userId) {
+        return ResponseEntity.ok(likedService.toggleLike(userId, postId));
+    }
+}
