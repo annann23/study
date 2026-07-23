@@ -14,6 +14,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp -> csp
+                                .policyDirectives("default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:;")
+                        )
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/sign-up", "/auth/login").permitAll()
                         .anyRequest().authenticated()
