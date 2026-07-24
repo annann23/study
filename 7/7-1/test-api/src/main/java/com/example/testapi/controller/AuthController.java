@@ -6,10 +6,14 @@ import com.example.testapi.dtos.response.UserResponse;
 import com.example.testapi.domain.UserEntity;
 import com.example.testapi.service.AuthService;
 import com.example.testapi.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,10 +24,12 @@ import java.util.Objects;
 public class AuthController {
     private final AuthService authService;
     private final UserService userService;
+    private final SecurityContextRepository securityContextRepository;
 
-    public AuthController(AuthService authService, UserService userService) {
+    public AuthController(AuthService authService, UserService userService, SecurityContextRepository securityContextRepository) {
         this.authService = authService;
         this.userService = userService;
+        this.securityContextRepository = securityContextRepository;
     }
 
     @GetMapping("/me")
@@ -40,12 +46,15 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@RequestBody UserLoginRequest request) {
+    public ResponseEntity<UserResponse> login(@RequestBody UserLoginRequest request, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         UserEntity user = authService.login(request);
 
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(user.getId(), null, List.of());
-        SecurityContextHolder.getContext().setAuthentication(auth);
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(auth);
+        SecurityContextHolder.setContext(context);
+        securityContextRepository.saveContext(context, httpRequest, httpResponse);
 
         return ResponseEntity.ok(UserResponse.from(user));
     }
