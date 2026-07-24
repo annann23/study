@@ -1,0 +1,110 @@
+import { useEffect, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { api } from '../lib/api'
+import { useAuth } from '../lib/auth'
+import type { Board, LikeStatus, Post } from '../lib/types'
+// import { sanitizeHtml } from '../lib/html' // TEMP: CSP 실습 동안 비활성화
+import CommentSection from '../components/CommentSection'
+
+function formatDateTime(iso: string) {
+  return new Date(iso).toLocaleString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+}
+
+export default function PostDetailPage() {
+  const { postId } = useParams<{ postId: string }>()
+  const navigate = useNavigate()
+  const { user } = useAuth()
+
+  const [post, setPost] = useState<Post | null>(null)
+  const [authorNickname, setAuthorNickname] = useState('')
+  const [board, setBoard] = useState<Board | null>(null)
+  const [like, setLike] = useState<LikeStatus | null>(null)
+
+  useEffect(() => {
+    api<Post>(`/posts/${postId}`).then((data) => {
+      setPost(data)
+      api<{ nickname: string }>(`/user/${data.userId}`).then((u) => setAuthorNickname(u.nickname))
+      api<Board>(`/board/${data.boardId}`).then(setBoard)
+      api<LikeStatus>(`/posts/${data.id}/like?userId=${user!.id}`).then(setLike)
+    })
+  }, [postId, user])
+
+  const toggleLike = async () => {
+    if (!post) return
+    await api<boolean>(`/posts/${post.id}/like?userId=${user!.id}`, { method: 'POST' })
+    setLike((prev) => (prev ? { count: prev.count + (prev.likedByMe ? -1 : 1), likedByMe: !prev.likedByMe } : prev))
+  }
+
+  const handleDelete = async () => {
+    if (!post || !window.confirm('게시글을 삭제할까요?')) return
+    await api('/posts', { method: 'DELETE', body: JSON.stringify({ postId: post.id }) })
+    navigate(`/?board=${post.boardId}`)
+  }
+
+  if (!post) {
+    return <p className="mt-16 text-center text-sm text-gray-400">불러오는 중...</p>
+  }
+
+  const isMine = user?.id === post.userId
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <header className="border-b border-gray-100 bg-white/80 px-6 py-4 backdrop-blur-md">
+        <div className="mx-auto max-w-3xl">
+          <Link to={`/?board=${post.boardId}`} className="text-sm text-gray-400 hover:text-gray-600">
+            ← {board?.name ?? '목록'}으로
+          </Link>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-3xl px-6 py-8">
+        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="text-xl font-semibold text-gray-900">{post.title}</h1>
+            {isMine && (
+              <div className="flex shrink-0 gap-2">
+                <Link
+                  to={`/board/${post.boardId}/posts/${post.id}/edit`}
+                  className="rounded-lg px-3 py-1.5 text-xs text-gray-500 transition hover:bg-gray-100"
+                >
+                  수정
+                </Link>
+                <button
+                  onClick={handleDelete}
+                  className="rounded-lg px-3 py-1.5 text-xs text-gray-500 transition hover:bg-gray-100 hover:text-red-500"
+                >
+                  삭제
+                </button>
+              </div>
+            )}
+          </div>
+          <div className="mt-1 flex items-center gap-2 text-xs text-gray-400">
+            <span>{authorNickname}</span>
+            <span>·</span>
+            <span>{formatDateTime(post.createdAt)}</span>
+          </div>
+
+          <div
+            className="post-content mt-5 text-sm leading-relaxed text-gray-800"
+            // TEMP: CSP 실습을 위해 sanitizeHtml(post.content) 대신 원본을 그대로 렌더링 중 — 실습 끝나면 되돌릴 것
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
+
+          <button
+            onClick={toggleLike}
+            disabled={like == null}
+            className={`mt-6 flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm font-medium transition ${
+              like?.likedByMe
+                ? 'border-red-200 bg-red-50 text-red-500'
+                : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+            }`}
+          >
+            {like?.likedByMe ? '♥' : '♡'} 좋아요 {like?.count ?? 0}
+          </button>
+        </div>
+
+        <CommentSection postId={post.id} />
+      </main>
+    </div>
+  )
+}
