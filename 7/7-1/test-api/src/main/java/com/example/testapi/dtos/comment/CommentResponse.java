@@ -6,7 +6,8 @@ import java.time.ZonedDateTime;
 public record CommentResponse(
         Long id,
         String content,
-        String userId,
+        Long userId,
+        String nickname,
         Boolean isEdited,
         ZonedDateTime createdAt
 ) {
@@ -14,7 +15,8 @@ public record CommentResponse(
         return new CommentResponse(
                 entity.getId(),
                 entity.getContent(),
-                entity.getUserId(),
+                entity.getUser().getId(),
+                entity.getUser().getNickname(),
                 entity.getIsEdited(),
                 entity.getCreatedAt()
         );

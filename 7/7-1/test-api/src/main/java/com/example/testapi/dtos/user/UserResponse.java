@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 public record UserResponse(
         Long id,
         String loginId,
+        String nickname,
         Long userLevel,
         ZonedDateTime createdAt
 ) {
@@ -13,6 +14,7 @@ public record UserResponse(
         return new UserResponse(
                 entity.getId(),
                 entity.getLoginId(),
+                entity.getNickname(),
                 entity.getUserLevelId(),
                 entity.getCreatedAt()
         );

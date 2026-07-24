@@ -3,6 +3,7 @@ package com.example.testapi.controller;
 import com.example.testapi.dtos.request.PostDeleteRequest;
 import com.example.testapi.dtos.request.PostEditRequest;
 import com.example.testapi.dtos.request.PostSaveRequest;
+import com.example.testapi.dtos.response.LikeStatusResponse;
 import com.example.testapi.dtos.response.PostResponse;
 import com.example.testapi.service.LikedService;
 import com.example.testapi.service.PostService;
@@ -71,5 +72,10 @@ public class PostController {
     @PostMapping("/{postId}/like")
     public ResponseEntity<Boolean> toggleLike(@PathVariable Long postId, @RequestParam Long userId) {
         return ResponseEntity.ok(likedService.toggleLike(userId, postId));
+    }
+
+    @GetMapping("/{postId}/like")
+    public ResponseEntity<LikeStatusResponse> getLikeStatus(@PathVariable Long postId, @RequestParam Long userId) {
+        return ResponseEntity.ok(new LikeStatusResponse(likedService.countByPost(postId), likedService.isLikedBy(userId, postId)));
     }
 }

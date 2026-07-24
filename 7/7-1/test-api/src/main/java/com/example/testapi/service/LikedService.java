@@ -43,4 +43,12 @@ public class LikedService {
         userService.findById(userId);
         return likedRepository.findAllByUserId(userId);
     }
+
+    public long countByPost(Long postId) {
+        return likedRepository.findAllByPostId(postId).size();
+    }
+
+    public boolean isLikedBy(Long userId, Long postId) {
+        return likedRepository.existsByUserIdAndPostId(userId, postId);
+    }
 }
