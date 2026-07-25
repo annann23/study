@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test API</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: sans-serif;
+        background: #f5f5f5;
+        color: #222;
+      }
+
+      nav {
+        background: #222;
+        display: flex;
+        gap: 4px;
+        padding: 12px 16px;
+      }
+      nav button {
+        background: transparent;
+        border: 1px solid #555;
+        color: #ccc;
+        padding: 6px 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      nav button.active {
+        background: #fff;
+        color: #222;
+        border-color: #fff;
+      }
+
+      .page {
+        display: none;
+        max-width: 700px;
+        margin: 32px auto;
+        padding: 0 16px;
+      }
+      .page.active {
+        display: block;
+      }
+
+      h2 {
+        margin-bottom: 20px;
+        font-size: 20px;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 8px;
+        padding: 24px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 14px;
+      }
+      .field label {
+        font-size: 13px;
+        color: #555;
+      }
+      .field input,
+      .field textarea {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 8px 10px;
+        font-size: 14px;
+        width: 100%;
+      }
+      .field textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .btn {
+        background: #222;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        font-size: 14px;
+        cursor: pointer;
+        width: 100%;
+      }
+      .btn:hover {
+        background: #444;
+      }
+
+      .link-btn {
+        background: none;
+        border: none;
+        color: #0066cc;
+        cursor: pointer;
+        font-size: 13px;
+        padding: 0;
+        text-decoration: underline;
+      }
+
+      #msg-register,
+      #msg-login {
+        font-size: 13px;
+        margin-top: 10px;
+        min-height: 18px;
+      }
+
+      /* 게시판 + 게시글 레이아웃 (네이버 카페 스타일) */
+      .page.page-wide {
+        max-width: 960px;
+      }
+      .board-layout {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+      }
+      .board-sidebar {
+        width: 200px;
+        flex-shrink: 0;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        padding: 16px 0;
+      }
+      .board-sidebar-title {
+        font-size: 13px;
+        color: #888;
+        padding: 0 16px 10px;
+      }
+      .board-nav-item {
+        display: block;
+        width: 100%;
+        text-align: left;
+        background: none;
+        border: none;
+        border-left: 3px solid transparent;
+        padding: 10px 16px;
+        font-size: 14px;
+        color: #333;
+        cursor: pointer;
+      }
+      .board-nav-item:hover {
+        background: #f5f5f5;
+      }
+      .board-nav-item.active {
+        background: #eef4ff;
+        border-left-color: #0066cc;
+        color: #0066cc;
+        font-weight: 600;
+      }
+      .board-main {
+        flex: 1;
+        min-width: 0;
+      }
+
+      /* 게시글 리스트 */
+      .post-item {
+        background: #fff;
+        border-radius: 6px;
+        padding: 16px;
+        margin-bottom: 10px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .post-item:hover {
+        background: #f0f0f0;
+      }
+      .post-item .post-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .post-item .post-meta {
+        font-size: 12px;
+        color: #888;
+      }
+
+      .empty {
+        color: #aaa;
+        font-size: 14px;
+        text-align: center;
+        padding: 40px 0;
+      }
+
+      /* 게시글 상세 */
+      #detail-back {
+        margin-bottom: 16px;
+      }
+      #detail-title {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      #detail-meta {
+        font-size: 12px;
+        color: #888;
+        margin-bottom: 20px;
+      }
+      #detail-body {
+        font-size: 15px;
+        line-height: 1.7;
+        white-space: pre-wrap;
+      }
+
+      .divider {
+        border: none;
+        border-top: 1px solid #eee;
+        margin: 20px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="nav" style="display: none">
+      <button onclick="show('posts')">게시글 목록</button>
+      <button onclick="show('boards')">게시판 관리</button>
+      <button onclick="logout()" style="margin-left: auto">로그아웃</button>
+    </nav>
+    <div id="page-login" class="page active">
+      <h2>로그인</h2>
+      <div class="card">
+        <div class="field">
+          <label>아이디</label>
+          <input id="login-id" type="text" placeholder="로그인 아이디" />
+        </div>
+        <div class="field">
+          <label>비밀번호</label>
+          <input id="login-pw" type="password" placeholder="비밀번호" />
+        </div>
+        <button class="btn" onclick="login()">로그인</button>
+        <p id="msg-login"></p>
+        <hr class="divider" />
+        <p style="text-align: center; font-size: 13px; color: #555">
+          계정이 없으신가요?
+          <button class="link-btn" onclick="show('register')">회원가입</button>
+        </p>
+      </div>
+    </div>
+    <div id="page-register" class="page">
+      <h2>회원가입</h2>
+      <div class="card">
+        <div class="field">
+          <label>아이디</label>
+          <input id="reg-id" type="text" placeholder="로그인 아이디" />
+        </div>
+        <div class="field">
+          <label>비밀번호</label>
+          <input id="reg-pw" type="password" placeholder="비밀번호" />
+        </div>
+        <div class="field">
+          <label>닉네임</label>
+          <input id="reg-nickname" type="text" placeholder="닉네임" />
+        </div>
+        <button class="btn" onclick="register()">가입하기</button>
+        <p id="msg-register"></p>
+        <hr class="divider" />
+        <p style="text-align: center; font-size: 13px; color: #555">
+          이미 계정이 있으신가요?
+          <button class="link-btn" onclick="show('login')">로그인</button>
+        </p>
+      </div>
+    </div>
+    <div id="page-posts" class="page page-wide">
+      <div class="board-layout">
+        <aside class="board-sidebar">
+          <div class="board-sidebar-title">게시판</div>
+          <div id="board-nav"><p class="empty">불러오는 중...</p></div>
+        </aside>
+        <div class="board-main">
+          <h2 id="posts-title">게시글 목록</h2>
+          <div id="post-list"><p class="empty">불러오는 중...</p></div>
+        </div>
+      </div>
+    </div>
+    <!-- 게시판 관리 -->
+    <div id="page-boards" class="page">
+      <h2>게시판 관리</h2>
+      <div class="card" style="margin-bottom:16px">
+        <div class="field">
+          <label>게시판 이름</label>
+          <input id="board-name" type="text" placeholder="게시판 이름" />
+        </div>
+        <div class="field">
+          <label>게시판 타입 ID</label>
+          <input id="board-type-id" type="number" placeholder="1" />
+        </div>
+        <button class="btn" onclick="createBoard()">게시판 등록</button>
+        <p id="msg-board" style="font-size:13px;margin-top:10px;min-height:18px"></p>
+      </div>
+      <div id="board-list"><p class="empty">불러오는 중...</p></div>
+    </div>
+
+    <!-- 게시글 상세 -->
+    <div id="page-detail" class="page">
+      <button class="link-btn" id="detail-back" onclick="show('posts')">
+        ← 목록으로
+      </button>
+      <div class="card">
+        <div id="detail-title"></div>
+        <div id="detail-meta"></div>
+        <hr class="divider" />
+        <div id="detail-body"></div>
+      </div>
+    </div>
+
+    <script>
+      const BASE = "http://localhost:9090";
+      let currentBoardId = null;
+
+      function show(name) {
+        document
+          .querySelectorAll(".page")
+          .forEach((p) => p.classList.remove("active"));
+        document.getElementById("page-" + name).classList.add("active");
+        if (name === "posts") initPostsPage();
+        if (name === "boards") loadBoards();
+      }
+
+      function setLoggedIn(loggedIn) {
+        document.getElementById("nav").style.display = loggedIn
+          ? "flex"
+          : "none";
+      }
+
+      async function logout() {
+        // TODO: await fetch(`${BASE}/auth/logout`, { method: "POST", credentials: "include" });
+        setLoggedIn(false);
+        show("login");
+      }
+
+      window.addEventListener("load", async () => {
+        try {
+          const res = await fetch(`${BASE}/auth/me`, {
+            credentials: "include",
+          });
+          if (res.ok) {
+            setLoggedIn(true);
+            show("posts");
+          } else {
+            setLoggedIn(false);
+            show("login");
+          }
+        } catch (e) {
+          console.error("API 요청 실패:", e);
+          setLoggedIn(false);
+          show("login");
+        }
+      });
+
+      async function register() {
+        const loginId = document.getElementById("reg-id").value.trim();
+        const password = document.getElementById("reg-pw").value;
+        const nickname = document.getElementById("reg-nickname").value.trim();
+
+        try {
+          const res = await fetch(`${BASE}/auth/sign-up`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ loginId, password, nickname }),
+          });
+          if (res.ok) {
+            show("login");
+          } else {
+            const error = await res.json();
+            document.getElementById("msg-register").textContent = error.message;
+          }
+        } catch (e) {
+          console.error("API 요청 실패:", e);
+        }
+      }
+
+      async function login() {
+        const loginId = document.getElementById("login-id").value.trim();
+        const password = document.getElementById("login-pw").value;
+        const msg = document.getElementById("msg-login");
+
+        const res = await fetch(`${BASE}/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ loginId, password }),
+        });
+        if (res.ok) {
+          setLoggedIn(true);
+          show("posts");
+        } else msg.textContent = "아이디 또는 비밀번호가 틀렸습니다.";
+        msg.textContent = "API 미연동";
+      }
+
+      async function initPostsPage() {
+        const nav = document.getElementById("board-nav");
+        nav.innerHTML = "<p class='empty'>불러오는 중...</p>";
+
+        const res = await fetch(`${BASE}/board`, { credentials: "include" });
+        const boards = await res.json();
+
+        if (!boards.length) {
+          nav.innerHTML = "<p class='empty'>게시판이 없습니다.</p>";
+          document.getElementById("posts-title").textContent = "게시글 목록";
+          document.getElementById("post-list").innerHTML =
+            "<p class='empty'>게시판을 먼저 등록해주세요.</p>";
+          currentBoardId = null;
+          return;
+        }
+
+        renderBoardNav(boards);
+
+        const selected =
+          boards.find((b) => b.id === currentBoardId) ?? boards[0];
+        selectBoard(selected.id, selected.name);
+      }
+
+      function renderBoardNav(boards) {
+        const nav = document.getElementById("board-nav");
+        nav.innerHTML = boards
+          .map(
+            (b) => `
+          <button
+            class="board-nav-item${b.id === currentBoardId ? " active" : ""}"
+            data-board-id="${b.id}"
+            onclick="selectBoard(${b.id}, '${escHtml(b.name).replace(/'/g, "\\'")}')"
+          >${escHtml(b.name)}</button>
+        `,
+          )
+          .join("");
+      }
+
+      function selectBoard(boardId, boardName) {
+        currentBoardId = boardId;
+        document.getElementById("posts-title").textContent = boardName;
+        document
+          .querySelectorAll("#board-nav .board-nav-item")
+          .forEach((btn) => {
+            btn.classList.toggle(
+              "active",
+              Number(btn.dataset.boardId) === boardId,
+            );
+          });
+        loadPosts(boardId);
+      }
+
+      async function loadPosts(boardId) {
+        const container = document.getElementById("post-list");
+        container.innerHTML = "<p class='empty'>불러오는 중...</p>";
+
+        const res = await fetch(`${BASE}/posts/board/${boardId}`, {
+          credentials: "include",
+        });
+        const data = await res.json();
+        renderPosts(data);
+      }
+
+      function renderPosts(posts) {
+        const container = document.getElementById("post-list");
+        if (!posts.length) {
+          container.innerHTML = "<p class='empty'>게시글이 없습니다.</p>";
+          return;
+        }
+        container.innerHTML = posts
+          .map(
+            (p) => `
+          <div class="post-item" onclick="showDetail(${p.id})">
+            <div class="post-title">${escHtml(p.title)}</div>
+            <div class="post-meta">${new Date(p.createdAt).toLocaleString()}</div>
+          </div>
+        `,
+          )
+          .join("");
+      }
+
+      async function showDetail(id) {
+        show("detail");
+
+        // TODO: API 연동 후 renderDetail(data) 호출
+        // const res = await fetch(`${BASE}/posts/${id}`, { credentials: "include" });
+        // const data = await res.json();
+        // renderDetail(data);
+
+        renderDetail({
+          title: `게시글 #${id}`,
+          content: "API 미연동",
+          createdAt: new Date(),
+        }); // 임시
+      }
+
+      function renderDetail(post) {
+        document.getElementById("detail-title").textContent = post.title;
+        document.getElementById("detail-meta").textContent = new Date(
+          post.createdAt,
+        ).toLocaleString();
+        document.getElementById("detail-body").textContent = post.content;
+      }
+
+      async function loadBoards() {
+        const container = document.getElementById("board-list");
+        container.innerHTML = "<p class='empty'>불러오는 중...</p>";
+        const res = await fetch(`${BASE}/board`, { credentials: "include" });
+        const data = await res.json();
+        if (!data.length) { container.innerHTML = "<p class='empty'>게시판이 없습니다.</p>"; return; }
+        container.innerHTML = data.map(b => `
+          <div class="post-item" style="cursor:default">
+            <div class="post-title">${escHtml(b.name)}</div>
+            <div class="post-meta">ID: ${b.id}</div>
+          </div>
+        `).join("");
+      }
+
+      async function createBoard() {
+        const name = document.getElementById("board-name").value.trim();
+        const boardTypeId = Number(document.getElementById("board-type-id").value);
+        const msg = document.getElementById("msg-board");
+        const res = await fetch(`${BASE}/board`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ name, boardTypeId }),
+        });
+        if (res.ok) {
+          document.getElementById("board-name").value = "";
+          document.getElementById("board-type-id").value = "";
+          msg.textContent = "등록 완료";
+          loadBoards();
+        } else {
+          const err = await res.json();
+          msg.textContent = err.message ?? "등록 실패";
+        }
+      }
+
+      function escHtml(str) {
+        return str.replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      }
+    </script>
+  </body>
+</html>

@@ -31,3 +31,19 @@ export type LikeStatus = {
   count: number
   likedByMe: boolean
 }
+
+export type UserLevel = {
+  id: number
+  name: string
+}
+
+export type Permission = {
+  id: number
+  name: string
+}
+
+export type Role = {
+  id: number
+  name: string
+  permissions: string[]
+}

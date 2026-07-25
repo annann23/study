@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import { useAuth } from '../lib/auth'
 import type { Board, LikeStatus, Post } from '../lib/types'
-// import { sanitizeHtml } from '../lib/html' // TEMP: CSP 실습 동안 비활성화
+import { sanitizeHtml } from '../lib/html'
 import CommentSection from '../components/CommentSection'
 
 function formatDateTime(iso: string) {
@@ -86,8 +86,7 @@ export default function PostDetailPage() {
 
           <div
             className="post-content mt-5 text-sm leading-relaxed text-gray-800"
-            // TEMP: CSP 실습을 위해 sanitizeHtml(post.content) 대신 원본을 그대로 렌더링 중 — 실습 끝나면 되돌릴 것
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
           />
 
           <button

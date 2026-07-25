@@ -1,15 +1,23 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { api } from '../lib/api'
 import { useAuth } from '../lib/auth'
 import { useClickOutside } from '../lib/useClickOutside'
+import type { UserLevel } from '../lib/types'
 import EditProfileModal from './EditProfileModal'
 
 export default function UserMenu() {
   const { user, logout } = useAuth()
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState(false)
+  const [levelName, setLevelName] = useState('')
   const menuRef = useRef<HTMLDivElement>(null)
 
   useClickOutside(menuRef, () => setOpen(false))
+
+  useEffect(() => {
+    if (!user) return
+    api<UserLevel>(`/user-level/${user.userLevel}`).then((level) => setLevelName(level.name))
+  }, [user])
 
   if (!user) return null
 
@@ -24,11 +32,14 @@ export default function UserMenu() {
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-900 text-sm font-medium text-white">
           {initial}
         </span>
-        <span className="text-sm font-medium text-gray-700">{user.nickname}</span>
+        <span className="flex flex-col items-start leading-tight">
+          <span className="text-sm font-medium text-gray-700">{user.nickname}</span>
+          {levelName && <span className="text-[11px] text-gray-400">{levelName}</span>}
+        </span>
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-44 overflow-hidden rounded-xl border border-gray-100 bg-white py-1 shadow-lg">
+        <div className="absolute right-0 mt-2 w-48 overflow-hidden rounded-xl border border-gray-100 bg-white py-1 shadow-lg">
           <button
             onClick={() => {
               setEditing(true)

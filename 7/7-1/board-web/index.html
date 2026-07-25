@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- 백엔드 SecurityConfig의 CSP는 API 응답에만 붙어 이 문서엔 적용되지 않으므로, 데모를 위해 동일한 정책을 meta 태그로 직접 적용 -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:;" />
     <title>board-web</title>
   </head>
   <body>

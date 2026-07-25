@@ -1,4 +1,5 @@
 import type { Board } from '../lib/types'
+import SettingsMenu from './SettingsMenu'
 import UserMenu from './UserMenu'
 
 export default function TopNav({
@@ -20,7 +21,10 @@ export default function TopNav({
     <header className="sticky top-0 z-10 border-b border-gray-100 bg-white/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
         <span className="text-lg font-semibold tracking-tight text-gray-900">게시판</span>
-        <UserMenu />
+        <div className="flex items-center gap-1">
+          <SettingsMenu />
+          <UserMenu />
+        </div>
       </div>
       <nav className="mx-auto flex max-w-4xl items-center gap-1 overflow-x-auto px-6">
         {boards.map((board) => {
