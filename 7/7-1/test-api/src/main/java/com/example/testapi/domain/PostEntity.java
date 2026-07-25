@@ -1,6 +1,7 @@
 package com.example.testapi.domain;
 
 import com.example.testapi.dtos.request.PostContentDto;
+import com.example.testapi.security.OwnableResource;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -9,7 +10,7 @@ import java.time.ZonedDateTime;
 
 @Entity
 @Table(name="post")
-public class PostEntity {
+public class PostEntity implements OwnableResource {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -56,6 +57,9 @@ public class PostEntity {
     public ZonedDateTime getCreatedAt() { return createdAt; }
     public ZonedDateTime getUpdatedAt() { return updatedAt; }
     public ZonedDateTime getDeletedAt() { return deletedAt; }
+
+    @Override
+    public Long getOwnerId() { return user.getId(); }
 
     public void setTitle(String title) { this.title = title; }
     public void setContent(String content) { this.content = content; }

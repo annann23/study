@@ -1,5 +1,6 @@
 package com.example.testapi.domain;
 
+import com.example.testapi.security.OwnableResource;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -7,7 +8,7 @@ import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "attachment")
-public class AttachmentEntity {
+public class AttachmentEntity implements OwnableResource {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,4 +45,7 @@ public class AttachmentEntity {
     public String getType() { return type; }
     public String getFileUrl() { return fileUrl; }
     public ZonedDateTime getCreatedAt() { return createdAt; }
+
+    @Override
+    public Long getOwnerId() { return post.getUser().getId(); }
 }

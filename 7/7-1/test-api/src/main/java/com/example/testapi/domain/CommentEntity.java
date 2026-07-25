@@ -1,5 +1,6 @@
 package com.example.testapi.domain;
 
+import com.example.testapi.security.OwnableResource;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -8,7 +9,7 @@ import java.time.ZonedDateTime;
 
 @Entity
 @Table(name="comments")
-public class CommentEntity {
+public class CommentEntity implements OwnableResource {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -62,4 +63,7 @@ public class CommentEntity {
     public void setContent(String content) { this.content = content; }
     public void setIsEdited(Boolean isEdited) { this.isEdited = isEdited; }
     public void setDeletedAt(ZonedDateTime deletedAt) { this.deletedAt = deletedAt; }
+
+    @Override
+    public Long getOwnerId() { return user.getId(); }
 }

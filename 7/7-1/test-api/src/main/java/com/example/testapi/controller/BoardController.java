@@ -5,6 +5,7 @@ import com.example.testapi.dtos.request.BoardSaveRequest;
 import com.example.testapi.dtos.response.BoardResponse;
 import com.example.testapi.service.BoardService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,11 +20,14 @@ public class BoardController {
         this.boardService = boardService;
     }
 
+    @PreAuthorize("hasPermission(null, 'BOARD', 'BOARD_CREATE')")
     @PostMapping
     public ResponseEntity<BoardResponse> create(@RequestBody BoardSaveRequest request) {
         return ResponseEntity.ok(BoardResponse.from(boardService.create(request.name(), request.boardTypeId())));
     }
 
+
+    @PreAuthorize("hasPermission(#request.boardId(), 'BOARD', 'BOARD_UPDATE')")
     @PutMapping("/name")
     public ResponseEntity<BoardResponse> updateName(@RequestBody BoardEditNameRequest request) {
         return ResponseEntity.ok(BoardResponse.from(boardService.updateName(request.boardId(), request.name())));
@@ -43,6 +47,7 @@ public class BoardController {
         return ResponseEntity.ok(BoardResponse.from(boardService.findById(id)));
     }
 
+    @PreAuthorize("hasPermission(#id, 'BOARD', 'BOARD_DELETE')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         boardService.delete(id);

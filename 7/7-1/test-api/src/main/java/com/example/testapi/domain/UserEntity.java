@@ -1,6 +1,7 @@
 package com.example.testapi.domain;
 
 import com.example.testapi.dtos.request.UserLoginRequest;
+import com.example.testapi.security.OwnableResource;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -11,7 +12,7 @@ import java.util.Set;
 
 @Entity
 @Table(name="users")
-public class UserEntity {
+public class UserEntity implements OwnableResource {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -66,6 +67,9 @@ public class UserEntity {
     public ZonedDateTime getCreatedAt() { return createdAt; }
     public ZonedDateTime getUpdatedAt() { return updatedAt; }
     public ZonedDateTime getDeletedAt() { return deletedAt; }
+
+    @Override
+    public Long getOwnerId() { return this.id; }
 
     public void setUserLevel(UserLevelEntity userLevel) { this.userLevel = userLevel; }
     public void setLoginId(String loginId) { this.loginId = loginId; }

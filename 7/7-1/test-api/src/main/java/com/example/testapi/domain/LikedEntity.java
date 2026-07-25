@@ -1,12 +1,13 @@
 package com.example.testapi.domain;
 
+import com.example.testapi.security.OwnableResource;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "liked", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "post_id"}))
-public class LikedEntity {
+public class LikedEntity implements OwnableResource {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +31,12 @@ public class LikedEntity {
         this.post = post;
     };
 
+
     public Long getId() { return id; }
     public UserEntity getUser() { return user; }
     public PostEntity getPost() { return post; }
     public ZonedDateTime getCreatedAt() { return createdAt; }
+
+    @Override
+    public Long getOwnerId() { return user.getId(); }
 }

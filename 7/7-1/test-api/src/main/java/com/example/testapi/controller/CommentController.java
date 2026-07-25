@@ -8,6 +8,7 @@ import com.example.testapi.dtos.response.CommentResponse;
 import com.example.testapi.domain.CommentEntity;
 import com.example.testapi.service.CommentService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,12 +23,14 @@ public class CommentController {
         this.commentService = commentService;
     }
 
+    @PreAuthorize("hasPermission(null, 'COMMENT', 'COMMENT_CREATE')")
     @PostMapping
     public ResponseEntity<CommentResponse> save(@RequestBody CommentSaveRequest request) {
         CommentEntity comment = commentService.save(request.content(), request.postId(), request.userId(), request.parentId());
         return ResponseEntity.ok(CommentResponse.from(comment));
     }
 
+    @PreAuthorize("hasPermission(#request.commentId(), 'COMMENT', 'COMMENT_UPDATE_ANY') or hasPermission(#request.commentId(), 'COMMENT', 'COMMENT_UPDATE_OWN')")
     @PutMapping
     public ResponseEntity<CommentResponse> edit(@RequestBody CommentEditRequest request) {
         CommentEntity comment = commentService.edit(request.commentId(), request.content());
@@ -52,6 +55,7 @@ public class CommentController {
         return ResponseEntity.ok(responses);
     }
 
+    @PreAuthorize("hasPermission(#request.commentId(), 'COMMENT', 'COMMENT_DELETE_ANY') or hasPermission(#request.commentId(), 'COMMENT', 'COMMENT_DELETE_OWN')")
     @DeleteMapping
     public void delete(@RequestBody CommentDeleteRequest request) {
         commentService.delete(request.commentId());

@@ -4,6 +4,7 @@ import com.example.testapi.dtos.request.AttachmentSaveRequest;
 import com.example.testapi.dtos.response.AttachmentResponse;
 import com.example.testapi.service.AttachmentService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class AttachmentController {
         this.attachmentService = attachmentService;
     }
 
+    @PreAuthorize("hasPermission(null, 'ATTACHMENT', 'ATTACHMENT_CREATE')")
     @PostMapping
     public ResponseEntity<AttachmentResponse> save(@RequestBody AttachmentSaveRequest request) {
         return ResponseEntity.ok(AttachmentResponse.from(
@@ -39,6 +41,7 @@ public class AttachmentController {
         return ResponseEntity.ok(responses);
     }
 
+    @PreAuthorize("hasPermission(#id, 'ATTACHMENT', 'ATTACHMENT_DELETE_ANY') or hasPermission(#id, 'ATTACHMENT', 'ATTACHMENT_DELETE_OWN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         attachmentService.delete(id);

@@ -1,5 +1,6 @@
 package com.example.testapi.service;
 
+import com.example.testapi.domain.RoleEntity;
 import com.example.testapi.domain.UserEntity;
 import com.example.testapi.domain.UserLevelEntity;
 import com.example.testapi.repository.UserRepository;
@@ -13,10 +14,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserLevelService userLevelService;
+    private final RoleService roleService;
 
-    public UserService(UserRepository userRepository, UserLevelService userLevelService) {
+    public UserService(UserRepository userRepository, UserLevelService userLevelService, RoleService roleService) {
         this.userRepository = userRepository;
         this.userLevelService = userLevelService;
+        this.roleService = roleService;
     }
 
     // r
@@ -69,6 +72,14 @@ public class UserService {
         UserLevelEntity userLevel = userLevelService.findById(userLevelId);
 
         user.setUserLevel(userLevel);
+        return userRepository.save(user);
+    }
+
+    public UserEntity assignRole(Long id, Long roleId) {
+        UserEntity user = getActiveUserOrThrow(id);
+        RoleEntity role = roleService.findById(roleId);
+
+        user.addRole(role);
         return userRepository.save(user);
     }
 

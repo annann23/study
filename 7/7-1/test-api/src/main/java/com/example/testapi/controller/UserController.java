@@ -6,8 +6,10 @@ import com.example.testapi.dtos.request.UserDataEditRequest;
 import com.example.testapi.dtos.request.UserDeleteRequest;
 import com.example.testapi.dtos.request.UserLevelEditRequest;
 import com.example.testapi.dtos.request.UserPasswordEditRequest;
+import com.example.testapi.dtos.request.UserRoleAssignRequest;
 import com.example.testapi.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +25,7 @@ public class UserController {
         this.userService = userService;
     }
 
+    @PreAuthorize("hasPermission(principal, 'USER', 'USER_UPDATE_OWN')")
     @PutMapping("/password")
     public ResponseEntity<UserResponse> updatePassword(@RequestBody UserPasswordEditRequest request) {
         Long userId = (Long) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
@@ -31,6 +34,7 @@ public class UserController {
         return ResponseEntity.ok(UserResponse.from(user));
     }
 
+    @PreAuthorize("hasPermission(principal, 'USER', 'USER_UPDATE_OWN')")
     @PutMapping("/user")
     public ResponseEntity<UserResponse> updateUserData(@RequestBody UserDataEditRequest request) {
         Long userId = (Long) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
@@ -39,9 +43,17 @@ public class UserController {
         return ResponseEntity.ok(UserResponse.from(user));
     }
 
+    @PreAuthorize("hasPermission(null, 'USER', 'USER_LEVEL_ASSIGN')")
     @PutMapping("/user-level")
     public ResponseEntity<UserResponse> updateLevel(@RequestBody UserLevelEditRequest request) {
         UserEntity user = userService.updateLevel(request.userId(), request.userLevelId());
+        return ResponseEntity.ok(UserResponse.from(user));
+    }
+
+    @PreAuthorize("hasPermission(null, 'USER', 'ROLE_ASSIGN')")
+    @PutMapping("/role")
+    public ResponseEntity<UserResponse> assignRole(@RequestBody UserRoleAssignRequest request) {
+        UserEntity user = userService.assignRole(request.userId(), request.roleId());
         return ResponseEntity.ok(UserResponse.from(user));
     }
 
@@ -59,6 +71,7 @@ public class UserController {
         return ResponseEntity.ok(UserResponse.from(userService.findById(id)));
     }
 
+    @PreAuthorize("hasPermission(#request.userId(), 'USER', 'USER_DELETE_ANY') or hasPermission(#request.userId(), 'USER', 'USER_DELETE_OWN')")
     @DeleteMapping
     public void delete(@RequestBody UserDeleteRequest request) {
         userService.delete(request.userId());

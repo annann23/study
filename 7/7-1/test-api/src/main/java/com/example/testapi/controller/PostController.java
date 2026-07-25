@@ -8,6 +8,7 @@ import com.example.testapi.dtos.response.PostResponse;
 import com.example.testapi.service.LikedService;
 import com.example.testapi.service.PostService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class PostController {
         this.likedService = likedService;
     }
 
+    @PreAuthorize("hasPermission(null, 'POST', 'POST_CREATE')")
     @PostMapping
     public ResponseEntity<PostResponse> save(@RequestBody PostSaveRequest request) {
         PostResponse response = PostResponse.from(
@@ -55,6 +57,7 @@ public class PostController {
         return ResponseEntity.ok(responses);
     }
 
+    @PreAuthorize("hasPermission(#request.postId(), 'POST', 'POST_UPDATE_ANY') or hasPermission(#request.postId(), 'POST', 'POST_UPDATE_OWN')")
     @PutMapping
     public ResponseEntity<PostResponse> edit(@RequestBody PostEditRequest request) {
         PostResponse response = PostResponse.from(
@@ -63,12 +66,14 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasPermission(#request.postId(), 'POST', 'POST_DELETE_ANY') or hasPermission(#request.postId(), 'POST', 'POST_DELETE_OWN')")
     @DeleteMapping
     public ResponseEntity<Void> delete(@RequestBody PostDeleteRequest request) {
         postService.delete(request.postId());
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasPermission(null, 'LIKE', 'LIKE_CREATE') or hasPermission(null, 'LIKE', 'LIKE_DELETE')")
     @PostMapping("/{postId}/like")
     public ResponseEntity<Boolean> toggleLike(@PathVariable Long postId, @RequestParam Long userId) {
         return ResponseEntity.ok(likedService.toggleLike(userId, postId));

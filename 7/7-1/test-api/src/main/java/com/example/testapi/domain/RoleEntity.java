@@ -41,7 +41,7 @@ public class RoleEntity {
 
     public Long getId() { return id; }
     public String getName() {return name; }
-    public Set<PermissionEntity> getPermissons() { return permissions; }
+    public Set<PermissionEntity> getPermissions() { return permissions; }
 
     public ZonedDateTime getCreatedAt() { return createdAt; }
     public ZonedDateTime getUpdatedAt() { return updatedAt; }
