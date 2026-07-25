@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { api } from '../lib/api'
-import { useAuth } from '../lib/auth'
+import { hasPermission, useAuth } from '../lib/auth'
 import type { Comment } from '../lib/types'
 
 function formatDateTime(iso: string) {
@@ -12,6 +12,8 @@ function CommentItem({ comment, onChanged }: { comment: Comment; onChanged: (com
   const [editing, setEditing] = useState(false)
   const [content, setContent] = useState(comment.content)
   const isMine = user?.id === comment.userId
+  const canEdit = hasPermission(user, 'COMMENT_UPDATE_ANY') || (isMine && hasPermission(user, 'COMMENT_UPDATE_OWN'))
+  const canDelete = hasPermission(user, 'COMMENT_DELETE_ANY') || (isMine && hasPermission(user, 'COMMENT_DELETE_OWN'))
 
   const handleSave = async () => {
     const updated = await api<Comment>('/comments', {
@@ -36,17 +38,21 @@ function CommentItem({ comment, onChanged }: { comment: Comment; onChanged: (com
           <span className="text-xs text-gray-400">{formatDateTime(comment.createdAt)}</span>
           {comment.isEdited && <span className="text-xs text-gray-300">(수정됨)</span>}
         </div>
-        {isMine && !editing && (
+        {(canEdit || canDelete) && !editing && (
           <div className="flex gap-2">
-            <button
-              onClick={() => setEditing(true)}
-              className="text-xs text-gray-400 transition hover:text-gray-700"
-            >
-              수정
-            </button>
-            <button onClick={handleDelete} className="text-xs text-gray-400 transition hover:text-red-500">
-              삭제
-            </button>
+            {canEdit && (
+              <button
+                onClick={() => setEditing(true)}
+                className="text-xs text-gray-400 transition hover:text-gray-700"
+              >
+                수정
+              </button>
+            )}
+            {canDelete && (
+              <button onClick={handleDelete} className="text-xs text-gray-400 transition hover:text-red-500">
+                삭제
+              </button>
+            )}
           </div>
         )}
       </div>

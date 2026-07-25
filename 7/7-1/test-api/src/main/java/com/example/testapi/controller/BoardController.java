@@ -27,7 +27,7 @@ public class BoardController {
     }
 
 
-    @PreAuthorize("hasPermission(#request.boardId(), 'BOARD', 'BOARD_UPDATE')")
+    @PreAuthorize("hasPermission(null, 'BOARD', 'BOARD_UPDATE')")
     @PutMapping("/name")
     public ResponseEntity<BoardResponse> updateName(@RequestBody BoardEditNameRequest request) {
         return ResponseEntity.ok(BoardResponse.from(boardService.updateName(request.boardId(), request.name())));
@@ -47,7 +47,7 @@ public class BoardController {
         return ResponseEntity.ok(BoardResponse.from(boardService.findById(id)));
     }
 
-    @PreAuthorize("hasPermission(#id, 'BOARD', 'BOARD_DELETE')")
+    @PreAuthorize("hasPermission(null, 'BOARD', 'BOARD_DELETE')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         boardService.delete(id);

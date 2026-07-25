@@ -29,6 +29,9 @@ INSERT INTO permissions (name) VALUES ('USER_UPDATE_ANY');
 INSERT INTO permissions (name) VALUES ('USER_DELETE_OWN');
 INSERT INTO permissions (name) VALUES ('USER_DELETE_ANY');
 INSERT INTO permissions (name) VALUES ('USER_LEVEL_ASSIGN');
+INSERT INTO permissions (name) VALUES ('USER_LEVEL_CREATE');
+INSERT INTO permissions (name) VALUES ('USER_LEVEL_UPDATE');
+INSERT INTO permissions (name) VALUES ('USER_LEVEL_DELETE');
 
 INSERT INTO permissions (name) VALUES ('ROLE_CREATE');
 INSERT INTO permissions (name) VALUES ('ROLE_UPDATE');

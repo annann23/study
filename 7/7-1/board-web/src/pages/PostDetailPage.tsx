@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../lib/api'
-import { useAuth } from '../lib/auth'
+import { hasPermission, useAuth } from '../lib/auth'
 import type { Board, LikeStatus, Post } from '../lib/types'
 import { sanitizeHtml } from '../lib/html'
 import CommentSection from '../components/CommentSection'
@@ -46,6 +46,8 @@ export default function PostDetailPage() {
   }
 
   const isMine = user?.id === post.userId
+  const canEdit = hasPermission(user, 'POST_UPDATE_ANY') || (isMine && hasPermission(user, 'POST_UPDATE_OWN'))
+  const canDelete = hasPermission(user, 'POST_DELETE_ANY') || (isMine && hasPermission(user, 'POST_DELETE_OWN'))
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -61,20 +63,24 @@ export default function PostDetailPage() {
         <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
           <div className="flex items-start justify-between gap-4">
             <h1 className="text-xl font-semibold text-gray-900">{post.title}</h1>
-            {isMine && (
+            {(canEdit || canDelete) && (
               <div className="flex shrink-0 gap-2">
-                <Link
-                  to={`/board/${post.boardId}/posts/${post.id}/edit`}
-                  className="rounded-lg px-3 py-1.5 text-xs text-gray-500 transition hover:bg-gray-100"
-                >
-                  수정
-                </Link>
-                <button
-                  onClick={handleDelete}
-                  className="rounded-lg px-3 py-1.5 text-xs text-gray-500 transition hover:bg-gray-100 hover:text-red-500"
-                >
-                  삭제
-                </button>
+                {canEdit && (
+                  <Link
+                    to={`/board/${post.boardId}/posts/${post.id}/edit`}
+                    className="rounded-lg px-3 py-1.5 text-xs text-gray-500 transition hover:bg-gray-100"
+                  >
+                    수정
+                  </Link>
+                )}
+                {canDelete && (
+                  <button
+                    onClick={handleDelete}
+                    className="rounded-lg px-3 py-1.5 text-xs text-gray-500 transition hover:bg-gray-100 hover:text-red-500"
+                  >
+                    삭제
+                  </button>
+                )}
               </div>
             )}
           </div>

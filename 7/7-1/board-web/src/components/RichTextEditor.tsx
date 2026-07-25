@@ -4,7 +4,7 @@ import Image from '@tiptap/extension-image'
 import Underline from '@tiptap/extension-underline'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import type { Editor } from '@tiptap/react'
 
 function fileToDataUrl(file: File): Promise<string> {
@@ -177,6 +177,12 @@ export default function RichTextEditor({
       },
     },
   })
+
+  useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content)
+    }
+  }, [content, editor])
 
   if (!editor) return null
 

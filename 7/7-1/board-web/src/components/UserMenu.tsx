@@ -1,25 +1,19 @@
-import { useEffect, useRef, useState } from 'react'
-import { api } from '../lib/api'
+import { useRef, useState } from 'react'
 import { useAuth } from '../lib/auth'
 import { useClickOutside } from '../lib/useClickOutside'
-import type { UserLevel } from '../lib/types'
 import EditProfileModal from './EditProfileModal'
 
 export default function UserMenu() {
   const { user, logout } = useAuth()
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState(false)
-  const [levelName, setLevelName] = useState('')
   const menuRef = useRef<HTMLDivElement>(null)
 
   useClickOutside(menuRef, () => setOpen(false))
 
-  useEffect(() => {
-    if (!user) return
-    api<UserLevel>(`/user-level/${user.userLevel}`).then((level) => setLevelName(level.name))
-  }, [user])
-
   if (!user) return null
+
+  const roleLabel = user.roles.length > 0 ? user.roles.join(', ') : '역할 없음'
 
   const initial = user.nickname.charAt(0).toUpperCase()
 
@@ -34,7 +28,7 @@ export default function UserMenu() {
         </span>
         <span className="flex flex-col items-start leading-tight">
           <span className="text-sm font-medium text-gray-700">{user.nickname}</span>
-          {levelName && <span className="text-[11px] text-gray-400">{levelName}</span>}
+          <span className="text-[11px] text-gray-400">{roleLabel}</span>
         </span>
       </button>
 

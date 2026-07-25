@@ -6,7 +6,17 @@ export type User = {
   loginId: string
   nickname: string
   userLevel: number
+  roles: string[]
+  permissions: string[]
   createdAt: string
+}
+
+export function hasPermission(user: User | null, permission: string): boolean {
+  return user != null && user.permissions.includes(permission)
+}
+
+export function hasAnyPermission(user: User | null, permissions: string[]): boolean {
+  return permissions.some((permission) => hasPermission(user, permission))
 }
 
 type AuthContextValue = {
