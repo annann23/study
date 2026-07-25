@@ -5,6 +5,7 @@ import com.example.testapi.dtos.request.UserLevelUpdateRequest;
 import com.example.testapi.dtos.response.UserLevelResponse;
 import com.example.testapi.service.UserLevelService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class UserLevelController {
         this.userLevelService = userLevelService;
     }
 
+    @PreAuthorize("hasPermission(null, 'USER_LEVEL', 'USER_LEVEL_CREATE')")
     @PostMapping
     public ResponseEntity<UserLevelResponse> create(@RequestBody UserLevelSaveRequest request) {
         return ResponseEntity.ok(UserLevelResponse.from(userLevelService.create(request.name())));
@@ -38,11 +40,13 @@ public class UserLevelController {
         return ResponseEntity.ok(UserLevelResponse.from(userLevelService.findById(id)));
     }
 
+    @PreAuthorize("hasPermission(null, 'USER_LEVEL', 'USER_LEVEL_UPDATE')")
     @PutMapping
     public ResponseEntity<UserLevelResponse> update(@RequestBody UserLevelUpdateRequest request) {
         return ResponseEntity.ok(UserLevelResponse.from(userLevelService.update(request.userLevelId(), request.name())));
     }
 
+    @PreAuthorize("hasPermission(null, 'USER_LEVEL', 'USER_LEVEL_DELETE')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         userLevelService.delete(id);
