@@ -18,7 +18,7 @@ public class EchoClient {
             client.init();
             client.echo();
         } finally {
-            client.close();  // 예외 처리 신경 안 써도 됨 (내부에서 이미 처리)
+            client.close();
         }
     }
 

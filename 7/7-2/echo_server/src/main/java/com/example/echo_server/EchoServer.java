@@ -3,19 +3,17 @@ package com.example.echo_server;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
 
 public class EchoServer {
     private ServerSocket serverSocket;
-    private Socket clientSocket;
+    private final ConnectionManager manager = new ConnectionManager();
 
     public static void main(String[] args) {
         EchoServer server = new EchoServer();
         try {
             server.init();
-            server.echo();
         } finally {
-            server.close();  // 예외 처리 신경 안 써도 됨 (내부에서 이미 처리)
+            server.close();
         }
     }
 
@@ -26,16 +24,23 @@ public class EchoServer {
             serverSocket = new ServerSocket(port);
             System.out.println("에코 서버: " + port );
 
-            clientSocket = serverSocket.accept();
+            while(true) {
+                Socket clientSocket = serverSocket.accept();
+                manager.connect(clientSocket);
+
+                System.out.println("클라이언트 연결: " + clientSocket.getRemoteSocketAddress());
+                Thread worker = new Thread(() -> echo(clientSocket));
+                worker.start();
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void echo() {
+    public void echo(Socket socket) {
         try {
-            InputStream in = clientSocket.getInputStream();
-            OutputStream out = clientSocket.getOutputStream();
+            InputStream in = socket.getInputStream();
+            OutputStream out = socket.getOutputStream();
             byte[] buffer = new byte[1024];
 
             while(true) {
@@ -46,12 +51,15 @@ public class EchoServer {
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            manager.disconnect(socket);
+            try { socket.close(); } catch(IOException ignored) {}
         }
     }
 
     public void close() {
         try {
-            if(clientSocket != null) clientSocket.close();
+            manager.closeAll();
             if(serverSocket != null) serverSocket.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
