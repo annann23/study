@@ -5,7 +5,8 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- 백엔드 SecurityConfig의 CSP는 API 응답에만 붙어 이 문서엔 적용되지 않으므로, 데모를 위해 동일한 정책을 meta 태그로 직접 적용 -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:;" />
+    <!-- style-src에 'unsafe-inline' 추가: Vite dev/Tailwind가 스타일을 인라인 주입하므로 dev에서 필수. 프로덕션 빌드(dist)는 외부 CSS 링크라 없어도 됨 -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;" />
     <title>board-web</title>
   </head>
   <body>

@@ -89,7 +89,6 @@ function CommentItem({ comment, onChanged }: { comment: Comment; onChanged: (com
 }
 
 export default function CommentSection({ postId }: { postId: number }) {
-  const { user } = useAuth()
   const [comments, setComments] = useState<Comment[] | null>(null)
   const [content, setContent] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -105,7 +104,7 @@ export default function CommentSection({ postId }: { postId: number }) {
     try {
       const created = await api<Comment>('/comments', {
         method: 'POST',
-        body: JSON.stringify({ content, postId, userId: user!.id, parentId: null }),
+        body: JSON.stringify({ content, postId, parentId: null }),
       })
       setComments((prev) => [...(prev ?? []), created])
       setContent('')

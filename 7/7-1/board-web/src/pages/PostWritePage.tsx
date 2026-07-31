@@ -1,7 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "../lib/api";
-import { useAuth } from "../lib/auth";
 import type { Board, BoardType, Post } from "../lib/types";
 import RichTextEditor from "../components/RichTextEditor";
 
@@ -9,7 +8,6 @@ export default function PostWritePage() {
   const { boardId, postId } = useParams<{ boardId: string; postId?: string }>();
   const isEdit = postId != null;
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   const [board, setBoard] = useState<Board | null>(null);
   const [boardTypes, setBoardTypes] = useState<BoardType[]>([]);
@@ -64,7 +62,6 @@ export default function PostWritePage() {
           body: JSON.stringify({
             post: { title, content },
             boardId: Number(boardId),
-            userId: user!.id,
           }),
         });
       }

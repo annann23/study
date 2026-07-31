@@ -25,13 +25,13 @@ export default function PostDetailPage() {
       setPost(data)
       api<{ nickname: string }>(`/user/${data.userId}`).then((u) => setAuthorNickname(u.nickname))
       api<Board>(`/board/${data.boardId}`).then(setBoard)
-      api<LikeStatus>(`/posts/${data.id}/like?userId=${user!.id}`).then(setLike)
+      api<LikeStatus>(`/posts/${data.id}/like`).then(setLike)
     })
   }, [postId, user])
 
   const toggleLike = async () => {
     if (!post) return
-    await api<boolean>(`/posts/${post.id}/like?userId=${user!.id}`, { method: 'POST' })
+    await api<boolean>(`/posts/${post.id}/like`, { method: 'POST' })
     setLike((prev) => (prev ? { count: prev.count + (prev.likedByMe ? -1 : 1), likedByMe: !prev.likedByMe } : prev))
   }
 
