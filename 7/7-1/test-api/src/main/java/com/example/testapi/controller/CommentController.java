@@ -6,9 +6,11 @@ import com.example.testapi.dtos.comment.CommentEditRequest;
 import com.example.testapi.dtos.comment.CommentSaveRequest;
 import com.example.testapi.dtos.comment.CommentResponse;
 import com.example.testapi.domain.CommentEntity;
+import com.example.testapi.security.CafeAuthUser;
 import com.example.testapi.service.CommentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,8 +27,8 @@ public class CommentController {
 
     @PreAuthorize("hasPermission(null, 'COMMENT', 'COMMENT_CREATE')")
     @PostMapping
-    public ResponseEntity<CommentResponse> save(@RequestBody CommentSaveRequest request) {
-        CommentEntity comment = commentService.save(request.content(), request.postId(), request.userId(), request.parentId());
+    public ResponseEntity<CommentResponse> save(@RequestBody CommentSaveRequest request, @AuthenticationPrincipal CafeAuthUser principal) {
+        CommentEntity comment = commentService.save(request.content(), request.postId(), principal.getUserId(), request.parentId());
         return ResponseEntity.ok(CommentResponse.from(comment));
     }
 

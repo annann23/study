@@ -10,6 +10,7 @@ import com.example.testapi.service.LikedService;
 import com.example.testapi.service.PostService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,9 +29,9 @@ public class PostController {
 
     @PreAuthorize("hasPermission(null, 'POST', 'POST_CREATE')")
     @PostMapping
-    public ResponseEntity<PostResponse> save(@RequestBody PostSaveRequest request) {
+    public ResponseEntity<PostResponse> save(@RequestBody PostSaveRequest request, @AuthenticationPrincipal CafeAuthUser principal) {
         PostResponse response = PostResponse.from(
-                postService.save(request.post(), request.boardId(), request.userId())
+                postService.save(request.post(), request.boardId(), principal.getUserId())
         );
         return ResponseEntity.ok(response);
     }
@@ -76,12 +77,12 @@ public class PostController {
 
     @PreAuthorize("hasPermission(null, 'LIKE', 'LIKE_CREATE') or hasPermission(null, 'LIKE', 'LIKE_DELETE')")
     @PostMapping("/{postId}/like")
-    public ResponseEntity<Boolean> toggleLike(@PathVariable Long postId, @RequestParam Long userId) {
-        return ResponseEntity.ok(likedService.toggleLike(userId, postId));
+    public ResponseEntity<Boolean> toggleLike(@PathVariable Long postId, @AuthenticationPrincipal CafeAuthUser principal) {
+        return ResponseEntity.ok(likedService.toggleLike(principal.getUserId(), postId));
     }
 
     @GetMapping("/{postId}/like")
-    public ResponseEntity<LikeStatusResponse> getLikeStatus(@PathVariable Long postId, @RequestParam Long userId) {
-        return ResponseEntity.ok(new LikeStatusResponse(likedService.countByPost(postId), likedService.isLikedBy(userId, postId)));
+    public ResponseEntity<LikeStatusResponse> getLikeStatus(@PathVariable Long postId, @AuthenticationPrincipal CafeAuthUser principal) {
+        return ResponseEntity.ok(new LikeStatusResponse(likedService.countByPost(postId), likedService.isLikedBy(principal.getUserId(), postId)));
     }
 }

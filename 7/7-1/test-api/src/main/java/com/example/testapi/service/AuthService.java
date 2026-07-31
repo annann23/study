@@ -3,16 +3,19 @@ import com.example.testapi.dtos.auth.UserLoginRequest;
 import com.example.testapi.domain.UserEntity;
 import com.example.testapi.domain.UserLevelEntity;
 import com.example.testapi.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
     private final UserRepository userRepository;
     private final UserLevelService userLevelService;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UserRepository userRepository, UserLevelService userLevelService) {
+    public AuthService(UserRepository userRepository, UserLevelService userLevelService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userLevelService = userLevelService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // c
@@ -37,7 +40,10 @@ public class AuthService {
 
         UserLevelEntity userLevel = userLevelService.findById(defaultUserLevel);
 
-        return userRepository.save(new UserEntity(loginRequest, nickname, userLevel));
+        UserEntity user = new UserEntity(loginRequest, nickname, userLevel);
+        user.setPassword(passwordEncoder.encode(loginRequest.password()));
+
+        return userRepository.save(user);
     }
 
     public UserEntity login(UserLoginRequest loginRequest) {

@@ -4,13 +4,17 @@ import com.example.testapi.dtos.auth.UserLoginRequest;
 import com.example.testapi.dtos.auth.UserRegisterRequest;
 import com.example.testapi.dtos.user.UserResponse;
 import com.example.testapi.domain.UserEntity;
+import com.example.testapi.security.CafeAuthUser;
 import com.example.testapi.service.AuthService;
 import com.example.testapi.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.SecurityContextRepository;
@@ -25,18 +29,18 @@ public class AuthController {
     private final AuthService authService;
     private final UserService userService;
     private final SecurityContextRepository securityContextRepository;
+    private final AuthenticationManager authenticationManager;
 
-    public AuthController(AuthService authService, UserService userService, SecurityContextRepository securityContextRepository) {
+    public AuthController(AuthService authService, UserService userService, SecurityContextRepository securityContextRepository, AuthenticationManager authenticationManager) {
         this.authService = authService;
         this.userService = userService;
         this.securityContextRepository = securityContextRepository;
+        this.authenticationManager = authenticationManager;
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> me() {
-        Long userId = (Long) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
-
-        return ResponseEntity.ok(UserResponse.from(userService.findById(userId)));
+    public ResponseEntity<UserResponse> me(@AuthenticationPrincipal CafeAuthUser principal) {
+        return ResponseEntity.ok(UserResponse.from(userService.findById(principal.getUserId())));
     }
 
     @PostMapping("/sign-up")
@@ -47,16 +51,16 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<UserResponse> login(@RequestBody UserLoginRequest request, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-        UserEntity user = authService.login(request);
+        Authentication auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.loginId(), request.password()));
 
-        UsernamePasswordAuthenticationToken auth =
-                new UsernamePasswordAuthenticationToken(user.getId(), null, List.of());
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(auth);
         SecurityContextHolder.setContext(context);
         securityContextRepository.saveContext(context, httpRequest, httpResponse);
 
-        return ResponseEntity.ok(UserResponse.from(user));
+        CafeAuthUser principal = (CafeAuthUser) auth.getPrincipal();
+        return ResponseEntity.ok(UserResponse.from(userService.findById(Objects.requireNonNull(principal).getUserId())));
     }
 
     @PostMapping("/logout")

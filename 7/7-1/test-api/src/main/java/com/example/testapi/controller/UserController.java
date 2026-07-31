@@ -11,6 +11,7 @@ import com.example.testapi.security.CafeAuthUser;
 import com.example.testapi.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,19 +29,15 @@ public class UserController {
 
     @PreAuthorize("hasPermission(principal, 'USER', 'USER_UPDATE_OWN')")
     @PutMapping("/password")
-    public ResponseEntity<UserResponse> updatePassword(@RequestBody UserPasswordEditRequest request) {
-        Long userId = (Long) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
-
-        UserEntity user = userService.updatePassword(userId, request.password());
+    public ResponseEntity<UserResponse> updatePassword(@RequestBody UserPasswordEditRequest request, @AuthenticationPrincipal CafeAuthUser principal) {
+        UserEntity user = userService.updatePassword(principal.getUserId(), request.password());
         return ResponseEntity.ok(UserResponse.from(user));
     }
 
     @PreAuthorize("hasPermission(principal, 'USER', 'USER_UPDATE_OWN')")
     @PutMapping("/user")
-    public ResponseEntity<UserResponse> updateUserData(@RequestBody UserDataEditRequest request) {
-        Long userId = (Long) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
-
-        UserEntity user = userService.updateNickname(userId, request.nickname());
+    public ResponseEntity<UserResponse> updateUserData(@RequestBody UserDataEditRequest request, @AuthenticationPrincipal CafeAuthUser principal) {
+        UserEntity user = userService.updateNickname(principal.getUserId(), request.nickname());
         return ResponseEntity.ok(UserResponse.from(user));
     }
 
