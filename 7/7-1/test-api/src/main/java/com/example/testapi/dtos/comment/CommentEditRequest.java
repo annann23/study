@@ -1,3 +1,3 @@
-package com.example.testapi.dtos.request;
+package com.example.testapi.dtos.comment;
 
 public record CommentEditRequest(Long commentId, String content) {}

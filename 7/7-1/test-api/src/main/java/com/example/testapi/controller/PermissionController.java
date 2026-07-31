@@ -1,8 +1,8 @@
 package com.example.testapi.controller;
 
-import com.example.testapi.dtos.request.PermissionSaveRequest;
-import com.example.testapi.dtos.request.PermissionUpdateRequest;
-import com.example.testapi.dtos.response.PermissionResponse;
+import com.example.testapi.dtos.permission.PermissionSaveRequest;
+import com.example.testapi.dtos.permission.PermissionUpdateRequest;
+import com.example.testapi.dtos.permission.PermissionResponse;
 import com.example.testapi.service.PermissionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,5 +1,5 @@
 package com.example.testapi.service;
-import com.example.testapi.dtos.request.UserLoginRequest;
+import com.example.testapi.dtos.auth.UserLoginRequest;
 import com.example.testapi.domain.UserEntity;
 import com.example.testapi.domain.UserLevelEntity;
 import com.example.testapi.repository.UserRepository;

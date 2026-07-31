@@ -1,12 +1,13 @@
 package com.example.testapi.controller;
 
-import com.example.testapi.dtos.response.UserResponse;
+import com.example.testapi.dtos.user.UserResponse;
 import com.example.testapi.domain.UserEntity;
-import com.example.testapi.dtos.request.UserDataEditRequest;
-import com.example.testapi.dtos.request.UserDeleteRequest;
-import com.example.testapi.dtos.request.UserLevelEditRequest;
-import com.example.testapi.dtos.request.UserPasswordEditRequest;
-import com.example.testapi.dtos.request.UserRoleAssignRequest;
+import com.example.testapi.dtos.user.UserDataEditRequest;
+import com.example.testapi.dtos.user.UserDeleteRequest;
+import com.example.testapi.dtos.user.UserLevelEditRequest;
+import com.example.testapi.dtos.user.UserPasswordEditRequest;
+import com.example.testapi.dtos.user.UserRoleAssignRequest;
+import com.example.testapi.security.CafeAuthUser;
 import com.example.testapi.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

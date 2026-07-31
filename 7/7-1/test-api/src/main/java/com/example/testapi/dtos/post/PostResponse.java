@@ -1,4 +1,4 @@
-package com.example.testapi.dtos.response;
+package com.example.testapi.dtos.post;
 
 import com.example.testapi.domain.PostEntity;
 

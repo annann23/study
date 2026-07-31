@@ -1,4 +1,4 @@
-package com.example.testapi.dtos.response;
+package com.example.testapi.dtos.user;
 import com.example.testapi.domain.UserLevelEntity;
 
 public record UserLevelResponse(

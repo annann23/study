@@ -1,10 +1,10 @@
 //
 package com.example.testapi.controller;
 
-import com.example.testapi.dtos.request.CommentDeleteRequest;
-import com.example.testapi.dtos.request.CommentEditRequest;
-import com.example.testapi.dtos.request.CommentSaveRequest;
-import com.example.testapi.dtos.response.CommentResponse;
+import com.example.testapi.dtos.comment.CommentDeleteRequest;
+import com.example.testapi.dtos.comment.CommentEditRequest;
+import com.example.testapi.dtos.comment.CommentSaveRequest;
+import com.example.testapi.dtos.comment.CommentResponse;
 import com.example.testapi.domain.CommentEntity;
 import com.example.testapi.service.CommentService;
 import org.springframework.http.ResponseEntity;

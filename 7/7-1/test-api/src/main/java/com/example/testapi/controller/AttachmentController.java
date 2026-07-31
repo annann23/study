@@ -1,7 +1,7 @@
 package com.example.testapi.controller;
 
-import com.example.testapi.dtos.request.AttachmentSaveRequest;
-import com.example.testapi.dtos.response.AttachmentResponse;
+import com.example.testapi.dtos.attachment.AttachmentSaveRequest;
+import com.example.testapi.dtos.attachment.AttachmentResponse;
 import com.example.testapi.service.AttachmentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

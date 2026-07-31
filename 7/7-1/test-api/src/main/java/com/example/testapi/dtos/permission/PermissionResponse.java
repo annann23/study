@@ -1,4 +1,4 @@
-package com.example.testapi.dtos.response;
+package com.example.testapi.dtos.permission;
 import com.example.testapi.domain.PermissionEntity;
 
 public record PermissionResponse(

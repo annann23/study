@@ -1,6 +1,6 @@
 package com.example.testapi.domain;
 
-import com.example.testapi.dtos.request.UserLoginRequest;
+import com.example.testapi.dtos.auth.UserLoginRequest;
 import com.example.testapi.security.OwnableResource;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -36,7 +36,7 @@ public class UserEntity implements OwnableResource {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<RoleEntity> roles = new HashSet<>();
+    private final Set<RoleEntity> roles = new HashSet<>();
 
     @CreationTimestamp
     private ZonedDateTime createdAt;

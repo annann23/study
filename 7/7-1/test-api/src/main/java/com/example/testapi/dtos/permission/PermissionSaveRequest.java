@@ -1,3 +1,3 @@
-package com.example.testapi.dtos.request;
+package com.example.testapi.dtos.permission;
 
 public record PermissionSaveRequest(String name) {}

@@ -1,3 +1,4 @@
-package com.example.testapi.dtos.request;
+package com.example.testapi.dtos.post;
+import com.example.testapi.dtos.post.PostContentDto;
 
-public record PostSaveRequest(PostContentDto post, Long boardId, Long userId) {}
+public record PostSaveRequest(PostContentDto post, Long boardId) {}

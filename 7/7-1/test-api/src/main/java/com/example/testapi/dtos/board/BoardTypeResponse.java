@@ -1,4 +1,4 @@
-package com.example.testapi.dtos.response;
+package com.example.testapi.dtos.board;
 
 import com.example.testapi.domain.BoardTypeEntity;
 

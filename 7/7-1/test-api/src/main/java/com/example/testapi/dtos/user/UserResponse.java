@@ -1,4 +1,4 @@
-package com.example.testapi.dtos.response;
+package com.example.testapi.dtos.user;
 import com.example.testapi.domain.PermissionEntity;
 import com.example.testapi.domain.RoleEntity;
 import com.example.testapi.domain.UserEntity;

@@ -6,7 +6,6 @@ import com.example.testapi.domain.UserEntity;
 import com.example.testapi.repository.CommentRepository;
 import com.example.testapi.repository.PostRepository;
 import com.example.testapi.repository.UserRepository;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;

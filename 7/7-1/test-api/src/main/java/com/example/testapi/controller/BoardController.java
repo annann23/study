@@ -1,8 +1,8 @@
 package com.example.testapi.controller;
 
-import com.example.testapi.dtos.request.BoardEditNameRequest;
-import com.example.testapi.dtos.request.BoardSaveRequest;
-import com.example.testapi.dtos.response.BoardResponse;
+import com.example.testapi.dtos.board.BoardEditNameRequest;
+import com.example.testapi.dtos.board.BoardSaveRequest;
+import com.example.testapi.dtos.board.BoardResponse;
 import com.example.testapi.service.BoardService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

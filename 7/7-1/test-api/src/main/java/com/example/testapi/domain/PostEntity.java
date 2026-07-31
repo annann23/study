@@ -1,6 +1,6 @@
 package com.example.testapi.domain;
 
-import com.example.testapi.dtos.request.PostContentDto;
+import com.example.testapi.dtos.post.PostContentDto;
 import com.example.testapi.security.OwnableResource;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;

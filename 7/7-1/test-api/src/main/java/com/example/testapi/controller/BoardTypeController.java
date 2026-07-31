@@ -1,8 +1,8 @@
 package com.example.testapi.controller;
 
-import com.example.testapi.dtos.request.BoardTypeEditRequest;
-import com.example.testapi.dtos.request.BoardTypeSaveRequest;
-import com.example.testapi.dtos.response.BoardTypeResponse;
+import com.example.testapi.dtos.board.BoardTypeEditRequest;
+import com.example.testapi.dtos.board.BoardTypeSaveRequest;
+import com.example.testapi.dtos.board.BoardTypeResponse;
 import com.example.testapi.service.BoardTypeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

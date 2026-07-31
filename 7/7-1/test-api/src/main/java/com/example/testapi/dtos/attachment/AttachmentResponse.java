@@ -1,4 +1,4 @@
-package com.example.testapi.dtos.response;
+package com.example.testapi.dtos.attachment;
 
 import com.example.testapi.domain.AttachmentEntity;
 

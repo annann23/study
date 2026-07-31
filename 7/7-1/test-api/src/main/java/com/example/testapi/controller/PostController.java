@@ -1,10 +1,11 @@
 package com.example.testapi.controller;
 
-import com.example.testapi.dtos.request.PostDeleteRequest;
-import com.example.testapi.dtos.request.PostEditRequest;
-import com.example.testapi.dtos.request.PostSaveRequest;
-import com.example.testapi.dtos.response.LikeStatusResponse;
-import com.example.testapi.dtos.response.PostResponse;
+import com.example.testapi.dtos.post.PostDeleteRequest;
+import com.example.testapi.dtos.post.PostEditRequest;
+import com.example.testapi.dtos.post.PostSaveRequest;
+import com.example.testapi.dtos.like.LikeStatusResponse;
+import com.example.testapi.dtos.post.PostResponse;
+import com.example.testapi.security.CafeAuthUser;
 import com.example.testapi.service.LikedService;
 import com.example.testapi.service.PostService;
 import org.springframework.http.ResponseEntity;

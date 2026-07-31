@@ -1,8 +1,8 @@
 package com.example.testapi.controller;
 
-import com.example.testapi.dtos.request.RoleSaveRequest;
-import com.example.testapi.dtos.request.RoleUpdateRequest;
-import com.example.testapi.dtos.response.RoleResponse;
+import com.example.testapi.dtos.role.RoleSaveRequest;
+import com.example.testapi.dtos.role.RoleUpdateRequest;
+import com.example.testapi.dtos.role.RoleResponse;
 import com.example.testapi.service.RoleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -1,6 +1,6 @@
 package com.example.testapi.service;
 
-import com.example.testapi.dtos.request.PostContentDto;
+import com.example.testapi.dtos.post.PostContentDto;
 import com.example.testapi.domain.BoardEntity;
 import com.example.testapi.domain.PostEntity;
 import com.example.testapi.domain.UserEntity;

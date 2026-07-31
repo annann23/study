@@ -1,4 +1,4 @@
-package com.example.testapi.dtos.request;
+package com.example.testapi.dtos.auth;
 
 public record UserRegisterRequest(String loginId, String password, String nickname) {
     public UserLoginRequest toLoginDto() {

@@ -1,4 +1,4 @@
-package com.example.testapi.dtos.response;
+package com.example.testapi.dtos.comment;
 import com.example.testapi.domain.CommentEntity;
 
 import java.time.ZonedDateTime;

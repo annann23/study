@@ -1,6 +1,5 @@
 package com.example.testapi.domain;
 
-import com.example.testapi.dtos.request.UserLoginRequest;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -25,15 +24,13 @@ public class RoleEntity {
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
-    private Set<PermissionEntity> permissions = new HashSet<>();
+    private final Set<PermissionEntity> permissions = new HashSet<>();
 
     @CreationTimestamp
     private ZonedDateTime createdAt;
 
     @UpdateTimestamp
     private ZonedDateTime updatedAt;
-
-    public RoleEntity() {}
 
     public RoleEntity(String name) {
         this.name = name;

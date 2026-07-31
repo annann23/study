@@ -1,3 +1,3 @@
-package com.example.testapi.dtos.request;
+package com.example.testapi.dtos.post;
 
 public record PostDeleteRequest(Long postId) {}

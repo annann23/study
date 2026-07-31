@@ -1,4 +1,4 @@
-package com.example.testapi.dtos.request;
+package com.example.testapi.dtos.role;
 
 import java.util.Set;
 
