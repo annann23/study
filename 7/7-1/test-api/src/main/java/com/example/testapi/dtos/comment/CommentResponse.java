@@ -8,6 +8,7 @@ public record CommentResponse(
         String content,
         Long userId,
         String nickname,
+        Long parentId,
         Boolean isEdited,
         ZonedDateTime createdAt
 ) {
@@ -17,6 +18,7 @@ public record CommentResponse(
                 entity.getContent(),
                 entity.getUser().getId(),
                 entity.getUser().getNickname(),
+                entity.getParent() != null ? entity.getParent().getId() : null,
                 entity.getIsEdited(),
                 entity.getCreatedAt()
         );
