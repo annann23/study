@@ -1,4 +1,4 @@
-package com.example.testapi.config;
+package com.example.testapi.security;
 
 import com.example.testapi.repository.*;
 import com.example.testapi.security.OwnableResource;

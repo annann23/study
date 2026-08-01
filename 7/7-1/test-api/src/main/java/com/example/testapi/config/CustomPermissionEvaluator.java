@@ -2,7 +2,9 @@ package com.example.testapi.config;
 
 import com.example.testapi.domain.UserEntity;
 import com.example.testapi.repository.UserRepository;
+import com.example.testapi.security.CafeAuthUser;
 import com.example.testapi.security.OwnableResource;
+import com.example.testapi.security.ResourceLookupRegistry;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -27,7 +29,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
     @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
-        Long userId = (Long) authentication.getPrincipal();
+        Long userId = ((CafeAuthUser) authentication.getPrincipal()).getUserId();
         UserEntity user = userRepository.findById(userId).orElseThrow();
         String permissionName = (String) permission;
 

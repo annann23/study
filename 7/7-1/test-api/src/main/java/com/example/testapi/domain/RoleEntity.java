@@ -32,6 +32,8 @@ public class RoleEntity {
     @UpdateTimestamp
     private ZonedDateTime updatedAt;
 
+    protected RoleEntity() {} // JPA 조회 시 사용
+
     public RoleEntity(String name) {
         this.name = name;
     }
