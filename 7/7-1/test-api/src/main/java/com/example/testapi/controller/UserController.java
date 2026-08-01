@@ -27,14 +27,14 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PreAuthorize("hasPermission(principal, 'USER', 'USER_UPDATE_OWN')")
+    @PreAuthorize("hasPermission(principal.userId, 'USER', 'USER_UPDATE_OWN')")
     @PutMapping("/password")
     public ResponseEntity<UserResponse> updatePassword(@RequestBody UserPasswordEditRequest request, @AuthenticationPrincipal CafeAuthUser principal) {
         UserEntity user = userService.updatePassword(principal.getUserId(), request.password());
         return ResponseEntity.ok(UserResponse.from(user));
     }
 
-    @PreAuthorize("hasPermission(principal, 'USER', 'USER_UPDATE_OWN')")
+    @PreAuthorize("hasPermission(principal.userId, 'USER', 'USER_UPDATE_OWN')")
     @PutMapping("/user")
     public ResponseEntity<UserResponse> updateUserData(@RequestBody UserDataEditRequest request, @AuthenticationPrincipal CafeAuthUser principal) {
         UserEntity user = userService.updateNickname(principal.getUserId(), request.nickname());
