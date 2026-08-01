@@ -45,7 +45,7 @@ public class PostController {
     public ResponseEntity<List<PostResponse>> findAllByBoard(@PathVariable Long boardId) {
         List<PostResponse> responses = postService.findAllByBoard(boardId)
                 .stream()
-                .map(PostResponse::from)
+                .map(post -> post.getBoard().isPrivate() ? PostResponse.preview(post) : PostResponse.from(post))
                 .toList();
         return ResponseEntity.ok(responses);
     }
