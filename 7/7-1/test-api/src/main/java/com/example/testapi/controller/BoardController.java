@@ -23,7 +23,7 @@ public class BoardController {
     @PreAuthorize("hasPermission(null, 'BOARD', 'BOARD_CREATE')")
     @PostMapping
     public ResponseEntity<BoardResponse> create(@RequestBody BoardSaveRequest request) {
-        return ResponseEntity.ok(BoardResponse.from(boardService.create(request.name(), request.boardTypeId())));
+        return ResponseEntity.ok(BoardResponse.from(boardService.create(request.name(), request.boardTypeId(), request.isPrivate())));
     }
 
 

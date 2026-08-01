@@ -4,13 +4,15 @@ import com.example.testapi.domain.BoardEntity;
 public record BoardResponse(
         Long id,
         Long boardTypeId,
-        String name
+        String name,
+        boolean isPrivate
 ) {
     public static BoardResponse from(BoardEntity entity) {
         return new BoardResponse(
                 entity.getId(),
                 entity.getBoardTypeId(),
-                entity.getName()
+                entity.getName(),
+                entity.isPrivate()
         );
     }
 }

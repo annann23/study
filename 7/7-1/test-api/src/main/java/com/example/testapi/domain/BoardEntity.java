@@ -21,6 +21,9 @@ public class BoardEntity {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(nullable = false)
+    private boolean isPrivate;
+
     @CreationTimestamp
     private ZonedDateTime createdAt;
 
@@ -29,9 +32,10 @@ public class BoardEntity {
 
     public BoardEntity() {}
 
-    public BoardEntity(BoardTypeEntity boardType, String name) {
+    public BoardEntity(BoardTypeEntity boardType, String name, boolean isPrivate) {
         this.boardType = boardType;
         this.name = name;
+        this.isPrivate = isPrivate;
     }
 
     public BoardTypeEntity getBoardType() { return boardType; }
@@ -39,6 +43,7 @@ public class BoardEntity {
     public String getName() { return name; }
 
     public Long getId() { return id; }
+    public boolean isPrivate() { return isPrivate; }
 
     public void setName(String name) { this.name = name; }
     public void setBoardType(BoardTypeEntity boardType) { this.boardType = boardType; }

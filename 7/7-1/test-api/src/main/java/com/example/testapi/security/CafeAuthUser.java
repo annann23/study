@@ -56,4 +56,8 @@ public class CafeAuthUser implements UserDetails, Serializable {
     public Long getUserId() {
         return userId;
     }
+
+    public boolean hasAuthority(String name) {
+        return authorities.contains(name);
+    }
 }

@@ -9,6 +9,7 @@ import com.example.testapi.repository.BoardRepository;
 import com.example.testapi.repository.PostRepository;
 import com.example.testapi.repository.UserRepository;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
@@ -46,7 +47,18 @@ public class PostService {
 
     //r
     public PostEntity findById(Long id) {
-        return getActivePostOrThrow(id);
+        return postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+    }
+
+    public PostEntity findByIdWithAccessCheck(Long id, Long userId, boolean isAccessible) {
+        PostEntity post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다"));
+        if (post.getBoard().isPrivate()
+                && !isAccessible
+                && !post.getUserId().equals(userId)) {
+            throw new AccessDeniedException("비공개 게시판 글입니다.");
+        }
+        return post;
     }
 
     public List<PostEntity> findAllByBoard(Long boardId) {

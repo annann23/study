@@ -1,3 +1,3 @@
 package com.example.testapi.dtos.board;
 
-public record BoardSaveRequest(String name, Long boardTypeId) {}
+public record BoardSaveRequest(String name, Long boardTypeId, boolean isPrivate) {}

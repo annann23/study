@@ -19,7 +19,7 @@ public class BoardService {
     }
 
     // c
-    public BoardEntity create(String name, Long boardTypeId) {
+    public BoardEntity create(String name, Long boardTypeId, boolean isPrivate) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("name은 비어있을 수 없습니다.");
         }
@@ -28,7 +28,7 @@ public class BoardService {
         }
 
         BoardTypeEntity boardType = boardTypeService.findById(boardTypeId);
-        return boardRepository.save(new BoardEntity(boardType, name));
+        return boardRepository.save(new BoardEntity(boardType, name, isPrivate));
     }
 
     // r

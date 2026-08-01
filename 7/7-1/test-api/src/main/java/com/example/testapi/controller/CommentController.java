@@ -28,7 +28,7 @@ public class CommentController {
     @PreAuthorize("hasPermission(null, 'COMMENT', 'COMMENT_CREATE')")
     @PostMapping
     public ResponseEntity<CommentResponse> save(@RequestBody CommentSaveRequest request, @AuthenticationPrincipal CafeAuthUser principal) {
-        CommentEntity comment = commentService.save(request.content(), request.postId(), principal.getUserId(), request.parentId());
+        CommentEntity comment = commentService.save(request.content(), request.postId(), principal.getUserId(), request.parentId(), principal.hasAuthority("PRIVATE_BOARD_ACCESS"));
         return ResponseEntity.ok(CommentResponse.from(comment));
     }
 
@@ -40,8 +40,8 @@ public class CommentController {
     }
 
     @GetMapping("/post")
-    public ResponseEntity<List<CommentResponse>> findAllByPost(@RequestParam Long postId) {
-        List<CommentResponse> responses = commentService.findAllByPost(postId)
+    public ResponseEntity<List<CommentResponse>> findAllByPost(@RequestParam Long postId, @AuthenticationPrincipal CafeAuthUser principal) {
+        List<CommentResponse> responses = commentService.findAllByPost(postId, principal.getUserId(), principal.hasAuthority("PRIVATE_BOARD_ACCESS"))
                 .stream()
                 .map(CommentResponse::from)
                 .toList();

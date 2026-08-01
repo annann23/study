@@ -6,6 +6,7 @@ import com.example.testapi.domain.UserEntity;
 import com.example.testapi.repository.CommentRepository;
 import com.example.testapi.repository.PostRepository;
 import com.example.testapi.repository.UserRepository;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
@@ -27,7 +28,7 @@ public class CommentService {
     }
 
     //c
-    public CommentEntity save(String content, Long postId, Long userId, Long parentId) {
+    public CommentEntity save(String content, Long postId, Long userId, Long parentId, boolean isAccessible) {
         if (content == null || content.isBlank()) {
             throw new IllegalArgumentException("content는 비어있을 수 없습니다.");
         }
@@ -44,11 +45,21 @@ public class CommentService {
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
         }
 
+        if(post.getBoard().isPrivate() && !isAccessible && !post.getUserId().equals(userId)){
+            throw new AccessDeniedException("비공개 게시판 글입니다.");
+        }
+
         return commentRepository.save(new CommentEntity(content, post, user, parent));
     }
 
     //r
-    public List<CommentEntity> findAllByPost(Long postId) {
+    public List<CommentEntity> findAllByPost(Long postId, Long userId, boolean isAccessible) {
+        PostEntity post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+
+        if(post.getBoard().isPrivate() && !isAccessible && !post.getUserId().equals(userId)){
+            throw new AccessDeniedException("비공개 게시판 글입니다.");
+        }
         return commentRepository.findAllByPostIdAndDeletedAtIsNull(postId);
     }
 

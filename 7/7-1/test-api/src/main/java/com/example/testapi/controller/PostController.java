@@ -37,8 +37,8 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PostResponse> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(PostResponse.from(postService.findById(id)));
+    public ResponseEntity<PostResponse> findById(@PathVariable Long id, @AuthenticationPrincipal CafeAuthUser principal) {
+        return ResponseEntity.ok(PostResponse.from(postService.findByIdWithAccessCheck(id, principal.getUserId(), principal.hasAuthority("PRIVATE_BOARD_ACCESS"))));
     }
 
     @GetMapping("/board/{boardId}")
