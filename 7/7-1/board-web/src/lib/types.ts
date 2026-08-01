@@ -2,6 +2,7 @@ export type Board = {
   id: number
   boardTypeId: number
   name: string
+  isPrivate: boolean
 }
 
 export type BoardType = {
@@ -13,6 +14,8 @@ export type Post = {
   id: number
   boardId: number
   userId: number
+  nickName: string
+  userLevel: string
   title: string
   content: string
   createdAt: string
@@ -23,6 +26,7 @@ export type Comment = {
   content: string
   userId: number
   nickname: string
+  parentId: number | null
   isEdited: boolean | null
   createdAt: string
 }

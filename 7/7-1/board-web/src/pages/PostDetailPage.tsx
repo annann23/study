@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { api } from '../lib/api'
+import { api, ApiError } from '../lib/api'
 import { hasPermission, useAuth } from '../lib/auth'
 import type { Board, LikeStatus, Post } from '../lib/types'
 import { sanitizeHtml } from '../lib/html'
@@ -16,18 +16,31 @@ export default function PostDetailPage() {
   const { user } = useAuth()
 
   const [post, setPost] = useState<Post | null>(null)
-  const [authorNickname, setAuthorNickname] = useState('')
   const [board, setBoard] = useState<Board | null>(null)
   const [like, setLike] = useState<LikeStatus | null>(null)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    api<Post>(`/posts/${postId}`).then((data) => {
-      setPost(data)
-      api<{ nickname: string }>(`/user/${data.userId}`).then((u) => setAuthorNickname(u.nickname))
-      api<Board>(`/board/${data.boardId}`).then(setBoard)
-      api<LikeStatus>(`/posts/${data.id}/like`).then(setLike)
-    })
-  }, [postId, user])
+    api<Post>(`/posts/${postId}`)
+      .then((data) => {
+        setPost(data)
+        api<Board>(`/board/${data.boardId}`).then(setBoard)
+        api<LikeStatus>(`/posts/${data.id}/like`).then(setLike)
+      })
+      .catch((e: unknown) => {
+        const status = e instanceof ApiError ? e.status : 0
+        if (status === 403) {
+          alert('본인이 작성한 글만 볼 수 있습니다.')
+          navigate(-1)
+          return
+        }
+        setError('글을 불러올 수 없습니다.')
+      })
+  }, [postId, user, navigate])
+
+  if (error) {
+    return <p className="mt-16 text-center text-sm text-gray-400">{error}</p>
+  }
 
   const toggleLike = async () => {
     if (!post) return
@@ -85,7 +98,8 @@ export default function PostDetailPage() {
             )}
           </div>
           <div className="mt-1 flex items-center gap-2 text-xs text-gray-400">
-            <span>{authorNickname}</span>
+            <span className="font-medium text-gray-500">{post.nickName}</span>
+            <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[11px] text-gray-500">{post.userLevel}</span>
             <span>·</span>
             <span>{formatDateTime(post.createdAt)}</span>
           </div>

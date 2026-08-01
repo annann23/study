@@ -14,6 +14,7 @@ export default function BoardFormModal({ board, onClose, onSaved }: Props) {
   const [name, setName] = useState(board?.name ?? '')
   const [boardTypes, setBoardTypes] = useState<BoardType[]>([])
   const [boardTypeId, setBoardTypeId] = useState<number | null>(board?.boardTypeId ?? null)
+  const [isPrivate, setIsPrivate] = useState(false)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
@@ -37,7 +38,7 @@ export default function BoardFormModal({ board, onClose, onSaved }: Props) {
           })
         : await api<Board>('/board', {
             method: 'POST',
-            body: JSON.stringify({ name, boardTypeId }),
+            body: JSON.stringify({ name, boardTypeId, isPrivate }),
           })
       onSaved(saved)
       onClose()
@@ -91,6 +92,17 @@ export default function BoardFormModal({ board, onClose, onSaved }: Props) {
                   </option>
                 ))}
               </select>
+            </label>
+          )}
+
+          {!isEdit && (
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+              <input
+                type="checkbox"
+                checked={isPrivate}
+                onChange={(e) => setIsPrivate(e.target.checked)}
+              />
+              비공개 게시판 (작성자와 관리자만 열람 가능)
             </label>
           )}
 

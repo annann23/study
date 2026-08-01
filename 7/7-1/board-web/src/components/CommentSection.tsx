@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { api } from '../lib/api'
 import { hasPermission, useAuth } from '../lib/auth'
 import type { Comment } from '../lib/types'
@@ -7,27 +7,57 @@ function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 
-function CommentItem({ comment, onChanged }: { comment: Comment; onChanged: (comment: Comment | null) => void }) {
+type ChildrenMap = Map<number, Comment[]>
+
+function CommentItem({
+  comment,
+  postId,
+  childrenMap,
+  onAdded,
+  onChanged,
+}: {
+  comment: Comment
+  postId: number
+  childrenMap: ChildrenMap
+  onAdded: (comment: Comment) => void
+  onChanged: (id: number, comment: Comment | null) => void
+}) {
   const { user } = useAuth()
   const [editing, setEditing] = useState(false)
   const [content, setContent] = useState(comment.content)
+  const [replying, setReplying] = useState(false)
+  const [replyContent, setReplyContent] = useState('')
   const isMine = user?.id === comment.userId
   const canEdit = hasPermission(user, 'COMMENT_UPDATE_ANY') || (isMine && hasPermission(user, 'COMMENT_UPDATE_OWN'))
   const canDelete = hasPermission(user, 'COMMENT_DELETE_ANY') || (isMine && hasPermission(user, 'COMMENT_DELETE_OWN'))
+  const canReply = hasPermission(user, 'COMMENT_CREATE')
+  const replies = childrenMap.get(comment.id) ?? []
 
   const handleSave = async () => {
     const updated = await api<Comment>('/comments', {
       method: 'PUT',
       body: JSON.stringify({ commentId: comment.id, content }),
     })
-    onChanged(updated)
+    onChanged(comment.id, updated)
     setEditing(false)
   }
 
   const handleDelete = async () => {
     if (!window.confirm('댓글을 삭제할까요?')) return
     await api('/comments', { method: 'DELETE', body: JSON.stringify({ commentId: comment.id }) })
-    onChanged(null)
+    onChanged(comment.id, null)
+  }
+
+  const handleReply = async (e: FormEvent) => {
+    e.preventDefault()
+    if (!replyContent.trim()) return
+    const created = await api<Comment>('/comments', {
+      method: 'POST',
+      body: JSON.stringify({ content: replyContent, postId, parentId: comment.id }),
+    })
+    onAdded(created)
+    setReplyContent('')
+    setReplying(false)
   }
 
   return (
@@ -38,8 +68,16 @@ function CommentItem({ comment, onChanged }: { comment: Comment; onChanged: (com
           <span className="text-xs text-gray-400">{formatDateTime(comment.createdAt)}</span>
           {comment.isEdited && <span className="text-xs text-gray-300">(수정됨)</span>}
         </div>
-        {(canEdit || canDelete) && !editing && (
+        {!editing && (
           <div className="flex gap-2">
+            {canReply && (
+              <button
+                onClick={() => setReplying((v) => !v)}
+                className="text-xs text-gray-400 transition hover:text-gray-700"
+              >
+                답글
+              </button>
+            )}
             {canEdit && (
               <button
                 onClick={() => setEditing(true)}
@@ -84,6 +122,40 @@ function CommentItem({ comment, onChanged }: { comment: Comment; onChanged: (com
       ) : (
         <p className="mt-1 text-sm text-gray-600">{comment.content}</p>
       )}
+
+      {replying && (
+        <form onSubmit={handleReply} className="mt-2 flex gap-2">
+          <input
+            className="flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-sm outline-none focus:border-gray-400"
+            placeholder="답글을 입력하세요"
+            value={replyContent}
+            onChange={(e) => setReplyContent(e.target.value)}
+            autoFocus
+          />
+          <button
+            type="submit"
+            disabled={!replyContent.trim()}
+            className="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+          >
+            등록
+          </button>
+        </form>
+      )}
+
+      {replies.length > 0 && (
+        <ul className="mt-2 ml-4 border-l border-gray-100 pl-3">
+          {replies.map((child) => (
+            <CommentItem
+              key={child.id}
+              comment={child}
+              postId={postId}
+              childrenMap={childrenMap}
+              onAdded={onAdded}
+              onChanged={onChanged}
+            />
+          ))}
+        </ul>
+      )}
     </li>
   )
 }
@@ -94,8 +166,19 @@ export default function CommentSection({ postId }: { postId: number }) {
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    api<Comment[]>(`/comments/post?postId=${postId}`).then(setComments)
+    api<Comment[]>(`/comments/post?postId=${postId}`).then(setComments).catch(() => setComments([]))
   }, [postId])
+
+  // parentId로 자식 댓글을 묶어 트리 구성 (parentId 없는 것 = 최상위)
+  const { roots, childrenMap } = useMemo(() => {
+    const map: ChildrenMap = new Map()
+    const top: Comment[] = []
+    for (const c of comments ?? []) {
+      if (c.parentId == null) top.push(c)
+      else map.set(c.parentId, [...(map.get(c.parentId) ?? []), c])
+    }
+    return { roots: top, childrenMap: map }
+  }, [comments])
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -111,6 +194,10 @@ export default function CommentSection({ postId }: { postId: number }) {
     } finally {
       setSubmitting(false)
     }
+  }
+
+  const handleAdded = (created: Comment) => {
+    setComments((prev) => [...(prev ?? []), created])
   }
 
   const handleChanged = (id: number, updated: Comment | null) => {
@@ -145,11 +232,14 @@ export default function CommentSection({ postId }: { postId: number }) {
         <p className="mt-4 text-sm text-gray-400">첫 댓글을 남겨보세요.</p>
       ) : (
         <ul className="mt-2">
-          {comments.map((comment) => (
+          {roots.map((comment) => (
             <CommentItem
               key={comment.id}
               comment={comment}
-              onChanged={(updated) => handleChanged(comment.id, updated)}
+              postId={postId}
+              childrenMap={childrenMap}
+              onAdded={handleAdded}
+              onChanged={handleChanged}
             />
           ))}
         </ul>

@@ -82,6 +82,7 @@ export default function BoardPage() {
           posts={posts}
           loading={loadingPosts}
           getDetailHref={(post) => `/board/${post.boardId}/posts/${post.id}`}
+          isPrivate={boards.find((b) => b.id === selectedBoardId)?.isPrivate ?? false}
         />
       </main>
 
