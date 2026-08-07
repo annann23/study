@@ -5,6 +5,7 @@ import com.example.testapi.domain.BoardEntity;
 import com.example.testapi.domain.PostEntity;
 import com.example.testapi.domain.UserEntity;
 
+import com.example.testapi.dtos.post.PostSearchType;
 import com.example.testapi.repository.BoardRepository;
 import com.example.testapi.repository.PostRepository;
 import com.example.testapi.repository.UserRepository;
@@ -36,7 +37,7 @@ public class PostService {
         }
 
         BoardEntity board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시판입니다."));
 
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
@@ -67,6 +68,20 @@ public class PostService {
 
     public List<PostEntity> findAllByUser(Long userId) {
         return postRepository.findAllByUserIdAndDeletedAtIsNull(userId);
+    }
+
+    public List<PostEntity> search(Long boardId, String keyword, PostSearchType type) {
+        BoardEntity board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시판입니다."));
+        if (board.isPrivate()) {
+            return List.of();
+        }
+
+
+        return switch (type) {
+            case TITLE -> postRepository.searchByTitle(boardId, keyword);
+            case CONTENT -> postRepository.searchByContent(boardId, keyword);
+        };
     }
 
 

@@ -1,10 +1,7 @@
 package com.example.testapi.controller;
 
-import com.example.testapi.dtos.post.PostDeleteRequest;
-import com.example.testapi.dtos.post.PostEditRequest;
-import com.example.testapi.dtos.post.PostSaveRequest;
+import com.example.testapi.dtos.post.*;
 import com.example.testapi.dtos.like.LikeStatusResponse;
-import com.example.testapi.dtos.post.PostResponse;
 import com.example.testapi.security.CafeAuthUser;
 import com.example.testapi.service.LikedService;
 import com.example.testapi.service.PostService;
@@ -58,6 +55,16 @@ public class PostController {
                 .toList();
         return ResponseEntity.ok(responses);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<PostResponse>> search(@RequestParam Long boardId, @RequestParam String keyword, @RequestParam PostSearchType type) {
+        List<PostResponse> responses = postService.search(boardId, keyword, type)
+                .stream()
+                .map(PostResponse::from)
+                .toList();
+        return ResponseEntity.ok(responses);
+    }
+
 
     @PreAuthorize("hasPermission(#request.postId(), 'POST', 'POST_UPDATE_ANY') or hasPermission(#request.postId(), 'POST', 'POST_UPDATE_OWN')")
     @PutMapping
