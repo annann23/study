@@ -1,13 +1,16 @@
 package com.example.echo_server;
 
 import java.io.*;
-import java.net.ServerSocket;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
-public class EchoServer {
-    private ServerSocket serverSocket;
-    private final ConnectionManager manager = new ConnectionManager();
+import java.nio.ByteBuffer;
+import java.nio.channels.*;
+import java.util.Set;
 
+public class EchoServer {
+    private ServerSocketChannel serverSocket;
+    private Selector selector;
     public static void main(String[] args) {
         EchoServer server = new EchoServer();
         try {
@@ -21,47 +24,90 @@ public class EchoServer {
         int port = 9234;
 
         try {
-            serverSocket = new ServerSocket(port);
-            System.out.println("에코 서버: " + port );
+            serverSocket = ServerSocketChannel.open();
+            serverSocket.bind(new InetSocketAddress(port));
+            serverSocket.configureBlocking(false);
+
+            selector = Selector.open();
+            serverSocket.register(selector, SelectionKey.OP_ACCEPT);
 
             while(true) {
-                Socket clientSocket = serverSocket.accept();
-                manager.connect(clientSocket);
+                selector.select();
+                Set<SelectionKey> keys = selector.selectedKeys();
 
-                System.out.println("클라이언트 연결: " + clientSocket.getRemoteSocketAddress());
-                Thread worker = new Thread(() -> echo(clientSocket));
-                worker.start();
+                keys.forEach(key -> {
+                    try{
+                        if (key.isAcceptable()) { handleAccept(key, selector); }
+                        if (key.isReadable()) { handleRead(key); }
+                    } catch (IOException e) {
+                        System.out.println("처리 중 오류가 발생했습니다: " + e.getMessage());
+                        closeChannel(key);
+                    }
+
+                });
+
+                keys.clear();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void echo(Socket socket) {
-        try {
-            InputStream in = socket.getInputStream();
-            OutputStream out = socket.getOutputStream();
-            byte[] buffer = new byte[1024];
+    private static void handleAccept(SelectionKey key, Selector selector) throws  IOException {
+        ServerSocketChannel serverChannel = (ServerSocketChannel) key.channel();
+        SocketChannel client = serverChannel.accept();
+        client.configureBlocking(false);
 
-            while(true) {
-                int len = in.read(buffer);
-                if(len <= 0) break;
-                System.out.println("수신된 메시지: " + new String(buffer, 0, len));
-                out.write(buffer, 0, len);
+        try{
+            ByteBuffer buffer = ByteBuffer.allocate(1024);
+            client.register(selector, SelectionKey.OP_READ, buffer);
+        } catch (ClosedChannelException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private static void handleRead(SelectionKey key) throws IOException {
+        SocketChannel client = (SocketChannel) key.channel();
+        ByteBuffer buffer = (ByteBuffer) key.attachment();
+
+        try {
+            int len = client.read(buffer);
+
+            if (len == -1) {
+                closeChannel(key);
+                return;
             }
+
+            buffer.flip();
+            client.write(buffer);
+            buffer.clear();
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } finally {
-            manager.disconnect(socket);
-            try { socket.close(); } catch(IOException ignored) {}
         }
     }
 
     public void close() {
         try {
-            manager.closeAll();
-            if(serverSocket != null) serverSocket.close();
+            if (selector != null) selector.close();
         } catch (IOException e) {
+            System.out.println("selector close 중 오류가 발생했습니다: " + e.getMessage());
+        }
+
+        try {
+            if (serverSocket != null) serverSocket.close();
+        } catch (IOException e) {
+            System.out.println("serverSocket close 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    private static void closeChannel(SelectionKey key) {
+        key.cancel();
+
+        try {
+            key.channel().close();
+        } catch (IOException e) {
+            System.out.println("채널 close 중 오류가 발생했습니다: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
