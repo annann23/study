@@ -21,6 +21,14 @@ export type Post = {
   createdAt: string
 }
 
+export type PageResponse<T> = {
+  content: T[]
+  totalElements: number
+  totalPages: number
+  number: number
+  size: number
+}
+
 export type Comment = {
   id: number
   content: string

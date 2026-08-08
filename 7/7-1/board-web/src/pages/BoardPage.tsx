@@ -1,10 +1,12 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
-import type { Board, Post } from '../lib/types'
+import type { Board, PageResponse, Post } from '../lib/types'
 import TopNav from '../components/TopNav'
 import PostList from '../components/PostList'
 import BoardFormModal from '../components/BoardFormModal'
+
+const PAGE_SIZE_OPTIONS = [10, 20, 50, 100]
 
 export default function BoardPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -20,6 +22,12 @@ export default function BoardPage() {
   const [view, setView] = useState<'card' | 'table'>(
     () => (localStorage.getItem('postListView') as 'card' | 'table') ?? 'card',
   )
+  const [page, setPage] = useState(0)
+  const [pageSize, setPageSize] = useState(20)
+  const [pageJumpInput, setPageJumpInput] = useState('1')
+  const [totalElements, setTotalElements] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
+  const [isSearchMode, setIsSearchMode] = useState(false)
 
   const changeView = (next: 'card' | 'table') => {
     setView(next)
@@ -41,11 +49,22 @@ export default function BoardPage() {
   useEffect(() => {
     if (selectedBoardId == null) return
     setSearchKeyword('') // 게시판 바뀌면 검색어 초기화
-    setLoadingPosts(true)
-    api<Post[]>(`/posts/board/${selectedBoardId}`)
-      .then(setPosts)
-      .finally(() => setLoadingPosts(false))
+    setIsSearchMode(false)
+    setPage(0)
   }, [selectedBoardId])
+
+  useEffect(() => {
+    if (selectedBoardId == null || isSearchMode) return
+    setLoadingPosts(true)
+    api<PageResponse<Post>>(`/posts/board/${selectedBoardId}?page=${page}&size=${pageSize}`)
+      .then((data) => {
+        setPosts(data.content)
+        setTotalElements(data.totalElements)
+        setTotalPages(data.totalPages)
+        setPageJumpInput(String(data.number + 1))
+      })
+      .finally(() => setLoadingPosts(false))
+  }, [selectedBoardId, page, pageSize, isSearchMode])
 
   const handleSearch = async (e: FormEvent) => {
     e.preventDefault()
@@ -53,14 +72,33 @@ export default function BoardPage() {
     const keyword = searchKeyword.trim()
     setLoadingPosts(true)
     try {
-      // 검색어 없으면 전체 목록으로 복귀
-      const path = keyword
-        ? `/posts/search?boardId=${selectedBoardId}&keyword=${encodeURIComponent(keyword)}&type=${searchType}`
-        : `/posts/board/${selectedBoardId}`
-      setPosts(await api<Post[]>(path))
+      if (!keyword) {
+        // 검색어 없으면 전체 목록(페이지네이션)으로 복귀
+        setIsSearchMode(false)
+        return
+      }
+      // 검색 결과는 페이지네이션이 없는 별도 엔드포인트
+      setIsSearchMode(true)
+      const results = await api<Post[]>(
+        `/posts/search?boardId=${selectedBoardId}&keyword=${encodeURIComponent(keyword)}&type=${searchType}`,
+      )
+      setPosts(results)
+      setTotalElements(results.length)
+      setTotalPages(1)
     } finally {
       setLoadingPosts(false)
     }
+  }
+
+  const goToPage = (nextPage: number) => {
+    const clamped = Math.max(0, Math.min(nextPage, Math.max(totalPages - 1, 0)))
+    setPage(clamped)
+  }
+
+  const handlePageJump = (e: FormEvent) => {
+    e.preventDefault()
+    const parsed = Number(pageJumpInput)
+    if (Number.isFinite(parsed)) goToPage(parsed - 1)
   }
 
   const selectBoard = (id: number) => {
@@ -160,6 +198,53 @@ export default function BoardPage() {
           isPrivate={boards.find((b) => b.id === selectedBoardId)?.isPrivate ?? false}
           view={view}
         />
+        {!isSearchMode && selectedBoardId != null && (
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-gray-600">
+            <span>
+              총 {totalElements.toLocaleString()}건 · {totalPages.toLocaleString()}페이지
+            </span>
+            <div className="flex items-center gap-2">
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value))
+                  setPage(0)
+                }}
+                className="rounded-lg border border-gray-200 px-2 py-1.5 outline-none transition focus:border-gray-400"
+              >
+                {PAGE_SIZE_OPTIONS.map((size) => (
+                  <option key={size} value={size}>
+                    {size}개씩
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() => goToPage(page - 1)}
+                disabled={page <= 0}
+                className="rounded-lg border border-gray-200 px-3 py-1.5 font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                이전
+              </button>
+              <form onSubmit={handlePageJump} className="flex items-center gap-1">
+                <input
+                  value={pageJumpInput}
+                  onChange={(e) => setPageJumpInput(e.target.value)}
+                  className="w-16 rounded-lg border border-gray-200 px-2 py-1.5 text-center outline-none transition focus:border-gray-400"
+                />
+                <span>/ {Math.max(totalPages, 1).toLocaleString()}</span>
+              </form>
+              <button
+                type="button"
+                onClick={() => goToPage(page + 1)}
+                disabled={page >= totalPages - 1}
+                className="rounded-lg border border-gray-200 px-3 py-1.5 font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                다음
+              </button>
+            </div>
+          </div>
+        )}
       </main>
 
       {boardFormState !== 'closed' && (
