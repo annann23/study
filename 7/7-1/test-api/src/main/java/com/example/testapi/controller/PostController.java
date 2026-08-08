@@ -5,6 +5,10 @@ import com.example.testapi.dtos.like.LikeStatusResponse;
 import com.example.testapi.security.CafeAuthUser;
 import com.example.testapi.service.LikedService;
 import com.example.testapi.service.PostService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,11 +43,11 @@ public class PostController {
     }
 
     @GetMapping("/board/{boardId}")
-    public ResponseEntity<List<PostResponse>> findAllByBoard(@PathVariable Long boardId) {
-        List<PostResponse> responses = postService.findAllByBoard(boardId)
-                .stream()
-                .map(post -> post.getBoard().isPrivate() ? PostResponse.preview(post) : PostResponse.from(post))
-                .toList();
+    public ResponseEntity<Page<PostResponse>> findAllByBoard(
+            @PathVariable Long boardId,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<PostResponse> responses = postService.findAllByBoard(boardId, pageable)
+                .map(post -> post.getBoard().isPrivate() ? PostResponse.preview(post) : PostResponse.from(post));
         return ResponseEntity.ok(responses);
     }
 

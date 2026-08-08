@@ -10,6 +10,8 @@ import com.example.testapi.repository.BoardRepository;
 import com.example.testapi.repository.PostRepository;
 import com.example.testapi.repository.UserRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -62,8 +64,8 @@ public class PostService {
         return post;
     }
 
-    public List<PostEntity> findAllByBoard(Long boardId) {
-        return postRepository.findAllByBoardIdAndDeletedAtIsNull(boardId);
+    public Page<PostEntity> findAllByBoard(Long boardId, Pageable pageable) {
+        return postRepository.findAllByBoardIdAndDeletedAtIsNull(boardId, pageable);
     }
 
     public List<PostEntity> findAllByUser(Long userId) {
