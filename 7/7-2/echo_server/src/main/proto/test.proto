@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+enum MessageType {
+  PLACE_STONE = 0;
+  CHAT = 1;
+  SURRENDER = 2;
+}
+
+message GameMessage {
+  MessageType type = 1;
+  int32 x = 2;
+  int32 y = 3;
+  string player = 4;
+}
