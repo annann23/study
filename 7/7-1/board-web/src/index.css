@@ -1,5 +1,115 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand-50: #eefaf1;
+  --color-brand-100: #d7f2df;
+  --color-brand-200: #b0e4c0;
+  --color-brand-300: #7ecf9a;
+  --color-brand-400: #4bb579;
+  --color-brand-500: #2b9860;
+  --color-brand-600: #1c7c4d;
+  --color-brand-700: #17633f;
+  --color-brand-800: #124e33;
+  --color-brand-900: #0d3d29;
+  --color-brand-950: #062518;
+
+  --color-ink-50: #f4f8f5;
+  --color-ink-100: #e5ede7;
+  --color-ink-200: #cddad1;
+  --color-ink-300: #adc0b4;
+  --color-ink-400: #8fa397;
+  --color-ink-500: #647d6c;
+  --color-ink-700: #37473d;
+  --color-ink-900: #182019;
+}
+
+::selection {
+  background: var(--color-brand-200);
+  color: var(--color-brand-900);
+}
+
+body {
+  background: var(--color-ink-50);
+}
+
+@layer components {
+  .page-bg {
+    background-color: var(--color-ink-50);
+    background-image:
+      radial-gradient(circle, rgb(13 61 41 / 6%) 1px, transparent 1px),
+      radial-gradient(ellipse 900px 520px at -8% -15%, rgb(126 207 154 / 35%), transparent 60%),
+      radial-gradient(ellipse 820px 620px at 108% -10%, rgb(176 228 192 / 32%), transparent 55%),
+      radial-gradient(ellipse 1000px 720px at 50% 120%, rgb(215 242 223 / 55%), transparent 60%);
+    background-size: 26px 26px, auto, auto, auto;
+    background-attachment: fixed;
+    background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    border-radius: 0.5rem;
+    background-image: linear-gradient(135deg, var(--color-brand-600), var(--color-brand-400));
+    padding: 0.5rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: white;
+    box-shadow: 0 1px 2px 0 rgb(13 61 41 / 0.15);
+    transition: filter 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+  }
+  .btn-primary:hover:not(:disabled) {
+    filter: brightness(1.06);
+    box-shadow: 0 4px 14px 0 rgb(13 61 41 / 0.25);
+  }
+  .btn-primary:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+  .btn-primary:disabled {
+    opacity: 0.5;
+  }
+
+  .btn-ghost {
+    border-radius: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    color: var(--color-ink-500);
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .btn-ghost:hover {
+    background: var(--color-brand-50);
+    color: var(--color-brand-700);
+  }
+
+  .field {
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-ink-200);
+    background: white;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: var(--color-ink-900);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .field:focus {
+    border-color: var(--color-brand-400);
+    box-shadow: 0 0 0 4px var(--color-brand-100);
+  }
+  .field::placeholder {
+    color: var(--color-ink-300);
+  }
+
+  .brand-text {
+    background-image: linear-gradient(135deg, var(--color-brand-700), var(--color-brand-400));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+}
+
+.post-editor,
+.post-content {
+  overflow-wrap: anywhere;
+}
 .post-editor img,
 .post-content img {
   max-width: 100%;
@@ -22,15 +132,15 @@
 }
 .post-editor blockquote,
 .post-content blockquote {
-  border-left: 3px solid #d1d5db;
+  border-left: 3px solid var(--color-brand-300);
   padding-left: 0.75rem;
-  color: #6b7280;
+  color: var(--color-ink-500);
   margin: 0.5rem 0;
 }
 .post-editor pre,
 .post-content pre {
-  background: #1f2937;
-  color: #f9fafb;
+  background: var(--color-brand-950);
+  color: var(--color-brand-100);
   border-radius: 0.5rem;
   padding: 0.75rem;
   overflow-x: auto;
@@ -38,7 +148,7 @@
 }
 .post-editor a,
 .post-content a {
-  color: #2563eb;
+  color: var(--color-brand-600);
   text-decoration: underline;
 }
 .post-editor h1,
@@ -55,7 +165,7 @@
 }
 .post-editor p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
-  color: #9ca3af;
+  color: var(--color-ink-300);
   float: left;
   height: 0;
   pointer-events: none;

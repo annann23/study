@@ -25,36 +25,38 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="mx-auto mt-24 max-w-sm p-8">
-      <h1 className="text-2xl font-semibold">로그인</h1>
-      <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
-        <input
-          className="rounded border border-gray-300 px-3 py-2"
-          placeholder="아이디"
-          value={loginId}
-          onChange={(e) => setLoginId(e.target.value)}
-          required
-        />
-        <input
-          className="rounded border border-gray-300 px-3 py-2"
-          type="password"
-          placeholder="비밀번호"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        {error && <p className="text-sm text-red-500">{error}</p>}
-        <button
-          type="submit"
-          disabled={submitting}
-          className="rounded bg-gray-900 py-2 text-white disabled:opacity-50"
-        >
-          로그인
-        </button>
-      </form>
-      <p className="mt-4 text-sm text-gray-500">
-        계정이 없으신가요? <Link to="/sign-up" className="text-gray-900 underline">회원가입</Link>
-      </p>
+    <div className="page-bg relative flex min-h-screen items-center justify-center overflow-hidden px-6">
+      <div className="pointer-events-none absolute -top-32 -left-24 h-96 w-96 rounded-full bg-linear-to-br from-brand-300 to-brand-500 opacity-30 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-32 -right-24 h-96 w-96 rounded-full bg-linear-to-tr from-brand-400 to-brand-700 opacity-20 blur-3xl" />
+
+      <div className="relative w-full max-w-sm rounded-2xl border border-ink-100 bg-white/90 p-8 shadow-xl shadow-brand-900/10 backdrop-blur-sm">
+        <span className="brand-text text-sm font-bold tracking-wide">게시판</span>
+        <h1 className="mt-1 text-2xl font-semibold text-ink-900">로그인</h1>
+        <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-3">
+          <input
+            className="field"
+            placeholder="아이디"
+            value={loginId}
+            onChange={(e) => setLoginId(e.target.value)}
+            required
+          />
+          <input
+            className="field"
+            type="password"
+            placeholder="비밀번호"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          {error && <p className="text-sm text-red-500">{error}</p>}
+          <button type="submit" disabled={submitting} className="btn-primary mt-1 w-full">
+            로그인
+          </button>
+        </form>
+        <p className="mt-5 text-sm text-ink-500">
+          계정이 없으신가요? <Link to="/sign-up" className="font-medium text-brand-700 hover:underline">회원가입</Link>
+        </p>
+      </div>
     </div>
   )
 }

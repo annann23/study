@@ -39,7 +39,7 @@ export default function PostDetailPage() {
   }, [postId, user, navigate])
 
   if (error) {
-    return <p className="mt-16 text-center text-sm text-gray-400">{error}</p>
+    return <p className="mt-16 text-center text-sm text-ink-400">{error}</p>
   }
 
   const toggleLike = async () => {
@@ -55,7 +55,7 @@ export default function PostDetailPage() {
   }
 
   if (!post) {
-    return <p className="mt-16 text-center text-sm text-gray-400">불러오는 중...</p>
+    return <p className="mt-16 text-center text-sm text-ink-400">불러오는 중...</p>
   }
 
   const isMine = user?.id === post.userId
@@ -63,33 +63,30 @@ export default function PostDetailPage() {
   const canDelete = hasPermission(user, 'POST_DELETE_ANY') || (isMine && hasPermission(user, 'POST_DELETE_OWN'))
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-100 bg-white/80 px-6 py-4 backdrop-blur-md">
+    <div className="min-h-screen page-bg">
+      <header className="border-b border-ink-100 bg-white/80 px-6 py-4 backdrop-blur-md">
         <div className="mx-auto max-w-3xl">
-          <Link to={`/?board=${post.boardId}`} className="text-sm text-gray-400 hover:text-gray-600">
+          <Link to={`/?board=${post.boardId}`} className="text-sm text-ink-400 hover:text-brand-700">
             ← {board?.name ?? '목록'}으로
           </Link>
         </div>
       </header>
 
       <main className="mx-auto max-w-3xl px-6 py-8">
-        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-ink-100 bg-white p-6 shadow-sm shadow-ink-900/[0.03]">
           <div className="flex items-start justify-between gap-4">
-            <h1 className="text-xl font-semibold text-gray-900">{post.title}</h1>
+            <h1 className="text-xl font-semibold text-ink-900">{post.title}</h1>
             {(canEdit || canDelete) && (
               <div className="flex shrink-0 gap-2">
                 {canEdit && (
-                  <Link
-                    to={`/board/${post.boardId}/posts/${post.id}/edit`}
-                    className="rounded-lg px-3 py-1.5 text-xs text-gray-500 transition hover:bg-gray-100"
-                  >
+                  <Link to={`/board/${post.boardId}/posts/${post.id}/edit`} className="btn-ghost">
                     수정
                   </Link>
                 )}
                 {canDelete && (
                   <button
                     onClick={handleDelete}
-                    className="rounded-lg px-3 py-1.5 text-xs text-gray-500 transition hover:bg-gray-100 hover:text-red-500"
+                    className="rounded-lg px-3 py-1.5 text-xs text-ink-500 transition hover:bg-red-50 hover:text-red-500"
                   >
                     삭제
                   </button>
@@ -97,15 +94,15 @@ export default function PostDetailPage() {
               </div>
             )}
           </div>
-          <div className="mt-1 flex items-center gap-2 text-xs text-gray-400">
-            <span className="font-medium text-gray-500">{post.nickName}</span>
-            <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[11px] text-gray-500">{post.userLevel}</span>
+          <div className="mt-1 flex items-center gap-2 text-xs text-ink-400">
+            <span className="font-medium text-ink-500">{post.nickName}</span>
+            <span className="rounded bg-brand-50 px-1.5 py-0.5 text-[11px] text-brand-700">{post.userLevel}</span>
             <span>·</span>
             <span>{formatDateTime(post.createdAt)}</span>
           </div>
 
           <div
-            className="post-content mt-5 text-sm leading-relaxed text-gray-800"
+            className="post-content mt-5 text-sm leading-relaxed text-ink-700"
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
           />
 
@@ -115,7 +112,7 @@ export default function PostDetailPage() {
             className={`mt-6 flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm font-medium transition ${
               like?.likedByMe
                 ? 'border-red-200 bg-red-50 text-red-500'
-                : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+                : 'border-ink-200 text-ink-500 hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700'
             }`}
           >
             {like?.likedByMe ? '♥' : '♡'} 좋아요 {like?.count ?? 0}

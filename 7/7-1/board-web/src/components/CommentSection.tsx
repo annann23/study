@@ -61,19 +61,19 @@ function CommentItem({
   }
 
   return (
-    <li className="border-b border-gray-100 py-3 last:border-0">
+    <li className="border-b border-ink-100 py-3 last:border-0">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-900">{comment.nickname}</span>
-          <span className="text-xs text-gray-400">{formatDateTime(comment.createdAt)}</span>
-          {comment.isEdited && <span className="text-xs text-gray-300">(수정됨)</span>}
+          <span className="text-sm font-medium text-ink-900">{comment.nickname}</span>
+          <span className="text-xs text-ink-400">{formatDateTime(comment.createdAt)}</span>
+          {comment.isEdited && <span className="text-xs text-ink-300">(수정됨)</span>}
         </div>
         {!editing && (
           <div className="flex gap-2">
             {canReply && (
               <button
                 onClick={() => setReplying((v) => !v)}
-                className="text-xs text-gray-400 transition hover:text-gray-700"
+                className="text-xs text-ink-400 transition hover:text-brand-700"
               >
                 답글
               </button>
@@ -81,13 +81,13 @@ function CommentItem({
             {canEdit && (
               <button
                 onClick={() => setEditing(true)}
-                className="text-xs text-gray-400 transition hover:text-gray-700"
+                className="text-xs text-ink-400 transition hover:text-brand-700"
               >
                 수정
               </button>
             )}
             {canDelete && (
-              <button onClick={handleDelete} className="text-xs text-gray-400 transition hover:text-red-500">
+              <button onClick={handleDelete} className="text-xs text-ink-400 transition hover:text-red-500">
                 삭제
               </button>
             )}
@@ -98,15 +98,12 @@ function CommentItem({
       {editing ? (
         <div className="mt-2 flex gap-2">
           <input
-            className="flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-sm outline-none focus:border-gray-400"
+            className="field flex-1 py-1.5"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             autoFocus
           />
-          <button
-            onClick={handleSave}
-            className="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-800"
-          >
+          <button onClick={handleSave} className="btn-primary py-1.5">
             저장
           </button>
           <button
@@ -114,36 +111,32 @@ function CommentItem({
               setEditing(false)
               setContent(comment.content)
             }}
-            className="rounded-lg px-3 py-1.5 text-xs text-gray-500 hover:bg-gray-100"
+            className="rounded-lg px-3 py-1.5 text-xs text-ink-500 hover:bg-brand-50"
           >
             취소
           </button>
         </div>
       ) : (
-        <p className="mt-1 text-sm text-gray-600">{comment.content}</p>
+        <p className="mt-1 text-sm text-ink-700">{comment.content}</p>
       )}
 
       {replying && (
         <form onSubmit={handleReply} className="mt-2 flex gap-2">
           <input
-            className="flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-sm outline-none focus:border-gray-400"
+            className="field flex-1 py-1.5"
             placeholder="답글을 입력하세요"
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
             autoFocus
           />
-          <button
-            type="submit"
-            disabled={!replyContent.trim()}
-            className="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-800 disabled:opacity-50"
-          >
+          <button type="submit" disabled={!replyContent.trim()} className="btn-primary py-1.5">
             등록
           </button>
         </form>
       )}
 
       {replies.length > 0 && (
-        <ul className="mt-2 ml-4 border-l border-gray-100 pl-3">
+        <ul className="mt-2 ml-4 border-l border-brand-100 pl-3">
           {replies.map((child) => (
             <CommentItem
               key={child.id}
@@ -208,28 +201,24 @@ export default function CommentSection({ postId }: { postId: number }) {
 
   return (
     <section className="mt-8">
-      <h2 className="text-sm font-semibold text-gray-900">댓글 {comments?.length ?? 0}개</h2>
+      <h2 className="text-sm font-semibold text-ink-900">댓글 {comments?.length ?? 0}개</h2>
 
       <form onSubmit={handleSubmit} className="mt-3 flex gap-2">
         <input
-          className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none transition focus:border-gray-400"
+          className="field flex-1"
           placeholder="댓글을 입력하세요"
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
-        <button
-          type="submit"
-          disabled={submitting || !content.trim()}
-          className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 disabled:opacity-50"
-        >
+        <button type="submit" disabled={submitting || !content.trim()} className="btn-primary">
           등록
         </button>
       </form>
 
       {comments == null ? (
-        <p className="mt-4 text-sm text-gray-400">불러오는 중...</p>
+        <p className="mt-4 text-sm text-ink-400">불러오는 중...</p>
       ) : comments.length === 0 ? (
-        <p className="mt-4 text-sm text-gray-400">첫 댓글을 남겨보세요.</p>
+        <p className="mt-4 text-sm text-ink-400">첫 댓글을 남겨보세요.</p>
       ) : (
         <ul className="mt-2">
           {roots.map((comment) => (

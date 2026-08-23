@@ -60,10 +60,10 @@ export default function RoleManagePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-100 bg-white/80 px-6 py-4 backdrop-blur-md">
+    <div className="min-h-screen page-bg">
+      <header className="border-b border-ink-100 bg-white/80 px-6 py-4 backdrop-blur-md">
         <div className="mx-auto max-w-3xl">
-          <Link to="/" className="text-sm text-gray-400 hover:text-gray-600">
+          <Link to="/" className="text-sm text-ink-400 hover:text-brand-700">
             ← 목록으로
           </Link>
         </div>
@@ -71,34 +71,31 @@ export default function RoleManagePage() {
 
       <main className="mx-auto max-w-3xl px-6 py-8">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-gray-900">역할 관리</h1>
-          <button
-            onClick={() => setFormState('add')}
-            className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
-          >
+          <h1 className="text-xl font-semibold text-ink-900">역할 관리</h1>
+          <button onClick={() => setFormState('add')} className="btn-primary">
             역할 추가
           </button>
         </div>
 
-        <div className="mt-5 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+        <div className="mt-5 overflow-hidden rounded-2xl border border-ink-100 bg-white shadow-sm shadow-ink-900/[0.03]">
           {loading ? (
-            <p className="p-6 text-sm text-gray-400">불러오는 중...</p>
+            <p className="p-6 text-sm text-ink-400">불러오는 중...</p>
           ) : roles.length === 0 ? (
-            <p className="p-6 text-sm text-gray-400">등록된 역할이 없습니다.</p>
+            <p className="p-6 text-sm text-ink-400">등록된 역할이 없습니다.</p>
           ) : (
-            <ul className="divide-y divide-gray-50">
+            <ul className="divide-y divide-ink-50">
               {roles.map((role) => (
                 <li key={role.id} className="flex items-center justify-between gap-4 px-6 py-4">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{role.name}</p>
+                    <p className="text-sm font-medium text-ink-900">{role.name}</p>
                     <div className="mt-1 flex flex-wrap gap-1">
                       {role.permissions.length === 0 ? (
-                        <span className="text-xs text-gray-400">권한 없음</span>
+                        <span className="text-xs text-ink-400">권한 없음</span>
                       ) : (
                         role.permissions.map((p) => (
                           <span
                             key={p}
-                            className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] text-gray-500"
+                            className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] text-brand-700"
                           >
                             {p}
                           </span>
@@ -107,15 +104,12 @@ export default function RoleManagePage() {
                     </div>
                   </div>
                   <div className="flex shrink-0 gap-2">
-                    <button
-                      onClick={() => setFormState(role)}
-                      className="rounded-lg px-3 py-1.5 text-xs text-gray-500 transition hover:bg-gray-100"
-                    >
+                    <button onClick={() => setFormState(role)} className="btn-ghost">
                       수정
                     </button>
                     <button
                       onClick={() => handleDelete(role)}
-                      className="rounded-lg px-3 py-1.5 text-xs text-gray-500 transition hover:bg-gray-100 hover:text-red-500"
+                      className="rounded-lg px-3 py-1.5 text-xs text-ink-500 transition hover:bg-red-50 hover:text-red-500"
                     >
                       삭제
                     </button>
@@ -126,12 +120,12 @@ export default function RoleManagePage() {
           )}
         </div>
 
-        <h2 className="mt-8 text-lg font-semibold text-gray-900">역할 부여</h2>
-        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+        <h2 className="mt-8 text-lg font-semibold text-ink-900">역할 부여</h2>
+        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-2xl border border-ink-100 bg-white p-4 shadow-sm shadow-ink-900/[0.03]">
           <select
             value={assignUserId ?? ''}
             onChange={(e) => setAssignUserId(Number(e.target.value))}
-            className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none transition focus:border-gray-400"
+            className="field"
           >
             {users.map((u) => (
               <option key={u.id} value={u.id}>
@@ -142,7 +136,7 @@ export default function RoleManagePage() {
           <select
             value={assignRoleId ?? ''}
             onChange={(e) => setAssignRoleId(Number(e.target.value))}
-            className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none transition focus:border-gray-400"
+            className="field"
           >
             {roles.map((r) => (
               <option key={r.id} value={r.id}>
@@ -153,11 +147,11 @@ export default function RoleManagePage() {
           <button
             onClick={handleAssign}
             disabled={assigning || assignUserId == null || assignRoleId == null}
-            className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 disabled:opacity-50"
+            className="btn-primary"
           >
             부여
           </button>
-          {assignMessage && <span className="text-sm text-gray-500">{assignMessage}</span>}
+          {assignMessage && <span className="text-sm text-ink-500">{assignMessage}</span>}
         </div>
       </main>
 

@@ -55,20 +55,20 @@ export default function RoleFormModal({ role, permissions, onClose, onSaved }: P
   }
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/30 backdrop-blur-sm">
+      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl shadow-brand-900/10">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">{isEdit ? '역할 수정' : '역할 추가'}</h2>
-          <button onClick={onClose} className="text-gray-400 transition hover:text-gray-600" aria-label="닫기">
+          <h2 className="text-lg font-semibold text-ink-900">{isEdit ? '역할 수정' : '역할 추가'}</h2>
+          <button onClick={onClose} className="text-ink-400 transition hover:text-brand-700" aria-label="닫기">
             ✕
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-3">
-          <label className="flex flex-col gap-1 text-sm text-gray-600">
+          <label className="flex flex-col gap-1 text-sm text-ink-500">
             이름
             <input
-              className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none transition focus:border-gray-400"
+              className="field"
               placeholder="역할 이름"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -77,15 +77,16 @@ export default function RoleFormModal({ role, permissions, onClose, onSaved }: P
             />
           </label>
 
-          <div className="flex flex-col gap-1 text-sm text-gray-600">
+          <div className="flex flex-col gap-1 text-sm text-ink-500">
             권한
-            <div className="grid max-h-56 grid-cols-1 gap-1 overflow-y-auto rounded-lg border border-gray-200 p-2">
+            <div className="grid max-h-56 grid-cols-1 gap-1 overflow-y-auto rounded-lg border border-ink-200 p-2">
               {permissions.map((p) => (
-                <label key={p.id} className="flex items-center gap-2 rounded px-2 py-1 text-sm text-gray-700 hover:bg-gray-50">
+                <label key={p.id} className="flex items-center gap-2 rounded px-2 py-1 text-sm text-ink-700 hover:bg-brand-50">
                   <input
                     type="checkbox"
                     checked={selectedNames.has(p.name)}
                     onChange={() => togglePermission(p.name)}
+                    className="accent-brand-600"
                   />
                   {p.name}
                 </label>
@@ -97,7 +98,7 @@ export default function RoleFormModal({ role, permissions, onClose, onSaved }: P
           <button
             type="submit"
             disabled={submitting || !name.trim()}
-            className="mt-2 rounded-lg bg-gray-900 py-2 text-sm font-medium text-white transition hover:bg-gray-800 disabled:opacity-50"
+            className="btn-primary mt-2 w-full"
           >
             저장
           </button>

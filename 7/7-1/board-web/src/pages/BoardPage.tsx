@@ -27,7 +27,7 @@ export default function BoardPage() {
   const [pageJumpInput, setPageJumpInput] = useState('1')
   const [totalElements, setTotalElements] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
-  const [isSearchMode, setIsSearchMode] = useState(false)
+  const [appliedSearch, setAppliedSearch] = useState<{ keyword: string; type: 'TITLE' | 'CONTENT' } | null>(null)
 
   const changeView = (next: 'card' | 'table') => {
     setView(next)
@@ -49,14 +49,17 @@ export default function BoardPage() {
   useEffect(() => {
     if (selectedBoardId == null) return
     setSearchKeyword('') // 게시판 바뀌면 검색어 초기화
-    setIsSearchMode(false)
+    setAppliedSearch(null)
     setPage(0)
   }, [selectedBoardId])
 
   useEffect(() => {
-    if (selectedBoardId == null || isSearchMode) return
+    if (selectedBoardId == null) return
     setLoadingPosts(true)
-    api<PageResponse<Post>>(`/posts/board/${selectedBoardId}?page=${page}&size=${pageSize}`)
+    const path = appliedSearch
+      ? `/posts/search?boardId=${selectedBoardId}&keyword=${encodeURIComponent(appliedSearch.keyword)}&type=${appliedSearch.type}&page=${page}&size=${pageSize}`
+      : `/posts/board/${selectedBoardId}?page=${page}&size=${pageSize}`
+    api<PageResponse<Post>>(path)
       .then((data) => {
         setPosts(data.content)
         setTotalElements(data.totalElements)
@@ -64,30 +67,13 @@ export default function BoardPage() {
         setPageJumpInput(String(data.number + 1))
       })
       .finally(() => setLoadingPosts(false))
-  }, [selectedBoardId, page, pageSize, isSearchMode])
+  }, [selectedBoardId, page, pageSize, appliedSearch])
 
-  const handleSearch = async (e: FormEvent) => {
+  const handleSearch = (e: FormEvent) => {
     e.preventDefault()
-    if (selectedBoardId == null) return
     const keyword = searchKeyword.trim()
-    setLoadingPosts(true)
-    try {
-      if (!keyword) {
-        // 검색어 없으면 전체 목록(페이지네이션)으로 복귀
-        setIsSearchMode(false)
-        return
-      }
-      // 검색 결과는 페이지네이션이 없는 별도 엔드포인트
-      setIsSearchMode(true)
-      const results = await api<Post[]>(
-        `/posts/search?boardId=${selectedBoardId}&keyword=${encodeURIComponent(keyword)}&type=${searchType}`,
-      )
-      setPosts(results)
-      setTotalElements(results.length)
-      setTotalPages(1)
-    } finally {
-      setLoadingPosts(false)
-    }
+    setPage(0)
+    setAppliedSearch(keyword ? { keyword, type: searchType } : null)
   }
 
   const goToPage = (nextPage: number) => {
@@ -125,7 +111,7 @@ export default function BoardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen page-bg">
       <TopNav
         boards={boards}
         selectedBoardId={selectedBoardId}
@@ -141,7 +127,7 @@ export default function BoardPage() {
               <select
                 value={searchType}
                 onChange={(e) => setSearchType(e.target.value as 'TITLE' | 'CONTENT')}
-                className="rounded-lg border border-gray-200 px-2 py-2 text-sm outline-none transition focus:border-gray-400"
+                className="field"
               >
                 <option value="TITLE">제목</option>
                 <option value="CONTENT">본문</option>
@@ -150,11 +136,11 @@ export default function BoardPage() {
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
                 placeholder="검색어를 입력하세요"
-                className="w-48 rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none transition focus:border-gray-400"
+                className="field w-48"
               />
               <button
                 type="submit"
-                className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+                className="rounded-lg border border-ink-200 px-4 py-2 text-sm font-medium text-ink-700 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
               >
                 검색
               </button>
@@ -163,12 +149,12 @@ export default function BoardPage() {
             <span />
           )}
           <div className="flex shrink-0 items-center gap-2">
-            <div className="flex rounded-lg border border-gray-200 p-0.5">
+            <div className="flex rounded-lg border border-ink-200 p-0.5">
               <button
                 type="button"
                 onClick={() => changeView('card')}
                 title="카드형"
-                className={`rounded px-2 py-1 text-sm ${view === 'card' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'}`}
+                className={`rounded px-2 py-1 text-sm transition ${view === 'card' ? 'bg-linear-to-br from-brand-600 to-brand-400 text-white' : 'text-ink-500 hover:bg-brand-50'}`}
               >
                 ▦
               </button>
@@ -176,16 +162,13 @@ export default function BoardPage() {
                 type="button"
                 onClick={() => changeView('table')}
                 title="테이블형"
-                className={`rounded px-2 py-1 text-sm ${view === 'table' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'}`}
+                className={`rounded px-2 py-1 text-sm transition ${view === 'table' ? 'bg-linear-to-br from-brand-600 to-brand-400 text-white' : 'text-ink-500 hover:bg-brand-50'}`}
               >
                 ☰
               </button>
             </div>
             {selectedBoardId != null && (
-              <Link
-                to={`/board/${selectedBoardId}/write`}
-                className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
-              >
+              <Link to={`/board/${selectedBoardId}/write`} className="btn-primary">
                 글쓰기
               </Link>
             )}
@@ -198,8 +181,8 @@ export default function BoardPage() {
           isPrivate={boards.find((b) => b.id === selectedBoardId)?.isPrivate ?? false}
           view={view}
         />
-        {!isSearchMode && selectedBoardId != null && (
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-gray-600">
+        {selectedBoardId != null && (
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-ink-500">
             <span>
               총 {totalElements.toLocaleString()}건 · {totalPages.toLocaleString()}페이지
             </span>
@@ -210,7 +193,7 @@ export default function BoardPage() {
                   setPageSize(Number(e.target.value))
                   setPage(0)
                 }}
-                className="rounded-lg border border-gray-200 px-2 py-1.5 outline-none transition focus:border-gray-400"
+                className="field py-1.5"
               >
                 {PAGE_SIZE_OPTIONS.map((size) => (
                   <option key={size} value={size}>
@@ -222,7 +205,7 @@ export default function BoardPage() {
                 type="button"
                 onClick={() => goToPage(page - 1)}
                 disabled={page <= 0}
-                className="rounded-lg border border-gray-200 px-3 py-1.5 font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-lg border border-ink-200 px-3 py-1.5 font-medium text-ink-700 transition hover:border-brand-300 hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-ink-200 disabled:hover:bg-transparent"
               >
                 이전
               </button>
@@ -230,7 +213,7 @@ export default function BoardPage() {
                 <input
                   value={pageJumpInput}
                   onChange={(e) => setPageJumpInput(e.target.value)}
-                  className="w-16 rounded-lg border border-gray-200 px-2 py-1.5 text-center outline-none transition focus:border-gray-400"
+                  className="field w-16 py-1.5 text-center"
                 />
                 <span>/ {Math.max(totalPages, 1).toLocaleString()}</span>
               </form>
@@ -238,7 +221,7 @@ export default function BoardPage() {
                 type="button"
                 onClick={() => goToPage(page + 1)}
                 disabled={page >= totalPages - 1}
-                className="rounded-lg border border-gray-200 px-3 py-1.5 font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-lg border border-ink-200 px-3 py-1.5 font-medium text-ink-700 transition hover:border-brand-300 hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-ink-200 disabled:hover:bg-transparent"
               >
                 다음
               </button>

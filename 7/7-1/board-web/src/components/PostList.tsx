@@ -29,7 +29,7 @@ function LevelBadge({ level }: { level: string }) {
       </span>
     )
   }
-  return <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[11px] text-gray-500">{level}</span>
+  return <span className="rounded bg-brand-50 px-1.5 py-0.5 text-[11px] text-brand-700">{level}</span>
 }
 
 export default function PostList({
@@ -46,18 +46,18 @@ export default function PostList({
   view?: 'card' | 'table'
 }) {
   if (loading) {
-    return <p className="mt-16 text-center text-sm text-gray-400">불러오는 중...</p>
+    return <p className="mt-16 text-center text-sm text-ink-400">불러오는 중...</p>
   }
 
   if (posts.length === 0) {
-    return <p className="mt-16 text-center text-sm text-gray-400">아직 게시글이 없습니다.</p>
+    return <p className="mt-16 text-center text-sm text-ink-400">아직 게시글이 없습니다.</p>
   }
 
   if (view === 'table') {
     return (
-      <table className="w-full border-t border-gray-300 text-sm">
+      <table className="w-full border-t border-brand-200 text-sm">
         <thead>
-          <tr className="border-b border-gray-200 bg-gray-50 text-gray-500">
+          <tr className="border-b border-ink-200 bg-brand-50/60 text-ink-500">
             <th className="w-16 px-3 py-2 text-center font-medium">번호</th>
             <th className="px-3 py-2 text-left font-medium">제목</th>
             <th className="w-36 px-3 py-2 text-left font-medium">글쓴이</th>
@@ -66,15 +66,15 @@ export default function PostList({
         </thead>
         <tbody>
           {posts.map((post) => (
-            <tr key={post.id} className="border-b border-gray-100 hover:bg-gray-50">
-              <td className="px-3 py-2 text-center text-gray-400">{post.id}</td>
+            <tr key={post.id} className="border-b border-ink-100 transition hover:bg-brand-50/40">
+              <td className="px-3 py-2 text-center text-ink-400">{post.id}</td>
               <td className="px-3 py-2">
-                <Link to={getDetailHref(post)} className="flex min-w-0 items-center gap-1 text-gray-900 hover:underline">
+                <Link to={getDetailHref(post)} className="flex min-w-0 items-center gap-1 text-ink-900 hover:text-brand-700 hover:underline">
                   {isPrivate && <span title="비공개 - 작성자와 관리자만 열람 가능">🔒</span>}
                   <span className="truncate">{post.title}</span>
                 </Link>
               </td>
-              <td className="px-3 py-2 text-gray-500">
+              <td className="px-3 py-2 text-ink-500">
                 <div className="flex items-center gap-1">
                   <span className="min-w-0 truncate font-medium">{post.nickName}</span>
                   <span className="shrink-0">
@@ -82,7 +82,7 @@ export default function PostList({
                   </span>
                 </div>
               </td>
-              <td className="px-3 py-2 text-center text-xs text-gray-400">{formatDate(post.createdAt)}</td>
+              <td className="px-3 py-2 text-center text-xs text-ink-400">{formatDate(post.createdAt)}</td>
             </tr>
           ))}
         </tbody>
@@ -98,7 +98,7 @@ export default function PostList({
           <li key={post.id}>
             <Link
               to={getDetailHref(post)}
-              className="flex gap-4 rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              className="group flex gap-4 rounded-xl border border-ink-100 bg-white p-5 shadow-sm shadow-ink-900/[0.03] transition hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-md hover:shadow-brand-900/10"
             >
               {!isPrivate && thumbnail && (
                 <img
@@ -109,20 +109,20 @@ export default function PostList({
               )}
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <h3 className="flex min-w-0 items-center gap-1 font-medium text-gray-900">
+                  <h3 className="flex min-w-0 items-center gap-1 font-medium text-ink-900 transition group-hover:text-brand-700">
                     {isPrivate && (
                       <span title="비공개 - 작성자와 관리자만 열람 가능">🔒</span>
                     )}
                     <span className="truncate">{post.title}</span>
                   </h3>
-                  <span className="shrink-0 text-xs text-gray-400">{formatDate(post.createdAt)}</span>
+                  <span className="shrink-0 text-xs text-ink-400">{formatDate(post.createdAt)}</span>
                 </div>
-                <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-400">
-                  <span className="font-medium text-gray-500">{post.nickName}</span>
+                <div className="mt-1 flex items-center gap-1.5 text-xs text-ink-400">
+                  <span className="font-medium text-ink-500">{post.nickName}</span>
                   <LevelBadge level={post.userLevel} />
                 </div>
                 {!isPrivate && (
-                  <p className="mt-1 line-clamp-2 text-sm text-gray-500">{stripHtml(post.content)}</p>
+                  <p className="mt-1 line-clamp-2 break-words text-sm text-ink-500">{stripHtml(post.content)}</p>
                 )}
               </div>
             </Link>

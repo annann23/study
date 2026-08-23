@@ -75,21 +75,21 @@ export default function PostWritePage() {
 
   if (loading) {
     return (
-      <p className="mt-16 text-center text-sm text-gray-400">불러오는 중...</p>
+      <p className="mt-16 text-center text-sm text-ink-400">불러오는 중...</p>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-100 bg-white/80 px-6 py-4 backdrop-blur-md">
+    <div className="min-h-screen page-bg">
+      <header className="border-b border-ink-100 bg-white/80 px-6 py-4 backdrop-blur-md">
         <div className="mx-auto flex max-w-3xl items-center justify-between">
           <Link
             to={`/?board=${boardId}`}
-            className="text-sm text-gray-400 hover:text-gray-600"
+            className="text-sm text-ink-400 hover:text-brand-700"
           >
             ← {board?.name}(으)로
           </Link>
-          <h1 className="text-lg font-semibold text-gray-900">
+          <h1 className="text-lg font-semibold text-ink-900">
             {isEdit ? "글 수정" : "글쓰기"}
           </h1>
           <span className="w-16" />
@@ -99,7 +99,7 @@ export default function PostWritePage() {
       <main className="mx-auto max-w-3xl px-6 py-8">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
-            className="rounded-lg border border-gray-200 px-4 py-3 text-lg font-medium outline-none transition focus:border-gray-400"
+            className="field px-4 py-3 text-lg font-medium"
             placeholder="제목"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -116,14 +116,14 @@ export default function PostWritePage() {
           <div className="flex justify-end gap-2">
             <Link
               to={`/?board=${boardId}`}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-gray-500 transition hover:bg-gray-100"
+              className="rounded-lg px-4 py-2 text-sm font-medium text-ink-500 transition hover:bg-brand-50"
             >
               취소
             </Link>
             <button
               type="submit"
               disabled={submitting || !title.trim()}
-              className="rounded-lg bg-gray-900 px-5 py-2 text-sm font-medium text-white transition hover:bg-gray-800 disabled:opacity-50"
+              className="btn-primary px-5"
             >
               저장
             </button>

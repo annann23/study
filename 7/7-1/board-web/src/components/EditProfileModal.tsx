@@ -35,13 +35,13 @@ export default function EditProfileModal({ onClose }: { onClose: () => void }) {
   }
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/30 backdrop-blur-sm">
+      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl shadow-brand-900/10">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">정보 수정</h2>
+          <h2 className="text-lg font-semibold text-ink-900">정보 수정</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 transition hover:text-gray-600"
+            className="text-ink-400 transition hover:text-brand-700"
             aria-label="닫기"
           >
             ✕
@@ -49,22 +49,22 @@ export default function EditProfileModal({ onClose }: { onClose: () => void }) {
         </div>
 
         {done ? (
-          <p className="mt-6 text-sm text-gray-600">저장되었습니다.</p>
+          <p className="mt-6 text-sm text-ink-500">저장되었습니다.</p>
         ) : (
           <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-3">
-            <label className="flex flex-col gap-1 text-sm text-gray-600">
+            <label className="flex flex-col gap-1 text-sm text-ink-500">
               닉네임
               <input
-                className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none transition focus:border-gray-400"
+                className="field"
                 placeholder="변경할 닉네임"
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
               />
             </label>
-            <label className="flex flex-col gap-1 text-sm text-gray-600">
+            <label className="flex flex-col gap-1 text-sm text-ink-500">
               비밀번호
               <input
-                className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none transition focus:border-gray-400"
+                className="field"
                 type="password"
                 placeholder="변경할 비밀번호"
                 value={password}
@@ -72,11 +72,7 @@ export default function EditProfileModal({ onClose }: { onClose: () => void }) {
               />
             </label>
             {error && <p className="text-sm text-red-500">{error}</p>}
-            <button
-              type="submit"
-              disabled={submitting}
-              className="mt-2 rounded-lg bg-gray-900 py-2 text-sm font-medium text-white transition hover:bg-gray-800 disabled:opacity-50"
-            >
+            <button type="submit" disabled={submitting} className="btn-primary mt-2 w-full">
               저장
             </button>
           </form>

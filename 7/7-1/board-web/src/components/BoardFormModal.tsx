@@ -50,15 +50,15 @@ export default function BoardFormModal({ board, onClose, onSaved }: Props) {
   }
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/30 backdrop-blur-sm">
+      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl shadow-brand-900/10">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">
+          <h2 className="text-lg font-semibold text-ink-900">
             {isEdit ? '게시판 수정' : '게시판 추가'}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 transition hover:text-gray-600"
+            className="text-ink-400 transition hover:text-brand-700"
             aria-label="닫기"
           >
             ✕
@@ -66,10 +66,10 @@ export default function BoardFormModal({ board, onClose, onSaved }: Props) {
         </div>
 
         <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-3">
-          <label className="flex flex-col gap-1 text-sm text-gray-600">
+          <label className="flex flex-col gap-1 text-sm text-ink-500">
             이름
             <input
-              className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none transition focus:border-gray-400"
+              className="field"
               placeholder="게시판 이름"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -79,10 +79,10 @@ export default function BoardFormModal({ board, onClose, onSaved }: Props) {
           </label>
 
           {!isEdit && (
-            <label className="flex flex-col gap-1 text-sm text-gray-600">
+            <label className="flex flex-col gap-1 text-sm text-ink-500">
               카테고리
               <select
-                className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none transition focus:border-gray-400"
+                className="field"
                 value={boardTypeId ?? ''}
                 onChange={(e) => setBoardTypeId(Number(e.target.value))}
               >
@@ -96,11 +96,12 @@ export default function BoardFormModal({ board, onClose, onSaved }: Props) {
           )}
 
           {!isEdit && (
-            <label className="flex items-center gap-2 text-sm text-gray-600">
+            <label className="flex items-center gap-2 text-sm text-ink-500">
               <input
                 type="checkbox"
                 checked={isPrivate}
                 onChange={(e) => setIsPrivate(e.target.checked)}
+                className="accent-brand-600"
               />
               비공개 게시판 (작성자와 관리자만 열람 가능)
             </label>
@@ -110,7 +111,7 @@ export default function BoardFormModal({ board, onClose, onSaved }: Props) {
           <button
             type="submit"
             disabled={submitting || !name.trim()}
-            className="mt-2 rounded-lg bg-gray-900 py-2 text-sm font-medium text-white transition hover:bg-gray-800 disabled:opacity-50"
+            className="btn-primary mt-2 w-full"
           >
             저장
           </button>

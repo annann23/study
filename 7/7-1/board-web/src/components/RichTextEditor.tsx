@@ -32,8 +32,8 @@ function ToolbarButton({
       type="button"
       onClick={onClick}
       title={title}
-      className={`rounded px-2 py-1.5 text-sm transition hover:bg-gray-100 ${
-        active ? 'bg-gray-100 text-gray-900' : 'text-gray-500'
+      className={`rounded px-2 py-1.5 text-sm transition hover:bg-brand-100 ${
+        active ? 'bg-brand-100 text-brand-800' : 'text-ink-500'
       }`}
     >
       {label}
@@ -64,7 +64,7 @@ function Toolbar({ editor, allowImage }: { editor: Editor; allowImage: boolean }
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-0.5 rounded-t-lg border border-b-0 border-gray-200 bg-gray-50 p-1">
+    <div className="flex flex-wrap items-center gap-0.5 rounded-t-lg border border-b-0 border-ink-200 bg-brand-50/50 p-1">
       <ToolbarButton
         title="제목1"
         label="H1"
@@ -77,7 +77,7 @@ function Toolbar({ editor, allowImage }: { editor: Editor; allowImage: boolean }
         active={editor.isActive('heading', { level: 2 })}
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
       />
-      <span className="mx-1 h-4 w-px bg-gray-200" />
+      <span className="mx-1 h-4 w-px bg-ink-200" />
       <ToolbarButton
         title="굵게"
         label="B"
@@ -102,7 +102,7 @@ function Toolbar({ editor, allowImage }: { editor: Editor; allowImage: boolean }
         active={editor.isActive('strike')}
         onClick={() => editor.chain().focus().toggleStrike().run()}
       />
-      <span className="mx-1 h-4 w-px bg-gray-200" />
+      <span className="mx-1 h-4 w-px bg-ink-200" />
       <ToolbarButton
         title="목록"
         label="•"
@@ -140,7 +140,7 @@ function Toolbar({ editor, allowImage }: { editor: Editor; allowImage: boolean }
           />
         </>
       )}
-      <span className="mx-1 h-4 w-px bg-gray-200" />
+      <span className="mx-1 h-4 w-px bg-ink-200" />
       <ToolbarButton
         title="실행 취소"
         label="↺"
@@ -173,7 +173,7 @@ export default function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          'post-editor min-h-64 rounded-b-lg border border-gray-200 px-3 py-2 outline-none focus:border-gray-400',
+          'post-editor min-h-64 rounded-b-lg border border-ink-200 px-3 py-2 outline-none focus:border-brand-400',
       },
     },
   })

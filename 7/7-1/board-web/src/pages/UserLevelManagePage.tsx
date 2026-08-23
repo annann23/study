@@ -33,25 +33,25 @@ export default function UserLevelManagePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-100 bg-white/80 px-6 py-4 backdrop-blur-md">
+    <div className="min-h-screen page-bg">
+      <header className="border-b border-ink-100 bg-white/80 px-6 py-4 backdrop-blur-md">
         <div className="mx-auto max-w-3xl">
-          <Link to="/" className="text-sm text-gray-400 hover:text-gray-600">
+          <Link to="/" className="text-sm text-ink-400 hover:text-brand-700">
             ← 목록으로
           </Link>
         </div>
       </header>
 
       <main className="mx-auto max-w-3xl px-6 py-8">
-        <h1 className="text-xl font-semibold text-gray-900">회원 등급 관리</h1>
+        <h1 className="text-xl font-semibold text-ink-900">회원 등급 관리</h1>
 
-        <div className="mt-5 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+        <div className="mt-5 overflow-hidden rounded-2xl border border-ink-100 bg-white shadow-sm shadow-ink-900/[0.03]">
           {loading ? (
-            <p className="p-6 text-sm text-gray-400">불러오는 중...</p>
+            <p className="p-6 text-sm text-ink-400">불러오는 중...</p>
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-100 text-left text-xs text-gray-400">
+                <tr className="border-b border-ink-100 bg-brand-50/50 text-left text-xs text-ink-500">
                   <th className="px-6 py-3 font-medium">닉네임</th>
                   <th className="px-6 py-3 font-medium">아이디</th>
                   <th className="px-6 py-3 font-medium">등급</th>
@@ -59,15 +59,15 @@ export default function UserLevelManagePage() {
               </thead>
               <tbody>
                 {users.map((u) => (
-                  <tr key={u.id} className="border-b border-gray-50 last:border-0">
-                    <td className="px-6 py-3 text-gray-800">{u.nickname}</td>
-                    <td className="px-6 py-3 text-gray-500">{u.loginId}</td>
+                  <tr key={u.id} className="border-b border-ink-50 last:border-0">
+                    <td className="px-6 py-3 text-ink-700">{u.nickname}</td>
+                    <td className="px-6 py-3 text-ink-500">{u.loginId}</td>
                     <td className="px-6 py-3">
                       <select
                         value={u.userLevel}
                         disabled={savingUserId === u.id}
                         onChange={(e) => changeLevel(u.id, Number(e.target.value))}
-                        className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm outline-none transition focus:border-gray-400 disabled:opacity-50"
+                        className="field py-1.5 disabled:opacity-50"
                       >
                         {levels.map((level) => (
                           <option key={level.id} value={level.id}>
