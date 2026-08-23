@@ -30,7 +30,12 @@ public class ResourceLookupRegistry {
                 "LIKE", id -> (OwnableResource) likedRepository.findById(id)
                         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좋아요입니다.")),
                 "BOARD", id -> (OwnableResource) boardRepository.findById(id)
-                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시판입니다."))
+                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시판입니다.")),
+                "POST_BOARD", id -> {
+                    var post = postRepository.findById(id)
+                            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+                    return (OwnableResource) post.getBoard()::getOperatorId;
+                }
         );
     }
 

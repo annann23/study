@@ -183,6 +183,7 @@ export default function BoardPage() {
           getDetailHref={(post) => `/board/${post.boardId}/posts/${post.id}`}
           isPrivate={boards.find((b) => b.id === selectedBoardId)?.isPrivate ?? false}
           view={view}
+          operatorId={selectedBoard?.operatorId ?? null}
         />
         {selectedBoardId != null && (
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-ink-500">

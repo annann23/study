@@ -59,8 +59,9 @@ export default function PostDetailPage() {
   }
 
   const isMine = user?.id === post.userId
-  const canEdit = hasPermission(user, 'POST_UPDATE_ANY') || (isMine && hasPermission(user, 'POST_UPDATE_OWN'))
-  const canDelete = hasPermission(user, 'POST_DELETE_ANY') || (isMine && hasPermission(user, 'POST_DELETE_OWN'))
+  const isOperator = user?.id === board?.operatorId && hasPermission(user, 'BOARD_MODERATE_OWN')
+  const canEdit = hasPermission(user, 'POST_UPDATE_ANY') || (isMine && hasPermission(user, 'POST_UPDATE_OWN')) || isOperator
+  const canDelete = hasPermission(user, 'POST_DELETE_ANY') || (isMine && hasPermission(user, 'POST_DELETE_OWN')) || isOperator
 
   return (
     <div className="min-h-screen page-bg">
@@ -96,7 +97,13 @@ export default function PostDetailPage() {
           </div>
           <div className="mt-1 flex items-center gap-2 text-xs text-ink-400">
             <span className="font-medium text-ink-500">{post.nickName}</span>
-            <span className="rounded bg-brand-50 px-1.5 py-0.5 text-[11px] text-brand-700">{post.userLevel}</span>
+            {post.userId === board?.operatorId ? (
+              <span className="inline-flex items-center gap-0.5 rounded bg-linear-to-br from-brand-600 to-brand-400 px-1.5 py-0.5 text-[11px] font-semibold text-white">
+                🛠 운영자
+              </span>
+            ) : (
+              <span className="rounded bg-brand-50 px-1.5 py-0.5 text-[11px] text-brand-700">{post.userLevel}</span>
+            )}
             <span>·</span>
             <span>{formatDateTime(post.createdAt)}</span>
           </div>

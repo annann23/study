@@ -70,7 +70,7 @@ public class PostController {
     }
 
 
-    @PreAuthorize("hasPermission(#request.postId(), 'POST', 'POST_UPDATE_ANY') or hasPermission(#request.postId(), 'POST', 'POST_UPDATE_OWN')")
+    @PreAuthorize("hasPermission(#request.postId(), 'POST', 'POST_UPDATE_ANY') or hasPermission(#request.postId(), 'POST', 'POST_UPDATE_OWN') or hasPermission(#request.postId(), 'POST_BOARD', 'BOARD_MODERATE_OWN')")
     @PutMapping
     public ResponseEntity<PostResponse> edit(@RequestBody PostEditRequest request) {
         PostResponse response = PostResponse.from(
@@ -79,7 +79,7 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasPermission(#request.postId(), 'POST', 'POST_DELETE_ANY') or hasPermission(#request.postId(), 'POST', 'POST_DELETE_OWN')")
+    @PreAuthorize("hasPermission(#request.postId(), 'POST', 'POST_DELETE_ANY') or hasPermission(#request.postId(), 'POST', 'POST_DELETE_OWN') or hasPermission(#request.postId(), 'POST_BOARD', 'BOARD_MODERATE_OWN')")
     @DeleteMapping
     public ResponseEntity<Void> delete(@RequestBody PostDeleteRequest request) {
         postService.delete(request.postId());
