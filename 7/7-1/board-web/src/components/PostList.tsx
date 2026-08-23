@@ -32,18 +32,28 @@ function LevelBadge({ level }: { level: string }) {
   return <span className="rounded bg-brand-50 px-1.5 py-0.5 text-[11px] text-brand-700">{level}</span>
 }
 
+function OperatorBadge() {
+  return (
+    <span className="inline-flex items-center gap-0.5 rounded bg-linear-to-br from-brand-600 to-brand-400 px-1.5 py-0.5 text-[11px] font-semibold text-white">
+      🛠 운영자
+    </span>
+  )
+}
+
 export default function PostList({
   posts,
   loading,
   getDetailHref,
   isPrivate = false,
   view = 'card',
+  operatorId = null,
 }: {
   posts: Post[]
   loading: boolean
   getDetailHref: (post: Post) => string
   isPrivate?: boolean
   view?: 'card' | 'table'
+  operatorId?: number | null
 }) {
   if (loading) {
     return <p className="mt-16 text-center text-sm text-ink-400">불러오는 중...</p>
@@ -78,7 +88,7 @@ export default function PostList({
                 <div className="flex items-center gap-1">
                   <span className="min-w-0 truncate font-medium">{post.nickName}</span>
                   <span className="shrink-0">
-                    <LevelBadge level={post.userLevel} />
+                    {post.userId === operatorId ? <OperatorBadge /> : <LevelBadge level={post.userLevel} />}
                   </span>
                 </div>
               </td>
@@ -119,7 +129,7 @@ export default function PostList({
                 </div>
                 <div className="mt-1 flex items-center gap-1.5 text-xs text-ink-400">
                   <span className="font-medium text-ink-500">{post.nickName}</span>
-                  <LevelBadge level={post.userLevel} />
+                  {post.userId === operatorId ? <OperatorBadge /> : <LevelBadge level={post.userLevel} />}
                 </div>
                 {!isPrivate && (
                   <p className="mt-1 line-clamp-2 break-words text-sm text-ink-500">{stripHtml(post.content)}</p>
