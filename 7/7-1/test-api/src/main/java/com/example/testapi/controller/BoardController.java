@@ -1,11 +1,14 @@
 package com.example.testapi.controller;
 
 import com.example.testapi.dtos.board.BoardEditNameRequest;
+import com.example.testapi.dtos.board.BoardRequestDto;
 import com.example.testapi.dtos.board.BoardSaveRequest;
 import com.example.testapi.dtos.board.BoardResponse;
+import com.example.testapi.security.CafeAuthUser;
 import com.example.testapi.service.BoardService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +29,10 @@ public class BoardController {
         return ResponseEntity.ok(BoardResponse.from(boardService.create(request.name(), request.boardTypeId(), request.isPrivate())));
     }
 
+    @PostMapping("/request")
+    public ResponseEntity<BoardResponse> request(@RequestBody BoardRequestDto request, @AuthenticationPrincipal CafeAuthUser principal) {
+        return ResponseEntity.ok(BoardResponse.from(boardService.request(request.name(), request.boardTypeId(), principal.getUserId())));
+    }
 
     @PreAuthorize("hasPermission(null, 'BOARD', 'BOARD_UPDATE')")
     @PutMapping("/name")
@@ -33,9 +40,31 @@ public class BoardController {
         return ResponseEntity.ok(BoardResponse.from(boardService.updateName(request.boardId(), request.name())));
     }
 
+    @PreAuthorize("hasPermission(null, 'BOARD', 'BOARD_UPDATE')")
+    @PutMapping("/{id}/approve")
+    public ResponseEntity<BoardResponse> approve(@PathVariable Long id) {
+        return ResponseEntity.ok(BoardResponse.from(boardService.approve(id)));
+    }
+
+    @PreAuthorize("hasPermission(null, 'BOARD', 'BOARD_UPDATE')")
+    @PutMapping("/{id}/reject")
+    public ResponseEntity<BoardResponse> reject(@PathVariable Long id) {
+        return ResponseEntity.ok(BoardResponse.from(boardService.reject(id)));
+    }
+
     @GetMapping
     public ResponseEntity<List<BoardResponse>> findAll() {
         List<BoardResponse> responses = boardService.findAll()
+                .stream()
+                .map(BoardResponse::from)
+                .toList();
+        return ResponseEntity.ok(responses);
+    }
+
+    @PreAuthorize("hasPermission(null, 'BOARD', 'BOARD_UPDATE')")
+    @GetMapping("/pending")
+    public ResponseEntity<List<BoardResponse>> findAllPending() {
+        List<BoardResponse> responses = boardService.findAllPending()
                 .stream()
                 .map(BoardResponse::from)
                 .toList();

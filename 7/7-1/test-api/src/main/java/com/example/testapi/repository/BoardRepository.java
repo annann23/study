@@ -8,4 +8,5 @@ import java.util.List;
 public interface BoardRepository extends JpaRepository<BoardEntity, Long> {
     boolean existsByName(String name);
     List<BoardEntity> findAllByBoardTypeId(Long boardTypeId);
+    List<BoardEntity> findAllByStatus(BoardEntity.BoardStatus status);
 }

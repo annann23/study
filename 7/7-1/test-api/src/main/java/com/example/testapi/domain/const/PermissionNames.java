@@ -2,8 +2,11 @@ package com.example.testapi.domain;
 
 public class PermissionNames {
     public static final String BOARD_CREATE = "BOARD_CREATE";
+    public static final String BOARD_REQUEST= "BOARD_REQUEST";
     public static final String BOARD_UPDATE = "BOARD_UPDATE";
     public static final String BOARD_DELETE = "BOARD_DELETE";
+    public static final String BOARD_MODERATE_OWN = "BOARD_MODERATE_OWN";
+    public static final String BOARD_MODERATE_ANY = "BOARD_MODERATE_ANY";
 
     public static final String POST_CREATE = "POST_CREATE";
     public static final String POST_UPDATE_OWN = "POST_UPDATE_OWN";

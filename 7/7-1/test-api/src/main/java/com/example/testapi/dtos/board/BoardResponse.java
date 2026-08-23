@@ -5,14 +5,20 @@ public record BoardResponse(
         Long id,
         Long boardTypeId,
         String name,
-        boolean isPrivate
+        boolean isPrivate,
+        BoardEntity.BoardStatus status,
+        Long operatorId,
+        Long requestedById
 ) {
     public static BoardResponse from(BoardEntity entity) {
         return new BoardResponse(
                 entity.getId(),
                 entity.getBoardTypeId(),
                 entity.getName(),
-                entity.isPrivate()
+                entity.isPrivate(),
+                entity.getStatus(),
+                entity.getOperatorId(),
+                entity.getRequestedBy() == null ? null : entity.getRequestedBy().getId()
         );
     }
 }

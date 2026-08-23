@@ -16,7 +16,8 @@ public class ResourceLookupRegistry {
                                   CommentRepository commentRepository,
                                   AttachmentRepository attachmentRepository,
                                   UserRepository userRepository,
-                                  LikedRepository likedRepository) {
+                                  LikedRepository likedRepository,
+                                  BoardRepository boardRepository) {
         this.lookups = Map.of(
                 "POST", id -> (OwnableResource) postRepository.findById(id)
                         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다.")),
@@ -27,7 +28,9 @@ public class ResourceLookupRegistry {
                 "USER", id -> (OwnableResource) userRepository.findById(id)
                         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다.")),
                 "LIKE", id -> (OwnableResource) likedRepository.findById(id)
-                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좋아요입니다."))
+                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좋아요입니다.")),
+                "BOARD", id -> (OwnableResource) boardRepository.findById(id)
+                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시판입니다."))
         );
     }
 
