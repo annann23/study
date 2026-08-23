@@ -49,6 +49,9 @@ export default function BoardApprovalPage() {
                   <div>
                     <p className="text-sm font-medium text-ink-900">{board.name}</p>
                     <p className="mt-1 text-xs text-ink-400">요청자 ID: {board.requestedById}</p>
+                    {board.reason && (
+                      <p className="mt-1 max-w-md text-xs text-ink-500">{board.reason}</p>
+                    )}
                   </div>
                   <div className="flex shrink-0 gap-2">
                     <button onClick={() => handleApprove(board)} className="btn-primary">

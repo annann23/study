@@ -6,6 +6,7 @@ export type Board = {
   status: 'PENDING' | 'APPROVED' | 'REJECTED'
   operatorId: number | null
   requestedById: number | null
+  reason: string | null
 }
 
 export type BoardType = {

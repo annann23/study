@@ -8,7 +8,8 @@ public record BoardResponse(
         boolean isPrivate,
         BoardEntity.BoardStatus status,
         Long operatorId,
-        Long requestedById
+        Long requestedById,
+        String reason
 ) {
     public static BoardResponse from(BoardEntity entity) {
         return new BoardResponse(
@@ -18,7 +19,8 @@ public record BoardResponse(
                 entity.isPrivate(),
                 entity.getStatus(),
                 entity.getOperatorId(),
-                entity.getRequestedBy() == null ? null : entity.getRequestedBy().getId()
+                entity.getRequestedBy() == null ? null : entity.getRequestedBy().getId(),
+                entity.getReason()
         );
     }
 }

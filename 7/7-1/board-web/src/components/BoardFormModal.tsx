@@ -17,6 +17,7 @@ export default function BoardFormModal({ board, mode = 'create', onClose, onSave
   const [boardTypes, setBoardTypes] = useState<BoardType[]>([])
   const [boardTypeId, setBoardTypeId] = useState<number | null>(board?.boardTypeId ?? null)
   const [isPrivate, setIsPrivate] = useState(false)
+  const [reason, setReason] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
@@ -41,7 +42,7 @@ export default function BoardFormModal({ board, mode = 'create', onClose, onSave
         : isRequest
           ? await api<Board>('/board/request', {
               method: 'POST',
-              body: JSON.stringify({ name, boardTypeId }),
+              body: JSON.stringify({ name, boardTypeId, reason }),
             })
           : await api<Board>('/board', {
               method: 'POST',
@@ -115,9 +116,21 @@ export default function BoardFormModal({ board, mode = 'create', onClose, onSave
           )}
 
           {isRequest && (
-            <p className="text-xs text-ink-400">
-              요청한 게시판은 관리자 승인 후 생성되며, 요청자가 운영자로 지정됩니다.
-            </p>
+            <>
+              <label className="flex flex-col gap-1 text-sm text-ink-500">
+                요청 사유
+                <textarea
+                  className="field"
+                  placeholder="게시판이 필요한 이유를 적어주세요"
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  rows={3}
+                />
+              </label>
+              <p className="text-xs text-ink-400">
+                요청한 게시판은 관리자 승인 후 생성되며, 요청자가 운영자로 지정됩니다.
+              </p>
+            </>
           )}
 
           {error && <p className="text-sm text-red-500">{error}</p>}

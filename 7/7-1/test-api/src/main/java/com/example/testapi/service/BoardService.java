@@ -37,7 +37,7 @@ public class BoardService {
         return boardRepository.save(board);
     }
 
-    public BoardEntity request(String name, Long boardTypeId, Long userId) {
+    public BoardEntity request(String name, Long boardTypeId, Long userId, String reason) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("name은 비어있을 수 없습니다.");
         }
@@ -52,6 +52,7 @@ public class BoardService {
         BoardEntity board =  new BoardEntity(boardType, name, false);
         board.setRequestedBy(requestedUser);
         board.setStatus(BoardEntity.BoardStatus.PENDING);
+        board.setReason(reason);
 
         return boardRepository.save(board);
     }

@@ -41,6 +41,8 @@ public class BoardEntity implements OwnableResource {
     @JoinColumn(name = "requested_by")
     private UserEntity requestedBy;
 
+    private String reason;
+
     @CreationTimestamp
     private ZonedDateTime createdAt;
 
@@ -63,6 +65,7 @@ public class BoardEntity implements OwnableResource {
     public Long getOwnerId() { return getOperatorId(); }
     public BoardStatus getStatus() {return status;}
     public UserEntity getRequestedBy() {return requestedBy; }
+    public String getReason() { return reason; }
 
     public Long getId() { return id; }
     public boolean isPrivate() { return isPrivate; }
@@ -71,6 +74,7 @@ public class BoardEntity implements OwnableResource {
     public void setBoardType(BoardTypeEntity boardType) { this.boardType = boardType; }
 
     public void setRequestedBy(UserEntity requestedBy) { this.requestedBy = requestedBy; }
+    public void setReason(String reason) { this.reason = reason; }
     public void setStatus(BoardStatus status) { this.status = status; }
     public void setOperator(UserEntity operator) {this.operator = operator; }
 }

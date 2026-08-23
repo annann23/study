@@ -31,7 +31,7 @@ public class BoardController {
 
     @PostMapping("/request")
     public ResponseEntity<BoardResponse> request(@RequestBody BoardRequestDto request, @AuthenticationPrincipal CafeAuthUser principal) {
-        return ResponseEntity.ok(BoardResponse.from(boardService.request(request.name(), request.boardTypeId(), principal.getUserId())));
+        return ResponseEntity.ok(BoardResponse.from(boardService.request(request.name(), request.boardTypeId(), principal.getUserId(), request.reason())));
     }
 
     @PreAuthorize("hasPermission(null, 'BOARD', 'BOARD_UPDATE')")
