@@ -3,6 +3,9 @@ export type Board = {
   boardTypeId: number
   name: string
   isPrivate: boolean
+  status: 'PENDING' | 'APPROVED' | 'REJECTED'
+  operatorId: number | null
+  requestedById: number | null
 }
 
 export type BoardType = {

@@ -8,6 +8,7 @@ import PostWritePage from './pages/PostWritePage'
 import PostDetailPage from './pages/PostDetailPage'
 import UserLevelManagePage from './pages/UserLevelManagePage'
 import RoleManagePage from './pages/RoleManagePage'
+import BoardApprovalPage from './pages/BoardApprovalPage'
 
 function App() {
   return (
@@ -77,6 +78,15 @@ function App() {
               // TODO: ADMIN 권한만 접근 가능하도록 RequireAuth를 권한 체크 가드로 교체할 것
               <RequireAuth>
                 <RoleManagePage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/admin/boards"
+            element={
+              // TODO: BOARD_UPDATE 권한만 접근 가능하도록 RequireAuth를 권한 체크 가드로 교체할 것
+              <RequireAuth>
+                <BoardApprovalPage />
               </RequireAuth>
             }
           />

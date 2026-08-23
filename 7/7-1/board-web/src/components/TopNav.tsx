@@ -12,6 +12,7 @@ const SETTINGS_PERMISSIONS = [
   'ROLE_UPDATE',
   'ROLE_DELETE',
   'ROLE_ASSIGN',
+  'BOARD_UPDATE',
 ]
 
 export default function TopNav({
@@ -19,6 +20,7 @@ export default function TopNav({
   selectedBoardId,
   onSelectBoard,
   onAddBoard,
+  onRequestBoard,
   onEditBoard,
   onDeleteBoard,
 }: {
@@ -26,11 +28,13 @@ export default function TopNav({
   selectedBoardId: number | null
   onSelectBoard: (id: number) => void
   onAddBoard: () => void
+  onRequestBoard: () => void
   onEditBoard: (board: Board) => void
   onDeleteBoard: (board: Board) => void
 }) {
   const { user } = useAuth()
   const canCreateBoard = hasPermission(user, 'BOARD_CREATE')
+  const canRequestBoard = hasPermission(user, 'BOARD_REQUEST')
   const canUpdateBoard = hasPermission(user, 'BOARD_UPDATE')
   const canDeleteBoard = hasPermission(user, 'BOARD_DELETE')
   const canAccessSettings = hasAnyPermission(user, SETTINGS_PERMISSIONS)
@@ -94,6 +98,15 @@ export default function TopNav({
             className="ml-1 flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-sm text-ink-400 transition hover:bg-brand-50 hover:text-brand-700"
           >
             + 게시판
+          </button>
+        )}
+        {!canCreateBoard && canRequestBoard && (
+          <button
+            onClick={onRequestBoard}
+            aria-label="게시판 생성 요청"
+            className="ml-1 flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-sm text-ink-400 transition hover:bg-brand-50 hover:text-brand-700"
+          >
+            + 게시판 요청
           </button>
         )}
       </nav>

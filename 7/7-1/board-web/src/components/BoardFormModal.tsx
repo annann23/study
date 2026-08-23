@@ -5,12 +5,14 @@ import type { Board, BoardType } from '../lib/types'
 
 type Props = {
   board?: Board
+  mode?: 'create' | 'request'
   onClose: () => void
   onSaved: (board: Board) => void
 }
 
-export default function BoardFormModal({ board, onClose, onSaved }: Props) {
+export default function BoardFormModal({ board, mode = 'create', onClose, onSaved }: Props) {
   const isEdit = board != null
+  const isRequest = !isEdit && mode === 'request'
   const [name, setName] = useState(board?.name ?? '')
   const [boardTypes, setBoardTypes] = useState<BoardType[]>([])
   const [boardTypeId, setBoardTypeId] = useState<number | null>(board?.boardTypeId ?? null)
@@ -36,10 +38,15 @@ export default function BoardFormModal({ board, onClose, onSaved }: Props) {
             method: 'PUT',
             body: JSON.stringify({ boardId: board!.id, name }),
           })
-        : await api<Board>('/board', {
-            method: 'POST',
-            body: JSON.stringify({ name, boardTypeId, isPrivate }),
-          })
+        : isRequest
+          ? await api<Board>('/board/request', {
+              method: 'POST',
+              body: JSON.stringify({ name, boardTypeId }),
+            })
+          : await api<Board>('/board', {
+              method: 'POST',
+              body: JSON.stringify({ name, boardTypeId, isPrivate }),
+            })
       onSaved(saved)
       onClose()
     } catch {
@@ -54,7 +61,7 @@ export default function BoardFormModal({ board, onClose, onSaved }: Props) {
       <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl shadow-brand-900/10">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-ink-900">
-            {isEdit ? '게시판 수정' : '게시판 추가'}
+            {isEdit ? '게시판 수정' : isRequest ? '게시판 생성 요청' : '게시판 추가'}
           </h2>
           <button
             onClick={onClose}
@@ -95,7 +102,7 @@ export default function BoardFormModal({ board, onClose, onSaved }: Props) {
             </label>
           )}
 
-          {!isEdit && (
+          {!isEdit && !isRequest && (
             <label className="flex items-center gap-2 text-sm text-ink-500">
               <input
                 type="checkbox"
@@ -105,6 +112,12 @@ export default function BoardFormModal({ board, onClose, onSaved }: Props) {
               />
               비공개 게시판 (작성자와 관리자만 열람 가능)
             </label>
+          )}
+
+          {isRequest && (
+            <p className="text-xs text-ink-400">
+              요청한 게시판은 관리자 승인 후 생성되며, 요청자가 운영자로 지정됩니다.
+            </p>
           )}
 
           {error && <p className="text-sm text-red-500">{error}</p>}

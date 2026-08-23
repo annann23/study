@@ -16,7 +16,9 @@ export default function BoardPage() {
   )
   const [posts, setPosts] = useState<Post[]>([])
   const [loadingPosts, setLoadingPosts] = useState(false)
-  const [boardFormState, setBoardFormState] = useState<'closed' | 'add' | Board>('closed')
+  const [boardFormState, setBoardFormState] = useState<'closed' | 'add' | 'request' | Board>(
+    'closed',
+  )
   const [searchKeyword, setSearchKeyword] = useState('')
   const [searchType, setSearchType] = useState<'TITLE' | 'CONTENT'>('TITLE')
   const [view, setView] = useState<'card' | 'table'>(
@@ -117,6 +119,7 @@ export default function BoardPage() {
         selectedBoardId={selectedBoardId}
         onSelectBoard={selectBoard}
         onAddBoard={() => setBoardFormState('add')}
+        onRequestBoard={() => setBoardFormState('request')}
         onEditBoard={(board) => setBoardFormState(board)}
         onDeleteBoard={handleBoardDelete}
       />
@@ -232,9 +235,14 @@ export default function BoardPage() {
 
       {boardFormState !== 'closed' && (
         <BoardFormModal
-          board={boardFormState === 'add' ? undefined : boardFormState}
+          board={boardFormState === 'add' || boardFormState === 'request' ? undefined : boardFormState}
+          mode={boardFormState === 'request' ? 'request' : 'create'}
           onClose={() => setBoardFormState('closed')}
-          onSaved={handleBoardSaved}
+          onSaved={
+            boardFormState === 'request'
+              ? () => window.alert('요청이 접수되었습니다. 관리자 승인 후 게시판이 생성됩니다.')
+              : handleBoardSaved
+          }
         />
       )}
     </div>

@@ -1,10 +1,13 @@
 import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useClickOutside } from '../lib/useClickOutside'
+import { hasPermission, useAuth } from '../lib/auth'
 
 export default function SettingsMenu() {
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const { user } = useAuth()
+  const canApproveBoards = hasPermission(user, 'BOARD_UPDATE')
 
   useClickOutside(menuRef, () => setOpen(false))
 
@@ -34,6 +37,15 @@ export default function SettingsMenu() {
           >
             역할 관리
           </Link>
+          {canApproveBoards && (
+            <Link
+              to="/admin/boards"
+              onClick={() => setOpen(false)}
+              className="block w-full px-4 py-2 text-left text-sm text-ink-700 transition hover:bg-brand-50"
+            >
+              게시판 생성 요청
+            </Link>
+          )}
         </div>
       )}
     </div>
