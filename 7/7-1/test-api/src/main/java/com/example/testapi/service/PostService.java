@@ -72,17 +72,17 @@ public class PostService {
         return postRepository.findAllByUserIdAndDeletedAtIsNull(userId);
     }
 
-    public List<PostEntity> search(Long boardId, String keyword, PostSearchType type) {
+    public Page<PostEntity> search(Long boardId, String keyword, PostSearchType type, Pageable pageable) {
         BoardEntity board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시판입니다."));
         if (board.isPrivate()) {
-            return List.of();
+            return Page.empty(pageable);
         }
 
 
         return switch (type) {
-            case TITLE -> postRepository.searchByTitle(boardId, keyword);
-            case CONTENT -> postRepository.searchByContent(boardId, keyword);
+            case TITLE -> postRepository.searchByTitle(boardId, keyword, pageable);
+            case CONTENT -> postRepository.searchByContent(boardId, keyword, pageable);
         };
     }
 

@@ -17,8 +17,8 @@ public interface PostRepository extends JpaRepository<PostEntity, Long> {
     List<PostEntity> findAllByUserIdAndDeletedAtIsNull(@Param("userId") Long userId);
 
     @Query("SELECT p FROM PostEntity p WHERE  p.board.id = :boardId AND p.deletedAt IS NULL AND p.title LIKE %:keyword%")
-    List<PostEntity> searchByTitle(@Param("boardId") Long boardId, @Param("keyword") String keyword);
+    Page<PostEntity> searchByTitle(@Param("boardId") Long boardId, @Param("keyword") String keyword, Pageable pageable);
 
     @Query("SELECT p FROM PostEntity p WHERE p.board.id =:boardId AND p.deletedAt IS NULL AND p.content LIKE %:keyword%")
-    List<PostEntity> searchByContent(@Param("boardId") Long boardId, @Param("keyword") String keyword);
+    Page<PostEntity> searchByContent(@Param("boardId") Long boardId, @Param("keyword") String keyword, Pageable pageable);
 }

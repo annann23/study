@@ -61,11 +61,13 @@ public class PostController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<PostResponse>> search(@RequestParam Long boardId, @RequestParam String keyword, @RequestParam PostSearchType type) {
-        List<PostResponse> responses = postService.search(boardId, keyword, type)
-                .stream()
-                .map(PostResponse::from)
-                .toList();
+    public ResponseEntity<Page<PostResponse>> search(
+            @RequestParam Long boardId,
+            @RequestParam String keyword,
+            @RequestParam PostSearchType type,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<PostResponse> responses = postService.search(boardId, keyword, type, pageable)
+                .map(PostResponse::from);
         return ResponseEntity.ok(responses);
     }
 
