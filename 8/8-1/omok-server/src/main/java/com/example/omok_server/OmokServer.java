@@ -1,11 +1,15 @@
 package com.example.omok_server;
 
+import com.example.omok_server.protocol.Packet;
+import com.example.omok_server.protocol.PacketEncoder;
+
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
+import java.util.List;
 import java.util.Set;
 
 public class OmokServer {
@@ -59,8 +63,7 @@ public class OmokServer {
         client.configureBlocking(false);
 
         try{
-            ByteBuffer buffer = ByteBuffer.allocate(1024);
-            client.register(selector, SelectionKey.OP_READ, buffer);
+            client.register(selector, SelectionKey.OP_READ, new Session(client));
         } catch (ClosedChannelException e) {
             throw new RuntimeException(e);
         }
@@ -68,10 +71,11 @@ public class OmokServer {
     }
 
     private static void handleRead(SelectionKey key) throws IOException {
-        SocketChannel client = (SocketChannel) key.channel();
-        ByteBuffer buffer = (ByteBuffer) key.attachment();
+        Session session = (Session) key.attachment();
+        SocketChannel client = session.getChannel();
 
         try {
+            ByteBuffer buffer = ByteBuffer.allocate(1024);
             int len = client.read(buffer);
 
             if (len == -1) {
@@ -80,8 +84,16 @@ public class OmokServer {
             }
 
             buffer.flip();
-            client.write(buffer);
-            buffer.clear();
+            byte[] data = new byte[len];
+            buffer.get(data);
+
+            List<Packet> packets = session.getDecoder().decoder(data);
+            for (Packet packet : packets) {
+                System.out.println("패킷 데이터: " + packet.getPacketType());
+                // 추후 서비스 로직 처리
+                client.write(ByteBuffer.wrap(PacketEncoder.encode(packet)));
+            }
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
