@@ -30,7 +30,7 @@ public class CafeUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 사용자입니다"));
         Set<String> authorities = user.getRoles().stream().flatMap(role -> role.getPermissions().stream()).map(PermissionEntity::getName).collect(Collectors.toSet());
 
-        return new CafeAuthUser(user.getId(), user.getLoginId(), user.getPassword(), authorities);
+        return new CafeAuthUser(user.getId(), user.getLoginId(), user.getPassword(), user.getAuthorityNames());
     }
 
 }

@@ -12,7 +12,6 @@ import com.example.testapi.service.UserService;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -20,12 +19,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
@@ -95,6 +98,27 @@ public class AuthController {
 
         httpResponse.addHeader(HttpHeaders.SET_COOKIE, buildCookie("accessToken", "", 0).toString());
         httpResponse.addHeader(HttpHeaders.SET_COOKIE, buildCookie("refreshToken", "", 0).toString());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<Void> refresh(String refreshToken, HttpServletResponse httpResponse) {
+        Claims claims = jwtProvider.parseClaims(refreshToken);
+        Long userId = Long.valueOf(claims.getSubject());
+
+        if(!refreshTokenService.isValid(userId, refreshToken)) {
+            return ResponseEntity.status(401).build();
+        }
+
+        UserEntity userEntity = userService.findById(userId);
+
+        List<GrantedAuthority> authorities = userEntity.getAuthorityNames().stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+        String newAccessToken = jwtProvider.generateAccessToken(userId, userEntity.getLoginId(), authorities);
+
+        httpResponse.addHeader(HttpHeaders.SET_COOKIE, buildCookie("accessToken", newAccessToken, accessTokenExpiration).toString());
 
         return ResponseEntity.ok().build();
     }
