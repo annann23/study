@@ -103,7 +103,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<Void> refresh(String refreshToken, HttpServletResponse httpResponse) {
+    public ResponseEntity<Void> refresh(@CookieValue("refreshToken") String refreshToken, HttpServletResponse httpResponse) {
         Claims claims = jwtProvider.parseClaims(refreshToken);
         Long userId = Long.valueOf(claims.getSubject());
 
