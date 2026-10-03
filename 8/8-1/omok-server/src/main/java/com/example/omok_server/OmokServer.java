@@ -80,6 +80,9 @@ public class OmokServer {
         } else if (white == null) {
             white = session;
             session.setStone(2);
+
+            send(black, new Packet(PacketType.GAME_STARTED, new byte[]{1}));
+            send(white, new Packet(PacketType.GAME_STARTED, new byte[]{2}));
         }
     }
 
@@ -122,6 +125,11 @@ public class OmokServer {
         byte[] bytes = PacketEncoder.encode(packet);
         black.getChannel().write(ByteBuffer.wrap(bytes));
         white.getChannel().write(ByteBuffer.wrap(bytes));
+    }
+
+    private static void send(Session session, Packet packet) throws IOException {
+        byte[] bytes = PacketEncoder.encode(packet);
+        session.getChannel().write(ByteBuffer.wrap(bytes));
     }
 
     public void close() {

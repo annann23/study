@@ -21,7 +21,11 @@ public class OmokClient {
     private OutputStream out;
     private InputStream in;
     private final PacketDecoder decoder = new PacketDecoder();
-    private final JButton[][] cells = new JButton[BOARD_SIZE][BOARD_SIZE];
+    private final BoardCell[][] cells = new BoardCell[BOARD_SIZE][BOARD_SIZE];
+    private final Icon blackStone = new StoneIcon(32, true);
+    private final Icon whiteStone = new StoneIcon(32, false);
+    private final JLabel statusLabel  = new JLabel("상대를 기다리는 중...", SwingConstants.CENTER);
+    private int myStone;
 
     public static void main(String[] args) {
         OmokClient client = new OmokClient();
@@ -50,16 +54,19 @@ public class OmokClient {
             for (int x = 0; x < BOARD_SIZE; x++) {
                 int fx = x;
                 int fy = y;
-                JButton cell = new JButton();
-                cell.setMargin(new Insets(0, 0, 0, 0));
+                BoardCell cell = new BoardCell(x, y, BOARD_SIZE);
                 cell.addActionListener(e -> sendPlaceStone(fx, fy));
                 cells[x][y] = cell;
                 board.add(cell);
             }
         }
+        statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD, 16f));
+        statusLabel.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
 
-        frame.add(board);
-        frame.setSize(600, 620);
+        frame.add(statusLabel, BorderLayout.NORTH);
+        frame.add(board, BorderLayout.CENTER);
+        frame.setSize(600, 660);
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
@@ -111,18 +118,36 @@ public class OmokClient {
     }
 
     private void handleServerPacket(Packet packet) {
-        if (packet.getPacketType() == PacketType.PLACE_STONE) {
-            ByteBuffer payload = ByteBuffer.wrap(packet.getPayload());
-            int x = payload.get();
-            int y = payload.get();
+        ByteBuffer payload = ByteBuffer.wrap(packet.getPayload());
 
-            System.out.println("서버 응답 패킷: " + packet.getPacketType() + " (x=" + x + ", y=" + y + ")");
-
-            SwingUtilities.invokeLater(() -> {
-                cells[x][y].setText("●");
-                cells[x][y].setEnabled(false);
-            });
+        switch (packet.getPacketType()) {
+            case GAME_STARTED -> {
+                myStone = payload.get();
+                SwingUtilities.invokeLater(() -> updateStatus(1));
+            }
+            case STONE_PLACED -> {
+                int x = payload.get();
+                int y = payload.get();
+                int stone = payload.get();
+                SwingUtilities.invokeLater(() -> {
+                        cells[x][y].placeStone(stone == 1 ? blackStone : whiteStone);
+                        updateStatus((stone == 1) ? 2 : 1);
+                    }
+                );
+            }
+            case GAME_OVER -> {
+                int winner = payload.get();
+                SwingUtilities.invokeLater(() ->
+                        JOptionPane.showMessageDialog(null, winner == 1 ? "흑 승리!" : "백 승리!"));
+            }
+            default -> {
+                return;
+            }
         }
+    }
+
+    private void updateStatus(int turn) {
+        statusLabel.setText("나: " +  ((myStone == 1) ? "흑" : "백") + " ==== " + ((turn == myStone) ? "내 차례" : "상대 차례"));
     }
 
     public void close() {
