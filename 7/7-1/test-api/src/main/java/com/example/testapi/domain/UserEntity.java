@@ -9,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name="users")
@@ -82,4 +83,12 @@ public class UserEntity implements OwnableResource {
         return roles.stream()
                 .anyMatch(role -> role.hasPermission(permissionName));
     }
+    
+    public Set<String> getAuthorityNames() {
+        return roles.stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .map(PermissionEntity::getName)
+                .collect(Collectors.toSet());
+    }
+
 }
