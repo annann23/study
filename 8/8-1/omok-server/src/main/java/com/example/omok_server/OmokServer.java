@@ -2,6 +2,8 @@ package com.example.omok_server;
 
 import com.example.omok_server.protocol.Packet;
 import com.example.omok_server.protocol.PacketEncoder;
+import com.example.omok_server.protocol.PacketType;
+import com.example.omok_server.service.GameEngine;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -13,6 +15,10 @@ import java.util.List;
 import java.util.Set;
 
 public class OmokServer {
+    private static final GameEngine engine = new GameEngine();
+    private static Session black;
+    private static Session white;
+
     private ServerSocketChannel serverSocket;
     private Selector selector;
     public static void main(String[] args) {
@@ -42,10 +48,13 @@ public class OmokServer {
                 keys.forEach(key -> {
                     try{
                         if (key.isAcceptable()) { handleAccept(key, selector); }
-                        if (key.isReadable()) { handleRead(key); }
-                    } catch (IOException e) {
+                        else if (key.isReadable()) { handleRead(key); }
+                    } catch (Exception e) {
                         System.out.println("처리 중 오류가 발생했습니다: " + e.getMessage());
-                        closeChannel(key);
+
+                        if (key.channel() instanceof SocketChannel) {
+                            closeChannel(key);
+                        }
                     }
 
                 });
@@ -62,41 +71,57 @@ public class OmokServer {
         SocketChannel client = serverChannel.accept();
         client.configureBlocking(false);
 
-        try{
-            client.register(selector, SelectionKey.OP_READ, new Session(client));
-        } catch (ClosedChannelException e) {
-            throw new RuntimeException(e);
-        }
+        Session session = new Session(client);
+        client.register(selector, SelectionKey.OP_READ,session);
 
+        if (black == null) {
+            black = session;
+            session.setStone(1);
+        } else if (white == null) {
+            white = session;
+            session.setStone(2);
+        }
     }
 
-    private static void handleRead(SelectionKey key) throws IOException {
+    private static void handleRead(SelectionKey key) throws IOException{
         Session session = (Session) key.attachment();
         SocketChannel client = session.getChannel();
 
-        try {
-            ByteBuffer buffer = ByteBuffer.allocate(1024);
-            int len = client.read(buffer);
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        int len = client.read(buffer);
 
-            if (len == -1) {
-                closeChannel(key);
-                return;
-            }
-
-            buffer.flip();
-            byte[] data = new byte[len];
-            buffer.get(data);
-
-            List<Packet> packets = session.getDecoder().decoder(data);
-            for (Packet packet : packets) {
-                System.out.println("패킷 데이터: " + packet.getPacketType());
-                // 추후 서비스 로직 처리
-                client.write(ByteBuffer.wrap(PacketEncoder.encode(packet)));
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (len == -1) {
+            closeChannel(key);
+            return;
         }
+
+        buffer.flip();
+        byte[] data = new byte[len];
+        buffer.get(data);
+
+        List<Packet> packets = session.getDecoder().decoder(data);
+        for (Packet packet : packets) {
+            if (packet.getPacketType() != PacketType.PLACE_STONE || white == null) continue;
+
+            System.out.println("패킷 데이터: " + packet.getPacketType());
+
+            ByteBuffer payload = ByteBuffer.wrap(packet.getPayload());
+            int x = payload.get();
+            int y = payload.get();
+            int stone = session.getStone();
+
+            if (!engine.canPlace(x, y, stone)) continue;
+            boolean win = engine.placeStone(x, y, stone);
+
+            broadcast(new Packet(PacketType.STONE_PLACED, new byte[]{(byte) x, (byte) y, (byte) stone}));
+            if (win) broadcast(new Packet(PacketType.GAME_OVER, new byte[]{(byte) stone}));
+        }
+    }
+
+    private static void broadcast(Packet packet) throws IOException {
+        byte[] bytes = PacketEncoder.encode(packet);
+        black.getChannel().write(ByteBuffer.wrap(bytes));
+        white.getChannel().write(ByteBuffer.wrap(bytes));
     }
 
     public void close() {
@@ -120,7 +145,6 @@ public class OmokServer {
             key.channel().close();
         } catch (IOException e) {
             System.out.println("채널 close 중 오류가 발생했습니다: " + e.getMessage());
-            throw new RuntimeException(e);
         }
     }
 }
