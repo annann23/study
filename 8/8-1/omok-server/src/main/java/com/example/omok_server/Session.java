@@ -7,6 +7,7 @@ import java.nio.channels.SocketChannel;
 public class Session {
     private final SocketChannel channel;
     private final PacketDecoder decoder = new PacketDecoder();
+    private int stone;
 
     public Session(SocketChannel channel) {
         this.channel = channel;
@@ -18,5 +19,13 @@ public class Session {
 
     public PacketDecoder getDecoder() {
         return decoder;
+    }
+
+    public void setStone(int stone) {
+        this.stone = stone;
+    }
+
+    public int getStone() {
+        return stone;
     }
 }
