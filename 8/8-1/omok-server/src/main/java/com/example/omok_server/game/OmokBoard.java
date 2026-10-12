@@ -1,6 +1,6 @@
-package com.example.omok_server.service;
+package com.example.omok_server.game;
 
-public class GameEngine {
+public class OmokBoard {
     public static final int BOARD_SIZE = 15;
     private final int[][] board = new int[BOARD_SIZE][BOARD_SIZE];
     private int currentTurn = 1;
