@@ -1,13 +1,13 @@
 package com.example.omok_server;
 
+import com.example.omok_server.game.GameRoom;
 import com.example.omok_server.protocol.Packet;
 import com.example.omok_server.protocol.PacketEncoder;
 import com.example.omok_server.protocol.PacketType;
-import com.example.omok_server.service.GameEngine;
+import com.example.omok_server.game.OmokBoard;
 
 import java.io.*;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
@@ -15,10 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 public class OmokServer {
-    private static final GameEngine engine = new GameEngine();
-    private static Session black;
-    private static Session white;
-
+    private static Session waitingSession;
     private ServerSocketChannel serverSocket;
     private Selector selector;
     public static void main(String[] args) {
@@ -74,16 +71,14 @@ public class OmokServer {
         Session session = new Session(client);
         client.register(selector, SelectionKey.OP_READ,session);
 
-        if (black == null) {
-            black = session;
-            session.setStone(1);
-        } else if (white == null) {
-            white = session;
-            session.setStone(2);
-
-            send(black, new Packet(PacketType.GAME_STARTED, new byte[]{1}));
-            send(white, new Packet(PacketType.GAME_STARTED, new byte[]{2}));
+        if (waitingSession == null) {
+            waitingSession = session;
+            return;
         }
+
+        GameRoom room = new GameRoom(waitingSession, session);
+        waitingSession = null;
+        room.start();
     }
 
     private static void handleRead(SelectionKey key) throws IOException{
@@ -104,34 +99,18 @@ public class OmokServer {
 
         List<Packet> packets = session.getDecoder().decoder(data);
         for (Packet packet : packets) {
-            if (packet.getPacketType() != PacketType.PLACE_STONE || white == null) continue;
+            if (packet.getPacketType() == PacketType.PLACE_STONE) {
+                GameRoom room = session.getRoom();
+                if(room == null) continue;
 
-            System.out.println("패킷 데이터: " + packet.getPacketType());
+                ByteBuffer payload = ByteBuffer.wrap(packet.getPayload());
 
-            ByteBuffer payload = ByteBuffer.wrap(packet.getPayload());
-            int x = payload.get();
-            int y = payload.get();
-            int stone = session.getStone();
-
-            if (!engine.canPlace(x, y, stone)) continue;
-            boolean win = engine.placeStone(x, y, stone);
-
-            broadcast(new Packet(PacketType.STONE_PLACED, new byte[]{(byte) x, (byte) y, (byte) stone}));
-            if (win) broadcast(new Packet(PacketType.GAME_OVER, new byte[]{(byte) stone}));
+                int x = payload.get();
+                int y = payload.get();
+                room.placeStone(session, x, y);
+            }
         }
     }
-
-    private static void broadcast(Packet packet) throws IOException {
-        byte[] bytes = PacketEncoder.encode(packet);
-        black.getChannel().write(ByteBuffer.wrap(bytes));
-        white.getChannel().write(ByteBuffer.wrap(bytes));
-    }
-
-    private static void send(Session session, Packet packet) throws IOException {
-        byte[] bytes = PacketEncoder.encode(packet);
-        session.getChannel().write(ByteBuffer.wrap(bytes));
-    }
-
     public void close() {
         try {
             if (selector != null) selector.close();
