@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 public class GameRoom {
-    private static final OmokBoard board = new OmokBoard();
+    private OmokBoard board = new OmokBoard();
     private static Session black;
     private static Session white;
 
