@@ -1,6 +1,7 @@
 package com.example.omok_server;
 
 import com.example.omok_server.game.GameRoom;
+import com.example.omok_server.game.Lobby;
 import com.example.omok_server.protocol.Packet;
 import com.example.omok_server.protocol.PacketEncoder;
 import com.example.omok_server.protocol.PacketType;
@@ -15,9 +16,10 @@ import java.util.List;
 import java.util.Set;
 
 public class OmokServer {
-    private static Session waitingSession;
+    private static final Lobby lobby = new Lobby();
     private ServerSocketChannel serverSocket;
     private Selector selector;
+
     public static void main(String[] args) {
         OmokServer server = new OmokServer();
         try {
@@ -71,14 +73,7 @@ public class OmokServer {
         Session session = new Session(client);
         client.register(selector, SelectionKey.OP_READ,session);
 
-        if (waitingSession == null) {
-            waitingSession = session;
-            return;
-        }
 
-        GameRoom room = new GameRoom(waitingSession, session);
-        waitingSession = null;
-        room.start();
     }
 
     private static void handleRead(SelectionKey key) throws IOException{
@@ -99,15 +94,34 @@ public class OmokServer {
 
         List<Packet> packets = session.getDecoder().decoder(data);
         for (Packet packet : packets) {
-            if (packet.getPacketType() == PacketType.PLACE_STONE) {
-                GameRoom room = session.getRoom();
-                if(room == null) continue;
+            switch(packet.getPacketType()) {
+                case REQUEST_ROOM_LIST -> lobby.getWaitingRoomList(session);
+                case CREATE_ROOM -> lobby.createRoom(session);
+                case JOIN_ROOM -> {
+                    ByteBuffer payload = ByteBuffer.wrap(packet.getPayload());
+                    int id = payload.get();
 
-                ByteBuffer payload = ByteBuffer.wrap(packet.getPayload());
+                    lobby.joinRoom(session, id);
+                }
+                case REMATCH_OFFER -> {
+                    GameRoom room = session.getRoom();
+                    if(room == null) continue;
+                    room.offerRematch(session);
+                }
+                case PLACE_STONE -> {
+                    GameRoom room = session.getRoom();
+                    if(room == null) continue;
 
-                int x = payload.get();
-                int y = payload.get();
-                room.placeStone(session, x, y);
+                    ByteBuffer payload = ByteBuffer.wrap(packet.getPayload());
+
+                    int x = payload.get();
+                    int y = payload.get();
+                    room.placeStone(session, x, y);
+                }
+                case LEAVE_ROOM -> {
+                    GameRoom room = session.getRoom();
+                    room.leave(session);
+                }
             }
         }
     }

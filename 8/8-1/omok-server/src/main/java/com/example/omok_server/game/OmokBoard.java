@@ -59,5 +59,9 @@ public class OmokBoard {
         currentTurn = (stone == 1) ? 2 : 1;
         return false;
     }
+
+    public boolean isFinished() {
+        return finished;
+    }
 }
 

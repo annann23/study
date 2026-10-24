@@ -10,27 +10,48 @@ import java.nio.ByteBuffer;
 
 public class GameRoom {
     private OmokBoard board = new OmokBoard();
-    private static Session black;
-    private static Session white;
+    private Session black;
+    private Session white;
+    private int id;
+    private Session rematchOffered;
 
-    public GameRoom(Session black, Session white) {
-        this.black = black;
-        this.white = white;
+    public GameRoom(Session player, int roomId) {
+        this.black = player;
+        this.id = roomId;
+        player.setRoom(this);
+    }
+
+    public boolean isFull() {
+        return white != null && black != null;
+    }
+
+    public void join(Session player) throws IOException {
+        if(isFull()) return;
+
+        if(black != null) this.white = player;
+        else this.black = player;
+        player.setRoom(this);
+        start();
     }
 
     public void start() throws IOException {
         black.setStone(1);
         white.setStone(2);
-        black.setRoom(this);
-        white.setRoom(this);
 
-        send(black, new Packet(PacketType.GAME_STARTED, new byte[]{1}));
-        send(white, new Packet(PacketType.GAME_STARTED, new byte[]{2}));
+        black.send(new Packet(PacketType.GAME_STARTED, new byte[]{1}));
+        white.send(new Packet(PacketType.GAME_STARTED, new byte[]{2}));
     }
 
-    private static void send(Session session, Packet packet) throws IOException {
-        byte[] bytes = PacketEncoder.encode(packet);
-        session.getChannel().write(ByteBuffer.wrap(bytes));
+    public void offerRematch(Session session) throws IOException {
+        if (!board.isFinished()) return;
+
+        if(rematchOffered == null) {
+            rematchOffered = session;
+        }else if(rematchOffered != session) {
+            rematchOffered = null;
+            board = new OmokBoard();
+            start();
+        }
     }
 
     public void placeStone(Session session, int x, int y) throws  IOException {
@@ -42,9 +63,27 @@ public class GameRoom {
         if (win) broadcast(new Packet(PacketType.GAME_OVER, new byte[]{(byte) stone}));
     }
 
-    private static void broadcast(Packet packet) throws IOException {
+    private void broadcast(Packet packet) throws IOException {
         byte[] bytes = PacketEncoder.encode(packet);
         black.getChannel().write(ByteBuffer.wrap(bytes));
         white.getChannel().write(ByteBuffer.wrap(bytes));
+    }
+
+    public void leave(Session session) throws IOException {
+        session.setRoom(null);
+        if (session == black) black = null;
+        else white = null;
+
+        board = new OmokBoard();
+        rematchOffered = null;
+
+        Session opponent = (black != null) ? black : white;
+        if(opponent != null) {
+            opponent.send(new Packet(PacketType.OPPONENT_LEAVED, new byte[0]));
+        }
+    }
+
+    public int getId() {
+        return this.id;
     }
 }

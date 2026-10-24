@@ -1,8 +1,12 @@
 package com.example.omok_server;
 
 import com.example.omok_server.game.GameRoom;
+import com.example.omok_server.protocol.Packet;
 import com.example.omok_server.protocol.PacketDecoder;
+import com.example.omok_server.protocol.PacketEncoder;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 public class Session {
@@ -37,5 +41,9 @@ public class Session {
 
     public GameRoom getRoom() {
         return room;
+    }
+
+    public void send(Packet packet) throws IOException {
+        channel.write(ByteBuffer.wrap(PacketEncoder.encode(packet)));
     }
 }
