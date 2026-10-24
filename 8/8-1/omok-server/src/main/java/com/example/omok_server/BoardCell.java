@@ -29,6 +29,13 @@ public class BoardCell extends JButton {
         setEnabled(false);
     }
 
+    public void removeStone() {
+        setIcon(null);
+        setDisabledIcon(null);
+        setEnabled(true);
+    }
+
+
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
