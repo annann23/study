@@ -15,6 +15,15 @@ services:
     image: redis:7
     ports:
       - "6223:6379"
+  elasticsearch:
+    build:
+      context: ./elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
 
 volumes:
   pgdata:

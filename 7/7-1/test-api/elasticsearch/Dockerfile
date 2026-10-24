@@ -1,4 +1,2 @@
-FROM ubuntu:latest
-LABEL authors="Master"
-
-ENTRYPOINT ["top", "-b"]
+FROM docker.elastic.co/elasticsearch/elasticsearch:9.5.5
+RUN bin/elasticsearch-plugin install --batch analysis-nori

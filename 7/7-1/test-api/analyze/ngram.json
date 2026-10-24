@@ -1,0 +1,9 @@
+{
+  "char_filter": [
+    { "type": "pattern_replace", "pattern": " ", "replacement": "" }
+  ],
+  "tokenizer": {
+  "type":"ngram",
+  "min_gram": "3",
+  "max_gram": "3"
+}, "text": "오늘 저녁에 엽떡을 먹고 싶다"}
