@@ -17,7 +17,7 @@ import java.util.List;
 
 public class OmokClient {
     private static final int BOARD_SIZE = 15;
-
+    private JFrame frame;
     private final CardLayout cardLayout = new CardLayout();
     private final JPanel root = new JPanel(cardLayout);
     private final DefaultListModel<Integer> roomListModel = new DefaultListModel<>();
@@ -56,7 +56,7 @@ public class OmokClient {
         root.add(createLobbyPanel(), "lobby");
         root.add(createGamePanel(), "game");
 
-        JFrame frame = new JFrame("오목 클라이언트");
+        frame = new JFrame("오목 클라이언트");
         frame.add(root);
         frame.setSize(600, 660);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -233,7 +233,7 @@ public class OmokClient {
                     if (success) {
                         showGame();
                     } else {
-                        JOptionPane.showMessageDialog(null, "입장할 수 없는 방입니다.");
+                        JOptionPane.showMessageDialog(frame, "입장할 수 없는 방입니다.");
                         showLobby();
                     }
                 });
@@ -252,7 +252,7 @@ public class OmokClient {
                 int winner = payload.get();
                 SwingUtilities.invokeLater(() ->{
                     String msg = (winner == 1 ? "흑 승리!" : "백 승리!") + "\n재대국 하시겠습니까?";
-                    int answer = JOptionPane.showConfirmDialog(null, msg, "게임 종료", JOptionPane.YES_NO_OPTION);
+                    int answer = JOptionPane.showConfirmDialog(frame, msg, "게임 종료", JOptionPane.YES_NO_OPTION);
 
                     if (answer == JOptionPane.YES_OPTION) {
                         send(new Packet(PacketType.REMATCH_OFFER, new byte[0]));
@@ -265,7 +265,7 @@ public class OmokClient {
                 });
             }
             case OPPONENT_LEAVED -> SwingUtilities.invokeLater(() -> {
-                JOptionPane.showMessageDialog(null, "상대가 떠났습니다.");
+                JOptionPane.showMessageDialog(frame, "상대가 떠났습니다.");
                 reset();
                 statusLabel.setText("새 상대를 기다리는 중...");
             });

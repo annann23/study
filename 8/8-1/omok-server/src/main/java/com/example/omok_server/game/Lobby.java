@@ -32,7 +32,7 @@ public class Lobby {
 
         GameRoom room = new GameRoom(session, roomId++);
         rooms.put(room.getId(), room);
-        send(session, new Packet(PacketType.ROOM_CREATED_RESULT, new byte[]{1}));
+        send(session, new Packet(PacketType.ROOM_CREATED_RESULT, new byte[]{(byte) room.getId()}));
     }
 
     public void joinRoom(Session session, int roomId) throws IOException {
