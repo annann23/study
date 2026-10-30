@@ -20,5 +20,5 @@ while True:
     user_input = input("입력: ")
     if user_input in ("exit", "quit", "종료"):
         break
-    result = graph.invoke({"messages": user_input}, config=config)
+    result = graph.invoke({"messages": [{"role": "user", "content": user_input}]}, config=config)
     print("답변:", result["output"])
