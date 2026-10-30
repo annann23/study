@@ -11,3 +11,12 @@ llm_registers.add_llm_node(graph_builder, llm)
 
 graph_builder.add_edge(START, llm.type.value)
 graph_builder.add_edge(llm.type.value, END)
+
+graph = graph_builder.compile()
+
+while True:
+    user_input = input("입력: ")
+    if user_input in ("exit", "quit", "종료"):
+        break
+    result = graph.invoke({"messages": user_input})
+    print("답변:", result)
