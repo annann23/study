@@ -7,12 +7,12 @@ class AgentState(TypedDict):
     output: str
 
 def llm_invoke(state: AgentState, llm: LLM) -> Dict[str, Any]:
-    messages = [{"role": "system", "content": p} for p in llm.system_prompts]
-    messages.append({"role": "user", "content": state["messages"]})
+    sys_msg = [{"role": "system", "content": p} for p in llm.system_prompts]
+    state["messages"].append({"role": "user", "content": state["messages"]})
 
     response = ollama.chat(
         model='gemma4:e2b',
-        messages= messages,
+        messages= sys_msg + state["messages"],
         options={"temperature": llm.temperature},
     )
 
