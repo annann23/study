@@ -10,7 +10,7 @@ def llm_invoke(state: AgentState, llm: LLM) -> Dict[str, Any]:
     messages.append({"role": "user", "content": state["messages"]})
 
     response = ollama.chat(
-        model='gemma4:e4b',
+        model='gemma4:e2b',
         messages= messages,
         options={"temperature": llm.temperature},
     )
