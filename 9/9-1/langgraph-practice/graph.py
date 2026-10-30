@@ -19,4 +19,4 @@ while True:
     if user_input in ("exit", "quit", "종료"):
         break
     result = graph.invoke({"messages": user_input})
-    print("답변:", result)
+    print("답변:", result["output"])

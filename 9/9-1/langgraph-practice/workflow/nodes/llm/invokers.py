@@ -1,9 +1,10 @@
-from typing import Any, Dict
+from typing import Any, Dict, TypedDict
 from workflow.nodes.llm.entities import LLM
 import ollama
 
-class AgentState:
+class AgentState(TypedDict):
     messages: list
+    output: str
 
 def llm_invoke(state: AgentState, llm: LLM) -> Dict[str, Any]:
     messages = [{"role": "system", "content": p} for p in llm.system_prompts]
@@ -15,4 +16,4 @@ def llm_invoke(state: AgentState, llm: LLM) -> Dict[str, Any]:
         options={"temperature": llm.temperature},
     )
 
-    return {'message':  response['message']}
+    return {"output": response['message'].content}
