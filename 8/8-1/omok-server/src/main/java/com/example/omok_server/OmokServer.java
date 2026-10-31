@@ -3,22 +3,17 @@ package com.example.omok_server;
 import com.example.omok_server.game.GameRoom;
 import com.example.omok_server.game.Lobby;
 import com.example.omok_server.protocol.Packet;
-import com.example.omok_server.protocol.PacketEncoder;
-import com.example.omok_server.protocol.PacketType;
-import com.example.omok_server.game.OmokBoard;
 
 import java.io.*;
-import java.net.InetSocketAddress;
-
+import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.nio.channels.*;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
+import java.net.ServerSocket;
 
 public class OmokServer {
     private static final Lobby lobby = new Lobby();
-    private ServerSocketChannel serverSocket;
-    private Selector selector;
+    private ServerSocket serverSocket;
 
     public static void main(String[] args) {
         OmokServer server = new OmokServer();
@@ -33,119 +28,87 @@ public class OmokServer {
         int port = 9234;
 
         try {
-            serverSocket = ServerSocketChannel.open();
-            serverSocket.bind(new InetSocketAddress(port));
-            serverSocket.configureBlocking(false);
-
-            selector = Selector.open();
-            serverSocket.register(selector, SelectionKey.OP_ACCEPT);
+            serverSocket = new ServerSocket(port);
 
             while(true) {
-                selector.select();
-                Set<SelectionKey> keys = selector.selectedKeys();
-
-                keys.forEach(key -> {
-                    try{
-                        if (key.isAcceptable()) { handleAccept(key, selector); }
-                        else if (key.isReadable()) { handleRead(key); }
-                    } catch (Exception e) {
-                        System.out.println("처리 중 오류가 발생했습니다: " + e.getMessage());
-
-                        if (key.channel() instanceof SocketChannel) {
-                            closeChannel(key);
-                        }
-                    }
-
-                });
-
-                keys.clear();
+                Socket socket = serverSocket.accept();
+                handleAccept(socket);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static void handleAccept(SelectionKey key, Selector selector) throws  IOException {
-        ServerSocketChannel serverChannel = (ServerSocketChannel) key.channel();
-        SocketChannel client = serverChannel.accept();
-        client.configureBlocking(false);
-
+    private static void handleAccept(Socket client) throws  IOException {
         Session session = new Session(client);
-        client.register(selector, SelectionKey.OP_READ,session);
 
+        new Thread(() -> {
+            try {
+                handleRead(session);
+            } catch (IOException e) {
 
+            }
+
+        }).start();
     }
 
-    private static void handleRead(SelectionKey key) throws IOException{
-        Session session = (Session) key.attachment();
-        SocketChannel client = session.getChannel();
+    private static void handleRead(Session session) throws IOException{
+        Socket client = session.getChannel();
+        InputStream input = session.getInputStream();
 
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
-        int len = client.read(buffer);
+        while(true) {
+            byte[] buf = new byte[1024];
+            int len = input.read(buf);
 
-        if (len == -1) {
-            closeChannel(key);
-            return;
-        }
+            if(len == -1) {
+                session.close();
+                return;
+            }
 
-        buffer.flip();
-        byte[] data = new byte[len];
-        buffer.get(data);
+            byte[] data = Arrays.copyOf(buf, len);
 
-        List<Packet> packets = session.getDecoder().decoder(data);
-        for (Packet packet : packets) {
-            switch(packet.getPacketType()) {
-                case REQUEST_ROOM_LIST -> lobby.getWaitingRoomList(session);
-                case CREATE_ROOM -> lobby.createRoom(session);
-                case JOIN_ROOM -> {
-                    ByteBuffer payload = ByteBuffer.wrap(packet.getPayload());
-                    int id = payload.get();
+            List<Packet> packets = session.getDecoder().decoder(data);
+            for (Packet packet : packets) {
+                switch (packet.getPacketType()) {
+                    case REQUEST_ROOM_LIST -> lobby.getWaitingRoomList(session);
+                    case CREATE_ROOM -> lobby.createRoom(session);
+                    case JOIN_ROOM -> {
+                        ByteBuffer payload = ByteBuffer.wrap(packet.getPayload());
+                        int id = payload.get();
 
-                    lobby.joinRoom(session, id);
-                }
-                case REMATCH_OFFER -> {
-                    GameRoom room = session.getRoom();
-                    if(room == null) continue;
-                    room.offerRematch(session);
-                }
-                case PLACE_STONE -> {
-                    GameRoom room = session.getRoom();
-                    if(room == null) continue;
+                        lobby.joinRoom(session, id);
+                    }
+                    case REMATCH_OFFER -> {
+                        GameRoom room = session.getRoom();
+                        if (room == null) continue;
+                        room.offerRematch(session);
+                    }
+                    case PLACE_STONE -> {
+                        GameRoom room = session.getRoom();
+                        if (room == null) continue;
 
-                    ByteBuffer payload = ByteBuffer.wrap(packet.getPayload());
+                        ByteBuffer payload = ByteBuffer.wrap(packet.getPayload());
 
-                    int x = payload.get();
-                    int y = payload.get();
-                    room.placeStone(session, x, y);
-                }
-                case LEAVE_ROOM -> {
-                    GameRoom room = session.getRoom();
-                    room.leave(session);
+                        int x = payload.get();
+                        int y = payload.get();
+                        room.placeStone(session, x, y);
+                    }
+                    case LEAVE_ROOM -> {
+                        GameRoom room = session.getRoom();
+                        if (room == null) continue;
+
+                        room.leave(session);
+                    }
                 }
             }
         }
     }
-    public void close() {
-        try {
-            if (selector != null) selector.close();
-        } catch (IOException e) {
-            System.out.println("selector close 중 오류가 발생했습니다: " + e.getMessage());
-        }
 
+    public void close() {
         try {
             if (serverSocket != null) serverSocket.close();
         } catch (IOException e) {
             System.out.println("serverSocket close 중 오류가 발생했습니다: " + e.getMessage());
-        }
-    }
-
-    private static void closeChannel(SelectionKey key) {
-        key.cancel();
-
-        try {
-            key.channel().close();
-        } catch (IOException e) {
-            System.out.println("채널 close 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 }

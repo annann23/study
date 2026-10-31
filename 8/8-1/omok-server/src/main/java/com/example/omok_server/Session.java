@@ -6,20 +6,26 @@ import com.example.omok_server.protocol.PacketDecoder;
 import com.example.omok_server.protocol.PacketEncoder;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 
 public class Session {
-    private final SocketChannel channel;
+    private final Socket channel;
     private final PacketDecoder decoder = new PacketDecoder();
     private int stone;
     private GameRoom room;
 
-    public Session(SocketChannel channel) {
+    private final InputStream inputStream;
+    private final OutputStream outputStream;
+
+    public Session(Socket channel) throws IOException {
         this.channel = channel;
+        this.inputStream = channel.getInputStream();
+        this.outputStream = channel.getOutputStream();
     }
 
-    public SocketChannel getChannel() {
+    public Socket getChannel() {
         return channel;
     }
 
@@ -44,6 +50,15 @@ public class Session {
     }
 
     public void send(Packet packet) throws IOException {
-        channel.write(ByteBuffer.wrap(PacketEncoder.encode(packet)));
+        outputStream.write(PacketEncoder.encode(packet));
+    }
+
+    public InputStream getInputStream() {
+        return inputStream;
+    }
+
+    public void close() throws IOException {
+        inputStream.close();
+        outputStream.close();
     }
 }
