@@ -109,10 +109,26 @@ public class OmokClient {
         statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD, 16f));
         statusLabel.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
 
+        JButton leaveButton = new JButton("방 나가기");
+        leaveButton.addActionListener(e -> leaveRoom());
+
+        JPanel bottom = new JPanel();
+        bottom.add(leaveButton);
+
         JPanel game = new JPanel(new BorderLayout());
         game.add(statusLabel, BorderLayout.NORTH);
         game.add(board, BorderLayout.CENTER);
+        game.add(bottom, BorderLayout.SOUTH);
         return game;
+    }
+
+    private void leaveRoom() {
+        int answer = JOptionPane.showConfirmDialog(frame, "방을 나가시겠습니까?", "방 나가기", JOptionPane.YES_NO_OPTION);
+        if (answer != JOptionPane.YES_OPTION) return;
+
+        send(new Packet(PacketType.LEAVE_ROOM, new byte[0]));
+        reset();
+        showLobby();
     }
 
     private void createAndShowBoard() {
