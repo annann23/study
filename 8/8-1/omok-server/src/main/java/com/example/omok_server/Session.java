@@ -24,11 +24,7 @@ public class Session {
         this.inputStream = channel.getInputStream();
         this.outputStream = channel.getOutputStream();
     }
-
-    public Socket getChannel() {
-        return channel;
-    }
-
+    
     public PacketDecoder getDecoder() {
         return decoder;
     }
