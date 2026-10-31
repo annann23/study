@@ -98,6 +98,7 @@ public class OmokServer {
                         if (room == null) continue;
 
                         room.leave(session);
+                        if(room.isEmpty()) lobby.removeRoom(room);
                     }
                 }
             }
