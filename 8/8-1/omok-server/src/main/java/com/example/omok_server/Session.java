@@ -57,8 +57,13 @@ public class Session {
         return inputStream;
     }
 
-    public void close() throws IOException {
-        inputStream.close();
-        outputStream.close();
+    public void close() {
+        try{
+            inputStream.close();
+            outputStream.close();
+        } catch (IOException e) {
+            System.out.println("스트림 종료 중 오류가 발생했습니다: " + e.getMessage());
+        }
+
     }
 }

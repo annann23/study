@@ -46,14 +46,15 @@ public class OmokServer {
             try {
                 handleRead(session);
             } catch (IOException e) {
-
+                System.out.println("요청 읽기 중 오류가 발생했습니다:" + e.getMessage());
+            } finally {
+                disconnect(session);
             }
 
         }).start();
     }
 
     private static void handleRead(Session session) throws IOException{
-        Socket client = session.getChannel();
         InputStream input = session.getInputStream();
 
         while(true) {
@@ -61,7 +62,6 @@ public class OmokServer {
             int len = input.read(buf);
 
             if(len == -1) {
-                session.close();
                 return;
             }
 
@@ -110,5 +110,17 @@ public class OmokServer {
         } catch (IOException e) {
             System.out.println("serverSocket close 중 오류가 발생했습니다: " + e.getMessage());
         }
+    }
+
+    private static void disconnect(Session session) {
+        GameRoom room = session.getRoom();
+        if (room != null) {
+            try {
+                room.leave(session);
+            } catch (IOException e) {
+                System.out.println("방 떠나기 중 오류가 발생했습니다:" + e.getMessage());
+            }
+        }
+        session.close();
     }
 }
