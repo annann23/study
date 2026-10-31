@@ -2,11 +2,9 @@ package com.example.omok_server.game;
 
 import com.example.omok_server.Session;
 import com.example.omok_server.protocol.Packet;
-import com.example.omok_server.protocol.PacketEncoder;
 import com.example.omok_server.protocol.PacketType;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +46,7 @@ public class Lobby {
     }
 
     private void send(Session session, Packet packet) throws IOException {
-        session.getChannel().write(ByteBuffer.wrap(PacketEncoder.encode(packet)));
+        session.send(packet);
     }
 
     public void removeRoom(GameRoom room) {

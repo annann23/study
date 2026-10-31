@@ -2,11 +2,9 @@ package com.example.omok_server.game;
 
 import com.example.omok_server.Session;
 import com.example.omok_server.protocol.Packet;
-import com.example.omok_server.protocol.PacketEncoder;
 import com.example.omok_server.protocol.PacketType;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 public class GameRoom {
     private OmokBoard board = new OmokBoard();
@@ -64,9 +62,8 @@ public class GameRoom {
     }
 
     private void broadcast(Packet packet) throws IOException {
-        byte[] bytes = PacketEncoder.encode(packet);
-        black.getChannel().write(ByteBuffer.wrap(bytes));
-        white.getChannel().write(ByteBuffer.wrap(bytes));
+        black.send(packet);
+        white.send(packet);
     }
 
     public void leave(Session session) throws IOException {
