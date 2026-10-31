@@ -22,6 +22,7 @@ public class GameRoom {
     public boolean isFull() {
         return white != null && black != null;
     }
+    public boolean isEmpty() { return white == null && black == null; }
 
     public void join(Session player) throws IOException {
         if(isFull()) return;

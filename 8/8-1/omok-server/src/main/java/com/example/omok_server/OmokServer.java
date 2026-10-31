@@ -117,6 +117,8 @@ public class OmokServer {
         if (room != null) {
             try {
                 room.leave(session);
+                if(room.isEmpty()) lobby.removeRoom(room);
+
             } catch (IOException e) {
                 System.out.println("방 떠나기 중 오류가 발생했습니다:" + e.getMessage());
             }
