@@ -24,16 +24,17 @@ public class GameRoom {
     }
     public boolean isEmpty() { return white == null && black == null; }
 
-    public void join(Session player) throws IOException {
+    public synchronized void join(Session player) throws IOException {
         if(isFull()) return;
 
         if(black != null) this.white = player;
         else this.black = player;
         player.setRoom(this);
-        start();
+
+        if(isFull()) start();
     }
 
-    public void start() throws IOException {
+    public synchronized void start() throws IOException {
         black.setStone(1);
         white.setStone(2);
 
@@ -41,7 +42,7 @@ public class GameRoom {
         white.send(new Packet(PacketType.GAME_STARTED, new byte[]{2}));
     }
 
-    public void offerRematch(Session session) throws IOException {
+    public synchronized void offerRematch(Session session) throws IOException {
         if (!board.isFinished()) return;
 
         if(rematchOffered == null) {
@@ -53,7 +54,7 @@ public class GameRoom {
         }
     }
 
-    public void placeStone(Session session, int x, int y) throws  IOException {
+    public synchronized void placeStone(Session session, int x, int y) throws  IOException {
         int stone = session.getStone();
         if (!board.canPlace(x, y, stone)) return;
         boolean win = board.placeStone(x, y, stone);
@@ -67,7 +68,7 @@ public class GameRoom {
         white.send(packet);
     }
 
-    public void leave(Session session) throws IOException {
+    public synchronized void leave(Session session) throws IOException {
         session.setRoom(null);
         if (session == black) black = null;
         else white = null;

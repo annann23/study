@@ -13,7 +13,7 @@ public class Lobby {
     private final Map<Integer, GameRoom> rooms = new HashMap<>();
     private int roomId = 1;
 
-    public  void getWaitingRoomList(Session session)  throws IOException {
+    public void getWaitingRoomList(Session session)  throws IOException {
         List<GameRoom> waiting = rooms.values().stream().filter(r -> !r.isFull()).toList();
 
         byte[] payload = new byte[waiting.size() + 1];
@@ -25,7 +25,7 @@ public class Lobby {
         send(session, new Packet(PacketType.ROOM_LIST, payload));
     }
 
-    public void createRoom(Session session) throws IOException {
+    public synchronized void createRoom(Session session) throws IOException {
         if(session.getRoom() != null) return;
 
         GameRoom room = new GameRoom(session, roomId++);
@@ -33,7 +33,7 @@ public class Lobby {
         send(session, new Packet(PacketType.ROOM_CREATED_RESULT, new byte[]{(byte) room.getId()}));
     }
 
-    public void joinRoom(Session session, int roomId) throws IOException {
+    public synchronized void joinRoom(Session session, int roomId) throws IOException {
         if(session.getRoom() != null) return;
 
         GameRoom room = rooms.get(roomId);
@@ -49,7 +49,7 @@ public class Lobby {
         session.send(packet);
     }
 
-    public void removeRoom(GameRoom room) {
+    public synchronized void removeRoom(GameRoom room) {
         rooms.remove(room.getId());
     }
 }
